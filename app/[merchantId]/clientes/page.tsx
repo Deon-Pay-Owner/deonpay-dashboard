@@ -33,7 +33,7 @@ export default async function ClientesPage({
           <input
             type="text"
             placeholder="Buscar clientes por nombre, email o teléfono..."
-            className="input-field pl-10"
+            className="input-field pl-11"
           />
         </div>
       </div>

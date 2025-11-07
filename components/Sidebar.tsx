@@ -36,7 +36,10 @@ export default function Sidebar({ merchantId }: SidebarProps) {
       {/* Mobile menu button - Fixed with glassmorphism */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-3 left-3 z-50 p-2.5 rounded-lg glass-strong shadow-lg hover:scale-105 transition-transform"
+        className={`
+          lg:hidden fixed top-3 z-50 p-2.5 rounded-lg glass-strong shadow-lg hover:scale-105 transition-all duration-300
+          ${isOpen ? 'left-[260px]' : 'left-3'}
+        `}
         aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
       >
         {isOpen ? (
