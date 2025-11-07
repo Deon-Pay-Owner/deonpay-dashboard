@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
+import ClientHeader from '@/components/ClientHeader'
 
 export default async function MerchantLayout({
   children,
@@ -52,7 +52,7 @@ export default async function MerchantLayout({
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <Header merchantId={merchantId} userEmail={user.email} />
+        <ClientHeader merchantId={merchantId} userEmail={user.email} />
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto bg-[var(--color-background)]">
