@@ -19,7 +19,7 @@ export default async function WebhooksPage({
         </div>
         <button className="btn-primary flex items-center gap-2">
           <Plus size={18} />
-          Nuevo webhook
+          Nuevo Webhook
         </button>
       </div>
 

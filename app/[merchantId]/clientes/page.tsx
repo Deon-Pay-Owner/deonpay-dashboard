@@ -19,7 +19,7 @@ export default async function ClientesPage({
         </div>
         <button className="btn-primary flex items-center gap-2">
           <UserPlus size={18} />
-          Nuevo cliente
+          Nuevo Cliente
         </button>
       </div>
 

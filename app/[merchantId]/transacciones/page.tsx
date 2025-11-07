@@ -39,9 +39,9 @@ export default async function TransaccionesPage({
               className="input-field pl-10"
             />
           </div>
-          <button className="btn-secondary flex items-center gap-2">
+          <button className="btn-secondary flex items-center justify-center gap-2">
             <Filter size={18} />
-            Filtros
+            <span>Filtros</span>
           </button>
         </div>
       </div>
