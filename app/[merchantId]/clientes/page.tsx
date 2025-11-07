@@ -33,7 +33,7 @@ export default async function ClientesPage({
           <input
             type="text"
             placeholder="Buscar clientes por nombre, email o teléfono..."
-            className="input-field pl-11"
+            className="input-field pl-12"
           />
         </div>
       </div>
@@ -63,19 +63,19 @@ export default async function ClientesPage({
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Cliente
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden md:table-cell">
                   Email
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden sm:table-cell">
                   Teléfono
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden lg:table-cell">
                   Transacciones
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Total gastado
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden lg:table-cell">
                   Última compra
                 </th>
               </tr>
@@ -99,6 +99,9 @@ export default async function ClientesPage({
             </tbody>
           </table>
         </div>
+        <p className="text-xs text-[var(--color-textSecondary)] mt-3 md:hidden">
+          💡 Cambia a modo landscape para ver todas las columnas
+        </p>
       </div>
     </div>
   )

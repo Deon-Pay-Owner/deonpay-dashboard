@@ -36,7 +36,7 @@ export default async function TransaccionesPage({
             <input
               type="text"
               placeholder="Buscar por ID, cliente, email..."
-              className="input-field pl-11"
+              className="input-field pl-12"
             />
           </div>
           <button className="btn-secondary flex items-center justify-center gap-2">
