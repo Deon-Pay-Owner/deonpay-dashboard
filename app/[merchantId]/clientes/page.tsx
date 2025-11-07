@@ -12,8 +12,8 @@ export default async function ClientesPage({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Clientes</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">Clientes</h1>
+          <p className="text-[var(--color-textSecondary)]">
             Gestiona tu base de clientes y su información
           </p>
         </div>
@@ -28,7 +28,7 @@ export default async function ClientesPage({
         <div className="relative">
           <Search
             size={20}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-textSecondary)]"
           />
           <input
             type="text"
@@ -41,16 +41,16 @@ export default async function ClientesPage({
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="card">
-          <p className="text-sm text-gray-600 mb-2">Total de clientes</p>
-          <p className="text-3xl font-bold text-gray-900">0</p>
+          <p className="text-sm text-[var(--color-textSecondary)] mb-2">Total de clientes</p>
+          <p className="text-3xl font-bold text-[var(--color-textPrimary)]">0</p>
         </div>
         <div className="card">
-          <p className="text-sm text-gray-600 mb-2">Clientes activos</p>
-          <p className="text-3xl font-bold text-gray-900">0</p>
+          <p className="text-sm text-[var(--color-textSecondary)] mb-2">Clientes activos</p>
+          <p className="text-3xl font-bold text-[var(--color-textPrimary)]">0</p>
         </div>
         <div className="card">
-          <p className="text-sm text-gray-600 mb-2">Nuevos este mes</p>
-          <p className="text-3xl font-bold text-gray-900">0</p>
+          <p className="text-sm text-[var(--color-textSecondary)] mb-2">Nuevos este mes</p>
+          <p className="text-3xl font-bold text-[var(--color-textPrimary)]">0</p>
         </div>
       </div>
 
@@ -59,23 +59,23 @@ export default async function ClientesPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+              <tr className="border-b border-[var(--color-border)]">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Cliente
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Email
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Teléfono
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Transacciones
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Total gastado
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Última compra
                 </th>
               </tr>
@@ -84,11 +84,11 @@ export default async function ClientesPage({
               {/* Empty state */}
               <tr>
                 <td colSpan={6} className="py-16 text-center">
-                  <UsersIcon size={48} className="mx-auto mb-4 text-gray-300" />
-                  <p className="text-gray-500 font-medium mb-2">
+                  <UsersIcon size={48} className="mx-auto mb-4 text-[var(--color-border)]" />
+                  <p className="text-[var(--color-textSecondary)] font-medium mb-2">
                     No hay clientes registrados
                   </p>
-                  <p className="text-sm text-gray-400 mb-4">
+                  <p className="text-sm text-[var(--color-textSecondary)] opacity-70 mb-4">
                     Los clientes se crearán automáticamente con cada transacción
                   </p>
                   <button className="btn-primary mx-auto">

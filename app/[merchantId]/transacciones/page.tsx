@@ -12,10 +12,10 @@ export default async function TransaccionesPage({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">
             Transacciones
           </h1>
-          <p className="text-gray-600">
+          <p className="text-[var(--color-textSecondary)]">
             Historial completo de todas tus transacciones
           </p>
         </div>
@@ -31,7 +31,7 @@ export default async function TransaccionesPage({
           <div className="flex-1 relative">
             <Search
               size={20}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-textSecondary)]"
             />
             <input
               type="text"
@@ -51,23 +51,23 @@ export default async function TransaccionesPage({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+              <tr className="border-b border-[var(--color-border)]">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   ID
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Fecha
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Cliente
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Monto
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Estado
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Método
                 </th>
               </tr>
@@ -76,11 +76,11 @@ export default async function TransaccionesPage({
               {/* Empty state */}
               <tr>
                 <td colSpan={6} className="py-16 text-center">
-                  <CreditCard size={48} className="mx-auto mb-4 text-gray-300" />
-                  <p className="text-gray-500 font-medium mb-2">
+                  <CreditCard size={48} className="mx-auto mb-4 text-[var(--color-border)]" />
+                  <p className="text-[var(--color-textSecondary)] font-medium mb-2">
                     No hay transacciones aún
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-[var(--color-textSecondary)] opacity-70">
                     Las transacciones aparecerán aquí cuando proceses tu primer pago
                   </p>
                 </td>
@@ -91,54 +91,54 @@ export default async function TransaccionesPage({
       </div>
 
       {/* Example of what the table would look like with data */}
-      <div className="mt-8 card bg-gray-50">
-        <h3 className="text-sm font-semibold text-gray-700 mb-4">
+      <div className="mt-8 card bg-[var(--color-primary)]/5 border-[var(--color-primary)]/20">
+        <h3 className="text-sm font-semibold text-[var(--color-textPrimary)] mb-4">
           Vista previa con datos
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+              <tr className="border-b border-[var(--color-border)]">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   ID
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Fecha
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Cliente
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Monto
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Estado
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Método
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-gray-100">
-                <td className="py-3 px-4 text-sm font-mono text-gray-600">
+              <tr className="border-b border-[var(--color-border)] opacity-60">
+                <td className="py-3 px-4 text-sm font-mono text-[var(--color-textSecondary)]">
                   txn_123abc
                 </td>
-                <td className="py-3 px-4 text-sm text-gray-600">
+                <td className="py-3 px-4 text-sm text-[var(--color-textSecondary)]">
                   2025-11-06 10:30
                 </td>
-                <td className="py-3 px-4 text-sm text-gray-900">
+                <td className="py-3 px-4 text-sm text-[var(--color-textPrimary)]">
                   Juan Pérez
                 </td>
-                <td className="py-3 px-4 text-sm font-semibold text-gray-900">
+                <td className="py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   $1,250.00 MXN
                 </td>
                 <td className="py-3 px-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-success)]/20 text-[var(--color-success)]">
                     Exitoso
                   </span>
                 </td>
-                <td className="py-3 px-4 text-sm text-gray-600">
+                <td className="py-3 px-4 text-sm text-[var(--color-textSecondary)]">
                   Tarjeta •••• 4242
                 </td>
               </tr>

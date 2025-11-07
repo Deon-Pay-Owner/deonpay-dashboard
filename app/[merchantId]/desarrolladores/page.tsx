@@ -11,10 +11,10 @@ export default async function DesarrolladoresPage({
     <div className="container-dashboard py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">
           Desarrolladores
         </h1>
-        <p className="text-gray-600">
+        <p className="text-[var(--color-textSecondary)]">
           Credenciales API, documentación y herramientas de integración
         </p>
       </div>
@@ -22,8 +22,8 @@ export default async function DesarrolladoresPage({
       {/* API Keys */}
       <div className="card mb-6">
         <div className="flex items-center gap-2 mb-4">
-          <Key size={20} className="text-gray-700" />
-          <h2 className="text-lg font-semibold text-gray-900">
+          <Key size={20} className="text-[var(--color-primary)]" />
+          <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
             Credenciales API
           </h2>
         </div>
@@ -42,15 +42,15 @@ export default async function DesarrolladoresPage({
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                   <button
-                    className="p-2 hover:bg-gray-100 rounded transition-colors"
+                    className="p-2 hover:bg-[var(--color-border)] rounded transition-colors"
                     title="Copiar"
                   >
-                    <Copy size={16} className="text-gray-600" />
+                    <Copy size={16} className="text-[var(--color-textSecondary)]" />
                   </button>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-[var(--color-textSecondary)] mt-1">
               Esta key es segura para usar en el frontend de tu aplicación
             </p>
           </div>
@@ -68,28 +68,28 @@ export default async function DesarrolladoresPage({
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                   <button
-                    className="p-2 hover:bg-gray-100 rounded transition-colors"
+                    className="p-2 hover:bg-[var(--color-border)] rounded transition-colors"
                     title="Mostrar"
                   >
-                    <Eye size={16} className="text-gray-600" />
+                    <Eye size={16} className="text-[var(--color-textSecondary)]" />
                   </button>
                   <button
-                    className="p-2 hover:bg-gray-100 rounded transition-colors"
+                    className="p-2 hover:bg-[var(--color-border)] rounded transition-colors"
                     title="Copiar"
                   >
-                    <Copy size={16} className="text-gray-600" />
+                    <Copy size={16} className="text-[var(--color-textSecondary)]" />
                   </button>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-red-600 mt-1">
+            <p className="text-xs text-[var(--color-danger)] mt-1">
               ⚠️ Nunca expongas esta key en el frontend. Solo úsala en tu servidor.
             </p>
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm text-yellow-800">
+        <div className="mt-6 p-4 bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 rounded-lg">
+          <p className="text-sm text-[var(--color-textPrimary)]">
             <strong>Modo de prueba:</strong> Estas credenciales son de prueba.
             Las transacciones no procesarán dinero real. Activa el modo producción
             cuando estés listo para ir en vivo.
@@ -101,42 +101,42 @@ export default async function DesarrolladoresPage({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen size={20} className="text-primary-600" />
-            <h2 className="text-lg font-semibold text-gray-900">
+            <BookOpen size={20} className="text-[var(--color-primary)]" />
+            <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
               Documentación
             </h2>
           </div>
           <div className="space-y-3">
             <a
               href="#"
-              className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              className="block p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors"
             >
-              <p className="font-medium text-gray-900 text-sm mb-1">
+              <p className="font-medium text-[var(--color-textPrimary)] text-sm mb-1">
                 Guía de inicio rápido
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-[var(--color-textSecondary)]">
                 Integra DeonPay en 5 minutos
               </p>
             </a>
             <a
               href="#"
-              className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              className="block p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors"
             >
-              <p className="font-medium text-gray-900 text-sm mb-1">
+              <p className="font-medium text-[var(--color-textPrimary)] text-sm mb-1">
                 Referencia de API
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-[var(--color-textSecondary)]">
                 Documentación completa de endpoints
               </p>
             </a>
             <a
               href="#"
-              className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              className="block p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors"
             >
-              <p className="font-medium text-gray-900 text-sm mb-1">
+              <p className="font-medium text-[var(--color-textPrimary)] text-sm mb-1">
                 Webhooks
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-[var(--color-textSecondary)]">
                 Configura notificaciones en tiempo real
               </p>
             </a>
@@ -145,33 +145,33 @@ export default async function DesarrolladoresPage({
 
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
-            <Code2 size={20} className="text-primary-600" />
-            <h2 className="text-lg font-semibold text-gray-900">
+            <Code2 size={20} className="text-[var(--color-primary)]" />
+            <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
               Ejemplos de código
             </h2>
           </div>
           <div className="space-y-3">
-            <button className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <p className="font-medium text-gray-900 text-sm mb-1">
+            <button className="w-full text-left p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors">
+              <p className="font-medium text-[var(--color-textPrimary)] text-sm mb-1">
                 Node.js / Express
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-[var(--color-textSecondary)]">
                 Backend con JavaScript/TypeScript
               </p>
             </button>
-            <button className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <p className="font-medium text-gray-900 text-sm mb-1">
+            <button className="w-full text-left p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors">
+              <p className="font-medium text-[var(--color-textPrimary)] text-sm mb-1">
                 Python / Django
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-[var(--color-textSecondary)]">
                 Integración con Python
               </p>
             </button>
-            <button className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <p className="font-medium text-gray-900 text-sm mb-1">
+            <button className="w-full text-left p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors">
+              <p className="font-medium text-[var(--color-textPrimary)] text-sm mb-1">
                 PHP / Laravel
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-[var(--color-textSecondary)]">
                 Ejemplo con PHP moderno
               </p>
             </button>
@@ -180,7 +180,7 @@ export default async function DesarrolladoresPage({
       </div>
 
       {/* Code Example */}
-      <div className="card bg-gray-900 text-gray-100">
+      <div className="card bg-[#1e1e1e] text-[#d4d4d4] border-[#333]">
         <h2 className="text-lg font-semibold mb-4">Ejemplo rápido</h2>
         <pre className="text-sm overflow-x-auto">
           <code>{`// Instalar el SDK

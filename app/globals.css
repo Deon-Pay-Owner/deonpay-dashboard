@@ -312,3 +312,41 @@ body {
   transition-duration: 200ms;
   transition-timing-function: ease-in-out;
 }
+
+/* Form Inputs */
+.input-field {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-textPrimary);
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 95, 255, 0.1);
+}
+
+.input-field:disabled {
+  background-color: var(--color-background);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.input-field::placeholder {
+  color: var(--color-textSecondary);
+  opacity: 0.6;
+}
+
+/* Form Labels */
+.label-field {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-textPrimary);
+  margin-bottom: 0.5rem;
+}

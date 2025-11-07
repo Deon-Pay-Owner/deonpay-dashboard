@@ -21,10 +21,10 @@ export default async function CuentaPage({
     <div className="container-dashboard py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">
           Configuración de cuenta
         </h1>
-        <p className="text-gray-600">
+        <p className="text-[var(--color-textSecondary)]">
           Gestiona la información de tu cuenta y preferencias
         </p>
       </div>
@@ -35,8 +35,8 @@ export default async function CuentaPage({
           {/* Business Info */}
           <div className="card">
             <div className="flex items-center gap-2 mb-6">
-              <Building2 size={20} className="text-gray-700" />
-              <h2 className="text-lg font-semibold text-gray-900">
+              <Building2 size={20} className="text-[var(--color-primary)]" />
+              <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
                 Información del negocio
               </h2>
             </div>
@@ -70,7 +70,7 @@ export default async function CuentaPage({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label-field">Ciudad</label>
                   <input type="text" className="input-field" />
@@ -81,15 +81,15 @@ export default async function CuentaPage({
                 </div>
               </div>
 
-              <button className="btn-primary">Guardar cambios</button>
+              <button className="btn-primary w-full sm:w-auto">Guardar cambios</button>
             </div>
           </div>
 
           {/* Account Info */}
           <div className="card">
             <div className="flex items-center gap-2 mb-6">
-              <User size={20} className="text-gray-700" />
-              <h2 className="text-lg font-semibold text-gray-900">
+              <User size={20} className="text-[var(--color-primary)]" />
+              <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
                 Información de usuario
               </h2>
             </div>
@@ -100,10 +100,10 @@ export default async function CuentaPage({
                 <input
                   type="email"
                   defaultValue={user?.email || ''}
-                  className="input-field bg-gray-50"
+                  className="input-field"
                   disabled
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[var(--color-textSecondary)] mt-1">
                   Contacta soporte para cambiar tu email
                 </p>
               </div>
@@ -126,62 +126,62 @@ export default async function CuentaPage({
                 />
               </div>
 
-              <button className="btn-primary">Actualizar información</button>
+              <button className="btn-primary w-full sm:w-auto">Actualizar información</button>
             </div>
           </div>
 
           {/* Notifications */}
           <div className="card">
             <div className="flex items-center gap-2 mb-6">
-              <Bell size={20} className="text-gray-700" />
-              <h2 className="text-lg font-semibold text-gray-900">
+              <Bell size={20} className="text-[var(--color-primary)]" />
+              <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
                 Notificaciones
               </h2>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">
+              <div className="flex items-start sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <p className="font-medium text-[var(--color-textPrimary)] text-sm">
                     Transacciones
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-[var(--color-textSecondary)] mt-0.5">
                     Recibe notificaciones de nuevos pagos
                   </p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input type="checkbox" className="sr-only peer" defaultChecked />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                  <div className="w-11 h-6 bg-[var(--color-border)] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--color-primary)]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--color-border)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
                 </label>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">
+              <div className="flex items-start sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <p className="font-medium text-[var(--color-textPrimary)] text-sm">
                     Reembolsos
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-[var(--color-textSecondary)] mt-0.5">
                     Alertas cuando se solicitan reembolsos
                   </p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input type="checkbox" className="sr-only peer" defaultChecked />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                  <div className="w-11 h-6 bg-[var(--color-border)] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--color-primary)]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--color-border)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
                 </label>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">
+              <div className="flex items-start sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <p className="font-medium text-[var(--color-textPrimary)] text-sm">
                     Resumen semanal
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-[var(--color-textSecondary)] mt-0.5">
                     Recibe un resumen de actividad cada semana
                   </p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                   <input type="checkbox" className="sr-only peer" />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                  <div className="w-11 h-6 bg-[var(--color-border)] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--color-primary)]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--color-border)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
                 </label>
               </div>
             </div>
@@ -193,8 +193,8 @@ export default async function CuentaPage({
           {/* Security */}
           <div className="card">
             <div className="flex items-center gap-2 mb-4">
-              <Shield size={20} className="text-gray-700" />
-              <h2 className="text-lg font-semibold text-gray-900">
+              <Shield size={20} className="text-[var(--color-primary)]" />
+              <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
                 Seguridad
               </h2>
             </div>
@@ -215,16 +215,16 @@ export default async function CuentaPage({
           {/* Billing */}
           <div className="card">
             <div className="flex items-center gap-2 mb-4">
-              <CreditCard size={20} className="text-gray-700" />
-              <h2 className="text-lg font-semibold text-gray-900">
+              <CreditCard size={20} className="text-[var(--color-primary)]" />
+              <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
                 Facturación
               </h2>
             </div>
 
             <div className="space-y-3">
               <div className="text-sm">
-                <p className="text-gray-600 mb-1">Plan actual</p>
-                <p className="font-semibold text-gray-900">Gratuito</p>
+                <p className="text-[var(--color-textSecondary)] mb-1">Plan actual</p>
+                <p className="font-semibold text-[var(--color-textPrimary)]">Gratuito</p>
               </div>
 
               <button className="w-full btn-primary text-sm">
@@ -234,16 +234,16 @@ export default async function CuentaPage({
           </div>
 
           {/* Danger Zone */}
-          <div className="card border-red-200 bg-red-50">
-            <h2 className="text-lg font-semibold text-red-900 mb-4">
+          <div className="card border-[var(--color-danger)]/30 bg-[var(--color-danger)]/5">
+            <h2 className="text-lg font-semibold text-[var(--color-danger)] mb-4">
               Zona de peligro
             </h2>
 
             <div className="space-y-3">
-              <button className="w-full bg-white border border-red-300 text-red-700 hover:bg-red-50 font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
+              <button className="w-full bg-[var(--color-surface)] border border-[var(--color-danger)]/50 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
                 Desactivar cuenta
               </button>
-              <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
+              <button className="w-full bg-[var(--color-danger)] hover:opacity-90 text-white font-semibold py-2 px-4 rounded-lg transition-opacity text-sm">
                 Eliminar cuenta
               </button>
             </div>
