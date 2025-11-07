@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase'
 import { TrendingUp, TrendingDown, DollarSign, Users, CreditCard, Activity } from 'lucide-react'
+import AccountForm from './AccountForm'
 
 export default async function GeneralPage({
   params,
@@ -9,11 +10,21 @@ export default async function GeneralPage({
   const { merchantId } = await params
   const supabase = await createClient()
 
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser()
+
   // Get merchant info
   const { data: merchant } = await supabase
     .from('merchants')
     .select('name')
     .eq('id', merchantId)
+    .single()
+
+  // Get user profile
+  const { data: profile } = await supabase
+    .from('users_profile')
+    .select('full_name, phone, profile_type')
+    .eq('user_id', user?.id)
     .single()
 
   const stats = [
@@ -88,19 +99,19 @@ export default async function GeneralPage({
         ))}
       </div>
 
-      {/* Activity Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Transactions */}
-        <div className="card">
-          <h2 className="card-header">Transacciones recientes</h2>
-          <div className="text-center py-12 text-[var(--color-textSecondary)]">
-            <CreditCard size={48} className="mx-auto mb-4 text-[var(--color-border)]" />
-            <p>No hay transacciones aún</p>
-            <p className="text-sm mt-2">
-              Las transacciones aparecerán aquí cuando proceses tu primer pago
-            </p>
-          </div>
-        </div>
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Account Information Form */}
+        {user && profile && (
+          <AccountForm
+            merchantId={merchantId}
+            merchantName={merchant?.name || ''}
+            fullName={profile.full_name || ''}
+            phone={profile.phone || ''}
+            email={user.email || ''}
+            profileType={profile.profile_type || 'merchant_owner'}
+          />
+        )}
 
         {/* Quick Actions */}
         <div className="card">
@@ -122,47 +133,62 @@ export default async function GeneralPage({
         </div>
       </div>
 
-      {/* Getting Started Guide */}
-      <div className="mt-8 card bg-[var(--color-primary)]/5 border-[var(--color-primary)]/20">
-        <h2 className="card-header text-[var(--color-primary)]">Primeros pasos</h2>
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
-              1
-            </div>
-            <div>
-              <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
-                Obtén tus credenciales API
-              </h3>
-              <p className="text-sm text-[var(--color-textSecondary)]">
-                Ve a la sección de Desarrolladores para obtener tus API keys
-              </p>
-            </div>
+      {/* Activity Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Transactions */}
+        <div className="card">
+          <h2 className="card-header">Transacciones recientes</h2>
+          <div className="text-center py-12 text-[var(--color-textSecondary)]">
+            <CreditCard size={48} className="mx-auto mb-4 text-[var(--color-border)]" />
+            <p>No hay transacciones aún</p>
+            <p className="text-sm mt-2">
+              Las transacciones aparecerán aquí cuando proceses tu primer pago
+            </p>
           </div>
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
-              2
+        </div>
+
+        {/* Getting Started Guide */}
+        <div className="card bg-[var(--color-primary)]/5 border-[var(--color-primary)]/20">
+          <h2 className="card-header text-[var(--color-primary)]">Primeros pasos</h2>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                1
+              </div>
+              <div>
+                <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
+                  Obtén tus credenciales API
+                </h3>
+                <p className="text-sm text-[var(--color-textSecondary)]">
+                  Ve a la sección de Desarrolladores para obtener tus API keys
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
-                Configura tu primer webhook
-              </h3>
-              <p className="text-sm text-[var(--color-textSecondary)]">
-                Recibe notificaciones de pagos en tiempo real
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                2
+              </div>
+              <div>
+                <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
+                  Configura tu primer webhook
+                </h3>
+                <p className="text-sm text-[var(--color-textSecondary)]">
+                  Recibe notificaciones de pagos en tiempo real
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
-              3
-            </div>
-            <div>
-              <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
-                Procesa tu primera transacción
-              </h3>
-              <p className="text-sm text-[var(--color-textSecondary)]">
-                Usa nuestra API o crea un link de pago para empezar
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                3
+              </div>
+              <div>
+                <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
+                  Procesa tu primera transacción
+                </h3>
+                <p className="text-sm text-[var(--color-textSecondary)]">
+                  Usa nuestra API o crea un link de pago para empezar
+                </p>
+              </div>
             </div>
           </div>
         </div>
