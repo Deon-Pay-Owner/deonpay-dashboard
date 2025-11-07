@@ -45,7 +45,7 @@ export default async function MerchantLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-[var(--color-surface)]">
       {/* Sidebar */}
       <Sidebar merchantId={merchantId} />
 
@@ -55,7 +55,7 @@ export default async function MerchantLayout({
         <Header merchantId={merchantId} userEmail={user.email} />
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-[var(--color-background)]">
           {children}
         </main>
       </div>

@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { ChevronRight, LogOut, Sun, Moon } from 'lucide-react'
 import { useTheme } from '@/contexts/ThemeContext'
+import { useState, useEffect } from 'react'
 
 interface HeaderProps {
   merchantId: string
@@ -12,6 +13,11 @@ interface HeaderProps {
 export default function Header({ merchantId, userEmail }: HeaderProps) {
   const pathname = usePathname()
   const { theme, toggleTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Extract current page name from pathname
   const pathParts = pathname.split('/').filter(Boolean)
@@ -44,24 +50,26 @@ export default function Header({ merchantId, userEmail }: HeaderProps) {
         )}
 
         {/* Theme Toggle Button - Modern glassmorphism */}
-        <button
-          onClick={toggleTheme}
-          className="p-2.5 rounded-xl glass-strong hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md group"
-          aria-label={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
-          title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
-        >
-          {theme === 'light' ? (
-            <Moon
-              size={18}
-              className="text-[var(--color-textPrimary)] group-hover:rotate-12 transition-transform duration-300"
-            />
-          ) : (
-            <Sun
-              size={18}
-              className="text-[var(--color-primary)] group-hover:rotate-90 transition-transform duration-300"
-            />
-          )}
-        </button>
+        {mounted && (
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 rounded-xl glass-strong hover:scale-105 transition-all duration-200 shadow-sm hover:shadow-md group"
+            aria-label={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+            title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
+          >
+            {theme === 'light' ? (
+              <Moon
+                size={18}
+                className="text-[var(--color-textPrimary)] group-hover:rotate-12 transition-transform duration-300"
+              />
+            ) : (
+              <Sun
+                size={18}
+                className="text-[var(--color-primary)] group-hover:rotate-90 transition-transform duration-300"
+              />
+            )}
+          </button>
+        )}
 
         {/* Sign out button - Modern design */}
         <button
