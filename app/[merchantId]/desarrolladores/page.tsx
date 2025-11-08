@@ -1,6 +1,7 @@
 import { BookOpen, Code2, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import ApiKeysDisplay from '@/components/ApiKeysDisplay'
+import Link from 'next/link'
 
 export default async function DesarrolladoresPage({
   params,
@@ -19,6 +20,13 @@ export default async function DesarrolladoresPage({
     .order('created_at', { ascending: false })
 
   const testKey = apiKeys?.find(key => key.key_type === 'test')
+
+  // Fetch webhooks count
+  const { count: webhooksCount } = await supabase
+    .from('webhooks')
+    .select('*', { count: 'exact', head: true })
+    .eq('merchant_id', merchantId)
+    .eq('is_active', true)
 
   return (
     <div className="container-dashboard py-8">
@@ -93,17 +101,24 @@ export default async function DesarrolladoresPage({
                 Documentación completa de endpoints
               </p>
             </a>
-            <a
-              href="#"
+            <Link
+              href={`/${merchantId}/webhooks`}
               className="block p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-colors"
             >
-              <p className="font-medium text-[var(--color-textPrimary)] text-sm mb-1">
-                Webhooks
-              </p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="font-medium text-[var(--color-textPrimary)] text-sm">
+                  Webhooks
+                </p>
+                {webhooksCount !== null && webhooksCount > 0 && (
+                  <span className="px-2 py-0.5 bg-[var(--color-primary)] text-white text-xs rounded-full">
+                    {webhooksCount}
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-[var(--color-textSecondary)]">
                 Configura notificaciones en tiempo real
               </p>
-            </a>
+            </Link>
           </div>
         </div>
 
