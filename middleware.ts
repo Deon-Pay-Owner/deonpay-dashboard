@@ -17,11 +17,22 @@ export async function middleware(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value)
+
+            // Set secure httpOnly cookie for server
             supabaseResponse.cookies.set(name, value, {
               ...options,
               domain: process.env.SUPABASE_COOKIE_DOMAIN || '.deonpay.mx',
               secure: true,
               httpOnly: true,
+              sameSite: 'lax',
+            })
+
+            // Also set a client-accessible cookie (without httpOnly) for browser client
+            supabaseResponse.cookies.set(`${name}-client`, value, {
+              ...options,
+              domain: process.env.SUPABASE_COOKIE_DOMAIN || '.deonpay.mx',
+              secure: true,
+              httpOnly: false, // Client can read this
               sameSite: 'lax',
             })
           })
