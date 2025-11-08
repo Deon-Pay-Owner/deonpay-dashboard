@@ -22,13 +22,16 @@ export default function Sidebar({ merchantId }: SidebarProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
-  const navigation = [
+  const administrativeNav = [
     { name: 'General', href: `/${merchantId}/general`, icon: LayoutDashboard },
     { name: 'Transacciones', href: `/${merchantId}/transacciones`, icon: CreditCard },
     { name: 'Clientes', href: `/${merchantId}/clientes`, icon: Users },
-    { name: 'Webhooks', href: `/${merchantId}/webhooks`, icon: Webhook },
-    { name: 'Desarrolladores', href: `/${merchantId}/desarrolladores`, icon: Code },
     { name: 'Cuenta', href: `/${merchantId}/cuenta`, icon: Settings },
+  ]
+
+  const developerNav = [
+    { name: 'API Keys', href: `/${merchantId}/desarrolladores`, icon: Code },
+    { name: 'Webhooks', href: `/${merchantId}/webhooks`, icon: Webhook },
   ]
 
   return (
@@ -79,45 +82,100 @@ export default function Sidebar({ merchantId }: SidebarProps) {
           </div>
 
           {/* Navigation - Smooth hover effects */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`
-                    group flex items-center gap-3 px-4 py-3 rounded-xl
-                    transition-all duration-200 relative overflow-hidden
-                    ${
-                      isActive
-                        ? 'bg-white/20 text-white shadow-lg'
-                        : 'text-white/70 hover:bg-white/10 hover:text-white'
-                    }
-                  `}
-                >
-                  {/* Active indicator */}
-                  {isActive && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-info)] rounded-r" />
-                  )}
+          <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20">
+            {/* Administrative Section */}
+            <div>
+              <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider px-4 mb-3">
+                Administración
+              </h3>
+              <div className="space-y-2">
+                {administrativeNav.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`
+                        group flex items-center gap-3 px-4 py-3 rounded-xl
+                        transition-all duration-200 relative overflow-hidden
+                        ${
+                          isActive
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : 'text-white/70 hover:bg-white/10 hover:text-white'
+                        }
+                      `}
+                    >
+                      {/* Active indicator */}
+                      {isActive && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-info)] rounded-r" />
+                      )}
 
-                  <div className={`
-                    p-2 rounded-lg transition-all duration-200
-                    ${isActive
-                      ? 'bg-white/20'
-                      : 'bg-white/5 group-hover:bg-white/10'
-                    }
-                  `}>
-                    <item.icon size={20} />
-                  </div>
-                  <span className="font-medium text-[0.9375rem]">{item.name}</span>
+                      <div className={`
+                        p-2 rounded-lg transition-all duration-200
+                        ${isActive
+                          ? 'bg-white/20'
+                          : 'bg-white/5 group-hover:bg-white/10'
+                        }
+                      `}>
+                        <item.icon size={20} />
+                      </div>
+                      <span className="font-medium text-[0.9375rem]">{item.name}</span>
 
-                  {/* Hover effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                </Link>
-              )
-            })}
+                      {/* Hover effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Developer Section */}
+            <div>
+              <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider px-4 mb-3">
+                Desarrolladores
+              </h3>
+              <div className="space-y-2">
+                {developerNav.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`
+                        group flex items-center gap-3 px-4 py-3 rounded-xl
+                        transition-all duration-200 relative overflow-hidden
+                        ${
+                          isActive
+                            ? 'bg-white/20 text-white shadow-lg'
+                            : 'text-white/70 hover:bg-white/10 hover:text-white'
+                        }
+                      `}
+                    >
+                      {/* Active indicator */}
+                      {isActive && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-info)] rounded-r" />
+                      )}
+
+                      <div className={`
+                        p-2 rounded-lg transition-all duration-200
+                        ${isActive
+                          ? 'bg-white/20'
+                          : 'bg-white/5 group-hover:bg-white/10'
+                        }
+                      `}>
+                        <item.icon size={20} />
+                      </div>
+                      <span className="font-medium text-[0.9375rem]">{item.name}</span>
+
+                      {/* Hover effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
           </nav>
 
           {/* Footer - Compact merchant info */}

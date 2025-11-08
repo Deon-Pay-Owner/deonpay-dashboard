@@ -1,7 +1,5 @@
 import { createClient } from '@/lib/supabase'
 import { TrendingUp, TrendingDown, DollarSign, Users, CreditCard, Activity } from 'lucide-react'
-import AccountForm from './AccountForm'
-import DeleteAccountButton from './DeleteAccountButton'
 
 export default async function GeneralPage({
   params,
@@ -19,13 +17,6 @@ export default async function GeneralPage({
     .from('merchants')
     .select('name')
     .eq('id', merchantId)
-    .single()
-
-  // Get user profile
-  const { data: profile } = await supabase
-    .from('users_profile')
-    .select('full_name, phone, profile_type')
-    .eq('user_id', user?.id)
     .single()
 
   const stats = [
@@ -100,37 +91,22 @@ export default async function GeneralPage({
         ))}
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Account Information Form */}
-        {user && profile && (
-          <AccountForm
-            merchantId={merchantId}
-            merchantName={merchant?.name || ''}
-            fullName={profile.full_name || ''}
-            phone={profile.phone || ''}
-            email={user.email || ''}
-            profileType={profile.profile_type || 'merchant_owner'}
-          />
-        )}
-
-        {/* Quick Actions */}
-        <div className="card">
-          <h2 className="card-header">Acciones rápidas</h2>
-          <div className="space-y-3">
-            <button className="w-full btn-primary text-left">
-              Crear link de pago
-            </button>
-            <button className="w-full btn-secondary text-left">
-              Ver documentación API
-            </button>
-            <button className="w-full btn-secondary text-left">
-              Configurar webhook
-            </button>
-            <button className="w-full btn-secondary text-left">
-              Invitar miembro del equipo
-            </button>
-          </div>
+      {/* Quick Actions */}
+      <div className="card mb-8">
+        <h2 className="card-header">Acciones rápidas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <button className="btn-primary text-left">
+            Crear link de pago
+          </button>
+          <button className="btn-secondary text-left">
+            Ver documentación API
+          </button>
+          <button className="btn-secondary text-left">
+            Configurar webhook
+          </button>
+          <button className="btn-secondary text-left">
+            Invitar miembro del equipo
+          </button>
         </div>
       </div>
 
@@ -194,13 +170,6 @@ export default async function GeneralPage({
           </div>
         </div>
       </div>
-
-      {/* Delete Account Section */}
-      {user?.email && (
-        <div className="mt-8">
-          <DeleteAccountButton userEmail={user.email} />
-        </div>
-      )}
     </div>
   )
 }
