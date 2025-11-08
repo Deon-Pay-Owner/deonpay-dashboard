@@ -45,6 +45,7 @@ export default async function DesarrolladoresPage({
           publicKey={testKey.public_key}
           secretKeyPrefix={testKey.secret_key_prefix}
           keyType={testKey.key_type as 'test' | 'live'}
+          merchantId={merchantId}
           lastUsedAt={testKey.last_used_at}
           expiresAt={testKey.expires_at}
         />

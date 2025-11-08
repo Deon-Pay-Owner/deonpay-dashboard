@@ -2,25 +2,31 @@
 
 import { useState } from 'react'
 import { Copy, Eye, EyeOff, Key, RefreshCw, Check } from 'lucide-react'
+import GenerateKeysModal from './GenerateKeysModal'
 
 interface ApiKeysDisplayProps {
   publicKey: string
   secretKeyPrefix: string
   keyType: 'test' | 'live'
+  merchantId: string
   lastUsedAt?: string
   expiresAt?: string
+  onKeysUpdated?: () => void
 }
 
 export default function ApiKeysDisplay({
   publicKey,
   secretKeyPrefix,
   keyType,
+  merchantId,
   lastUsedAt,
   expiresAt,
+  onKeysUpdated,
 }: ApiKeysDisplayProps) {
   const [showSecretKey, setShowSecretKey] = useState(false)
   const [copiedPublic, setCopiedPublic] = useState(false)
   const [copiedSecret, setCopiedSecret] = useState(false)
+  const [showGenerateModal, setShowGenerateModal] = useState(false)
 
   const copyToClipboard = async (text: string, type: 'public' | 'secret') => {
     try {
@@ -192,15 +198,25 @@ export default function ApiKeysDisplay({
       <div className="mt-4">
         <button
           className="btn-secondary flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto"
-          onClick={() => {
-            // TODO: Implement key regeneration
-            alert('Funcionalidad de regeneración de keys próximamente')
-          }}
+          onClick={() => setShowGenerateModal(true)}
         >
           <RefreshCw size={16} />
           <span className="text-sm">Generar nuevas keys</span>
         </button>
       </div>
+
+      {/* Generate Keys Modal */}
+      <GenerateKeysModal
+        isOpen={showGenerateModal}
+        onClose={() => setShowGenerateModal(false)}
+        merchantId={merchantId}
+        keyType={keyType}
+        onSuccess={() => {
+          if (onKeysUpdated) {
+            onKeysUpdated()
+          }
+        }}
+      />
     </div>
   )
 }
