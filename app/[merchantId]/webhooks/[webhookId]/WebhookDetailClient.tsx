@@ -202,7 +202,7 @@ export default function WebhookDetailClient({
           Volver a webhooks
         </Link>
 
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">
               Detalle del Webhook
@@ -212,40 +212,40 @@ export default function WebhookDetailClient({
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <button
               onClick={handleSendTest}
               disabled={!webhook.is_active || sendingTest}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center gap-2 justify-center flex-1 sm:flex-initial"
               title={!webhook.is_active ? 'Activa el webhook para enviar pruebas' : 'Enviar evento de prueba'}
             >
               <Send size={18} />
-              {sendingTest ? 'Enviando...' : 'Enviar Prueba'}
+              <span className="whitespace-nowrap">{sendingTest ? 'Enviando...' : 'Enviar Prueba'}</span>
             </button>
             <button
               onClick={handleToggleActive}
-              className={`btn-ghost flex items-center gap-2 ${
+              className={`btn-ghost flex items-center gap-2 justify-center flex-1 sm:flex-initial ${
                 webhook.is_active ? 'text-gray-600' : 'text-green-600'
               }`}
             >
               {webhook.is_active ? (
                 <>
                   <PowerOff size={18} />
-                  Desactivar
+                  <span className="whitespace-nowrap">Desactivar</span>
                 </>
               ) : (
                 <>
                   <Power size={18} />
-                  Activar
+                  <span className="whitespace-nowrap">Activar</span>
                 </>
               )}
             </button>
             <button
               onClick={handleDelete}
-              className="btn-ghost text-red-600 flex items-center gap-2"
+              className="btn-ghost text-red-600 flex items-center gap-2 justify-center flex-1 sm:flex-initial"
             >
               <Trash2 size={18} />
-              Eliminar
+              <span className="whitespace-nowrap">Eliminar</span>
             </button>
           </div>
         </div>
@@ -298,7 +298,7 @@ export default function WebhookDetailClient({
             <label className="text-sm font-medium text-[var(--color-textSecondary)] block mb-1">
               URL del endpoint
             </label>
-            <p className="text-[var(--color-textPrimary)] font-mono text-sm bg-[var(--color-surface)] p-3 rounded-lg border border-[var(--color-border)]">
+            <p className="text-[var(--color-textPrimary)] font-mono text-sm bg-[var(--color-surface)] p-3 rounded-lg border border-[var(--color-border)] break-all overflow-x-auto">
               {webhook.url}
             </p>
           </div>
@@ -337,13 +337,13 @@ export default function WebhookDetailClient({
             <label className="text-sm font-medium text-[var(--color-textSecondary)] block mb-1">
               Webhook Secret
             </label>
-            <div className="flex items-center gap-2">
-              <p className="text-[var(--color-textPrimary)] font-mono text-sm bg-[var(--color-surface)] p-3 rounded-lg border border-[var(--color-border)] flex-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <p className="text-[var(--color-textPrimary)] font-mono text-sm bg-[var(--color-surface)] p-3 rounded-lg border border-[var(--color-border)] flex-1 break-all overflow-x-auto">
                 {webhook.secret}
               </p>
               <button
                 onClick={handleCopySecret}
-                className="btn-ghost flex items-center gap-2 whitespace-nowrap"
+                className="btn-ghost flex items-center gap-2 whitespace-nowrap justify-center sm:justify-start flex-shrink-0"
               >
                 {copiedSecret ? (
                   <>

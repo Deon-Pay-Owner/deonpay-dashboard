@@ -135,18 +135,18 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
                 key={webhook.id}
                 className="p-4 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] hover:border-[var(--color-primary)]/30 transition-colors"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0 w-full">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                       <Link
                         href={`/${merchantId}/webhooks/${webhook.id}`}
-                        className="font-semibold text-[var(--color-textPrimary)] hover:text-[var(--color-primary)] flex items-center gap-2"
+                        className="font-semibold text-[var(--color-textPrimary)] hover:text-[var(--color-primary)] flex items-center gap-2 break-all sm:break-normal"
                       >
-                        {webhook.url}
-                        <ExternalLink size={14} />
+                        <span className="break-all">{webhook.url}</span>
+                        <ExternalLink size={14} className="flex-shrink-0" />
                       </Link>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium self-start sm:self-auto whitespace-nowrap ${
                           webhook.is_active
                             ? 'bg-green-100 text-green-700'
                             : 'bg-gray-100 text-gray-700'
@@ -157,7 +157,7 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
                     </div>
 
                     {webhook.description && (
-                      <p className="text-sm text-[var(--color-textSecondary)] mb-2">
+                      <p className="text-sm text-[var(--color-textSecondary)] mb-2 break-words">
                         {webhook.description}
                       </p>
                     )}
@@ -178,7 +178,7 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
                     </p>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 self-end sm:self-auto flex-shrink-0">
                     <button
                       onClick={() => handleToggleActive(webhook.id, webhook.is_active)}
                       className="p-2 hover:bg-[var(--color-background)] rounded-lg transition-colors"
