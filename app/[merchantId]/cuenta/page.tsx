@@ -205,9 +205,10 @@ export default async function CuentaPage({
         </div>
       </div>
 
-      {/* Editable Account Form */}
-      {user && profile && (
-        <div className="mb-8">
+      {/* Editable Account Form and Change Password - Side by Side on Desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Editable Account Form */}
+        {user && profile && (
           <AccountForm
             merchantId={merchantId}
             merchantName={merchant?.name || ''}
@@ -216,15 +217,13 @@ export default async function CuentaPage({
             email={user.email || ''}
             profileType={profile.profile_type || 'merchant_owner'}
           />
-        </div>
-      )}
+        )}
 
-      {/* Change Password */}
-      <div className="mb-8">
+        {/* Change Password */}
         <ChangePasswordForm />
       </div>
 
-      {/* Sessions Display */}
+      {/* Sessions Display - Full Width */}
       <div className="mb-8">
         <SessionsDisplay sessions={sessions || []} />
       </div>
