@@ -1,4 +1,6 @@
-import { Copy, Eye, EyeOff, Key, BookOpen, Code2 } from 'lucide-react'
+import { BookOpen, Code2, AlertCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
+import ApiKeysDisplay from '@/components/ApiKeysDisplay'
 
 export default async function DesarrolladoresPage({
   params,
@@ -6,6 +8,17 @@ export default async function DesarrolladoresPage({
   params: Promise<{ merchantId: string }>
 }) {
   const { merchantId } = await params
+  const supabase = await createClient()
+
+  // Fetch API keys for this merchant
+  const { data: apiKeys, error } = await supabase
+    .from('api_keys')
+    .select('*')
+    .eq('merchant_id', merchantId)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+
+  const testKey = apiKeys?.find(key => key.key_type === 'test')
 
   return (
     <div className="container-dashboard py-8">
@@ -20,82 +33,32 @@ export default async function DesarrolladoresPage({
       </div>
 
       {/* API Keys */}
-      <div className="card mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Key size={20} className="text-[var(--color-primary)]" />
-          <h2 className="text-lg font-semibold text-[var(--color-textPrimary)]">
-            Credenciales API
-          </h2>
-        </div>
-
-        <div className="space-y-4">
-          {/* Publishable Key */}
-          <div>
-            <label className="label-field">Publishable Key (Pública)</label>
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  readOnly
-                  value="pk_test_xxxxxxxxxxxxxxxxxxxxxx"
-                  className="input-field font-mono text-sm pr-20"
-                />
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                  <button
-                    className="p-2 hover:bg-[var(--color-border)] rounded transition-colors"
-                    title="Copiar"
-                  >
-                    <Copy size={16} className="text-[var(--color-textSecondary)]" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <p className="text-xs text-[var(--color-textSecondary)] mt-1">
-              Esta key es segura para usar en el frontend de tu aplicación
-            </p>
-          </div>
-
-          {/* Secret Key */}
-          <div>
-            <label className="label-field">Secret Key (Privada)</label>
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <input
-                  type="password"
-                  readOnly
-                  value="sk_test_xxxxxxxxxxxxxxxxxxxxxx"
-                  className="input-field font-mono text-sm pr-20"
-                />
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                  <button
-                    className="p-2 hover:bg-[var(--color-border)] rounded transition-colors"
-                    title="Mostrar"
-                  >
-                    <Eye size={16} className="text-[var(--color-textSecondary)]" />
-                  </button>
-                  <button
-                    className="p-2 hover:bg-[var(--color-border)] rounded transition-colors"
-                    title="Copiar"
-                  >
-                    <Copy size={16} className="text-[var(--color-textSecondary)]" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <p className="text-xs text-[var(--color-danger)] mt-1">
-              ⚠️ Nunca expongas esta key en el frontend. Solo úsala en tu servidor.
-            </p>
+      {error ? (
+        <div className="card mb-6 bg-[var(--color-danger)]/10 border-[var(--color-danger)]/30">
+          <div className="flex items-center gap-2 text-[var(--color-danger)]">
+            <AlertCircle size={20} />
+            <p>Error al cargar las credenciales API. Por favor, contacta a soporte.</p>
           </div>
         </div>
-
-        <div className="mt-6 p-4 bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 rounded-lg">
-          <p className="text-sm text-[var(--color-textPrimary)]">
-            <strong>Modo de prueba:</strong> Estas credenciales son de prueba.
-            Las transacciones no procesarán dinero real. Activa el modo producción
-            cuando estés listo para ir en vivo.
-          </p>
+      ) : testKey ? (
+        <ApiKeysDisplay
+          publicKey={testKey.public_key}
+          secretKeyPrefix={testKey.secret_key_prefix}
+          keyType={testKey.key_type as 'test' | 'live'}
+          lastUsedAt={testKey.last_used_at}
+          expiresAt={testKey.expires_at}
+        />
+      ) : (
+        <div className="card mb-6 bg-[var(--color-warning)]/10 border-[var(--color-warning)]/30">
+          <div className="flex items-center gap-2 text-[var(--color-warning)]">
+            <AlertCircle size={20} />
+            <div>
+              <p className="font-medium">No se encontraron credenciales API</p>
+              <p className="text-sm">Contacta a soporte para generar tus credenciales.</p>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Documentation */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

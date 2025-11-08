@@ -27,13 +27,14 @@ export default async function ClientesPage({
       <div className="card mb-6">
         <div className="relative">
           <Search
-            size={20}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-textSecondary)]"
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-textSecondary)] pointer-events-none z-10"
           />
           <input
             type="text"
             placeholder="Buscar clientes por nombre, email o teléfono..."
-            className="input-field pl-12"
+            className="input-field pl-11 w-full"
+            style={{ paddingLeft: '2.75rem' }}
           />
         </div>
       </div>
