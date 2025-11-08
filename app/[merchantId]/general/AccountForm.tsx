@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { User, Building2, Phone, Mail } from 'lucide-react'
+import PhoneInput from '@/components/PhoneInput'
 
 interface AccountFormProps {
   merchantId: string
@@ -125,20 +126,15 @@ export default function AccountForm({
 
         {/* Phone */}
         <div>
-          <label htmlFor="phone" className="label-field">
+          <label className="label-field">
             <Phone size={16} className="inline mr-2" />
             Teléfono
           </label>
-          <input
-            id="phone"
-            type="tel"
+          <PhoneInput
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="input-field"
-            required
+            onChange={setPhone}
+            defaultCountry="MX"
             disabled={loading}
-            minLength={7}
-            maxLength={20}
           />
         </div>
 

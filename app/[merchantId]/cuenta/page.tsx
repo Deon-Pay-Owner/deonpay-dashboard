@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase'
 import { Building2, User, Mail, Phone, IdCard } from 'lucide-react'
 import AccountForm from '../general/AccountForm'
 import DeleteAccountButton from '../general/DeleteAccountButton'
+import SessionsDisplay from '@/components/SessionsDisplay'
+import ChangePasswordForm from '@/components/ChangePasswordForm'
 
 export default async function CuentaPage({
   params,
@@ -27,6 +29,14 @@ export default async function CuentaPage({
     .select('full_name, phone, profile_type')
     .eq('user_id', user?.id)
     .single()
+
+  // Get user sessions
+  const { data: sessions } = await supabase
+    .from('session_logs')
+    .select('id, login_at, logout_at, ip_address, device_type, browser, os, country, city, is_active')
+    .eq('user_id', user?.id)
+    .order('login_at', { ascending: false })
+    .limit(10)
 
   const PROFILE_TYPE_LABELS = {
     merchant_owner: 'Dueño de negocio',
@@ -208,6 +218,16 @@ export default async function CuentaPage({
           />
         </div>
       )}
+
+      {/* Change Password */}
+      <div className="mb-8">
+        <ChangePasswordForm />
+      </div>
+
+      {/* Sessions Display */}
+      <div className="mb-8">
+        <SessionsDisplay sessions={sessions || []} />
+      </div>
 
       {/* Delete Account Section - Danger Zone */}
       {user?.email && (
