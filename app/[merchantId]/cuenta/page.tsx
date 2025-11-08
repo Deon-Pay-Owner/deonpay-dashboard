@@ -30,13 +30,16 @@ export default async function CuentaPage({
     .eq('user_id', user?.id)
     .single()
 
-  // Get user sessions
+  // Get user sessions from last week only
+  const oneWeekAgo = new Date()
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
   const { data: sessions } = await supabase
     .from('session_logs')
     .select('id, login_at, logout_at, ip_address, device_type, browser, os, country, city, is_active')
     .eq('user_id', user?.id)
+    .gte('login_at', oneWeekAgo.toISOString())
     .order('login_at', { ascending: false })
-    .limit(10)
 
   const PROFILE_TYPE_LABELS = {
     merchant_owner: 'Dueño de negocio',
