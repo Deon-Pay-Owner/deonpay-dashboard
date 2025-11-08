@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     const validationResult = createWebhookSchema.safeParse(body)
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: validationResult.error.errors[0].message },
+        { error: validationResult.error.issues[0].message },
         { status: 400 }
       )
     }
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: error.issues[0].message },
         { status: 400 }
       )
     }
