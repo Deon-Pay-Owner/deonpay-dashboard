@@ -12,7 +12,8 @@ import {
   Power,
   PowerOff,
   Edit,
-  Trash2
+  Trash2,
+  Send
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -57,6 +58,11 @@ export default function WebhookDetailClient({
   const [webhook, setWebhook] = useState<Webhook>(initialWebhook)
   const [events, setEvents] = useState<WebhookEvent[]>(initialEvents)
   const [copiedSecret, setCopiedSecret] = useState(false)
+  const [sendingTest, setSendingTest] = useState(false)
+  const [testResult, setTestResult] = useState<{
+    success: boolean
+    message: string
+  } | null>(null)
 
   const handleCopySecret = () => {
     navigator.clipboard.writeText(webhook.secret)
@@ -100,6 +106,48 @@ export default function WebhookDetailClient({
       }
     } catch (error) {
       console.error('Error deleting webhook:', error)
+    }
+  }
+
+  const handleSendTest = async () => {
+    setSendingTest(true)
+    setTestResult(null)
+
+    try {
+      const response = await fetch(`/api/webhooks/${webhook.id}/test`, {
+        method: 'POST',
+      })
+
+      const data = await response.json()
+
+      setTestResult({
+        success: data.success,
+        message: data.message || (data.success ? 'Evento enviado' : 'Error al enviar'),
+      })
+
+      // Recargar eventos después de 2 segundos
+      setTimeout(async () => {
+        const eventsResponse = await fetch(`/api/webhooks/${webhook.id}`)
+        const eventsData = await eventsResponse.json()
+        if (eventsData.events) {
+          setEvents(eventsData.events)
+        }
+      }, 2000)
+
+      // Limpiar mensaje después de 5 segundos
+      setTimeout(() => {
+        setTestResult(null)
+      }, 5000)
+    } catch (error) {
+      setTestResult({
+        success: false,
+        message: 'Error al enviar evento de prueba',
+      })
+      setTimeout(() => {
+        setTestResult(null)
+      }, 5000)
+    } finally {
+      setSendingTest(false)
     }
   }
 
@@ -154,6 +202,15 @@ export default function WebhookDetailClient({
 
           <div className="flex gap-2">
             <button
+              onClick={handleSendTest}
+              disabled={!webhook.is_active || sendingTest}
+              className="btn-primary flex items-center gap-2"
+              title={!webhook.is_active ? 'Activa el webhook para enviar pruebas' : 'Enviar evento de prueba'}
+            >
+              <Send size={18} />
+              {sendingTest ? 'Enviando...' : 'Enviar Prueba'}
+            </button>
+            <button
               onClick={handleToggleActive}
               className={`btn-ghost flex items-center gap-2 ${
                 webhook.is_active ? 'text-gray-600' : 'text-green-600'
@@ -181,6 +238,32 @@ export default function WebhookDetailClient({
           </div>
         </div>
       </div>
+
+      {/* Test Result Message */}
+      {testResult && (
+        <div
+          className={`card mb-6 ${
+            testResult.success
+              ? 'bg-green-50 border-green-200'
+              : 'bg-red-50 border-red-200'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {testResult.success ? (
+              <CheckCircle size={20} className="text-green-600" />
+            ) : (
+              <XCircle size={20} className="text-red-600" />
+            )}
+            <p
+              className={`font-medium ${
+                testResult.success ? 'text-green-800' : 'text-red-800'
+              }`}
+            >
+              {testResult.message}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Webhook Info Card */}
       <div className="card mb-6">
