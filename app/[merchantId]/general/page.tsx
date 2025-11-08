@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase'
 import { TrendingUp, TrendingDown, DollarSign, Users, CreditCard, Activity } from 'lucide-react'
 import AccountForm from './AccountForm'
+import DeleteAccountButton from './DeleteAccountButton'
 
 export default async function GeneralPage({
   params,
@@ -193,6 +194,13 @@ export default async function GeneralPage({
           </div>
         </div>
       </div>
+
+      {/* Delete Account Section */}
+      {user?.email && (
+        <div className="mt-8">
+          <DeleteAccountButton userEmail={user.email} />
+        </div>
+      )}
     </div>
   )
 }
