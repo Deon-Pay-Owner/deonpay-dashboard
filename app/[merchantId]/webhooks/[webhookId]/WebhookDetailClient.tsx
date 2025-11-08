@@ -64,6 +64,17 @@ export default function WebhookDetailClient({
     message: string
   } | null>(null)
 
+  // Paginación
+  const [currentPage, setCurrentPage] = useState(1)
+  const eventsPerPage = 5
+  const maxEvents = 30
+
+  // Calcular eventos a mostrar
+  const indexOfLastEvent = currentPage * eventsPerPage
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage
+  const currentEvents = events.slice(0, maxEvents).slice(indexOfFirstEvent, indexOfLastEvent)
+  const totalPages = Math.ceil(Math.min(events.length, maxEvents) / eventsPerPage)
+
   const handleCopySecret = () => {
     navigator.clipboard.writeText(webhook.secret)
     setCopiedSecret(true)
@@ -131,6 +142,7 @@ export default function WebhookDetailClient({
         const eventsData = await eventsResponse.json()
         if (eventsData.events) {
           setEvents(eventsData.events)
+          setCurrentPage(1) // Volver a la primera página
         }
       }, 2000)
 
@@ -375,7 +387,14 @@ export default function WebhookDetailClient({
 
       {/* Events History */}
       <div className="card">
-        <h2 className="card-header">Historial de eventos ({events.length})</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="card-header">Historial de eventos ({Math.min(events.length, maxEvents)})</h2>
+          {events.length > maxEvents && (
+            <span className="text-xs text-[var(--color-textSecondary)]">
+              Mostrando los últimos {maxEvents} eventos
+            </span>
+          )}
+        </div>
 
         {events.length === 0 ? (
           <div className="py-12 text-center">
@@ -388,8 +407,9 @@ export default function WebhookDetailClient({
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {events.map((event) => (
+          <>
+            <div className="space-y-3 mb-4">
+              {currentEvents.map((event) => (
               <div
                 key={event.id}
                 className="p-4 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)]"
@@ -477,7 +497,51 @@ export default function WebhookDetailClient({
                 )}
               </div>
             ))}
-          </div>
+            </div>
+
+            {/* Paginación */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
+                <div className="text-sm text-[var(--color-textSecondary)]">
+                  Mostrando {indexOfFirstEvent + 1}-{Math.min(indexOfLastEvent, Math.min(events.length, maxEvents))} de {Math.min(events.length, maxEvents)} eventos
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 text-sm border border-[var(--color-border)] rounded hover:bg-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Anterior
+                  </button>
+
+                  <div className="flex gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`px-3 py-1 text-sm rounded transition-colors ${
+                          currentPage === page
+                            ? 'bg-[var(--color-primary)] text-white'
+                            : 'border border-[var(--color-border)] hover:bg-[var(--color-surface)]'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 text-sm border border-[var(--color-border)] rounded hover:bg-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
