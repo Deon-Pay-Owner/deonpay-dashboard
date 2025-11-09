@@ -75,9 +75,9 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
   }
 
   return (
-    <div className="container-dashboard pt-6 pb-4 sm:py-8">
+    <div className="container-dashboard pt-8 pb-4 sm:py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 sm:mb-8">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div>
           <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">Webhooks</h1>
           <p className="text-[var(--color-textSecondary)]">

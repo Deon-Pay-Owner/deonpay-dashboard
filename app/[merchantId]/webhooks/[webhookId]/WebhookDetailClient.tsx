@@ -191,9 +191,9 @@ export default function WebhookDetailClient({
   }
 
   return (
-    <div className="container-dashboard pt-6 pb-4 sm:py-8">
+    <div className="container-dashboard pt-8 pb-4 sm:py-8">
       {/* Header */}
-      <div className="mb-4 sm:mb-8">
+      <div className="mb-6 sm:mb-8">
         <Link
           href={`/${merchantId}/webhooks`}
           className="inline-flex items-center gap-2 text-[var(--color-textSecondary)] hover:text-[var(--color-primary)] mb-5 transition-colors"
