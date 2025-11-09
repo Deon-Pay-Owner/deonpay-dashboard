@@ -48,9 +48,9 @@ export default async function CuentaPage({
   }
 
   return (
-    <div className="container-dashboard py-8">
+    <div className="container-dashboard py-6 sm:py-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">
           Configuración de cuenta
         </h1>
