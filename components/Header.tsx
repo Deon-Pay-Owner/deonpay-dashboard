@@ -30,7 +30,7 @@ export default function Header({ merchantId, userEmail }: HeaderProps) {
   }
 
   return (
-    <header className="glass sticky top-0 z-30 h-16 px-4 sm:px-6 flex items-center justify-between border-b border-[var(--color-border)] backdrop-blur-md">
+    <header className="glass sticky top-0 z-30 h-16 px-4 sm:px-6 flex items-center justify-between border-b border-[var(--color-border)]">
       {/* Breadcrumbs - Responsive with space for hamburger */}
       <div className="flex items-center gap-2 text-sm pl-12 lg:pl-0">
         <span className="text-[var(--color-textSecondary)] hidden sm:inline">Dashboard</span>

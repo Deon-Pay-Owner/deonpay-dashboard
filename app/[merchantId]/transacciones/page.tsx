@@ -8,9 +8,9 @@ export default async function TransaccionesPage({
   const { merchantId } = await params
 
   return (
-    <div className="container-dashboard py-8">
+    <div className="container-dashboard py-6 sm:py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div>
           <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">
             Transacciones
