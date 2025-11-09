@@ -53,22 +53,28 @@ export default async function TransaccionesPage({
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--color-border)]">
+                {/* ID - Siempre visible */}
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   ID
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                {/* Fecha - Oculta en móvil portrait, visible en landscape */}
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Fecha
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                {/* Cliente - Oculta en móvil portrait, visible en landscape */}
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Cliente
                 </th>
+                {/* Monto - Siempre visible */}
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Monto
                 </th>
+                {/* Estado - Siempre visible */}
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Estado
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                {/* Método - Oculta en móvil portrait, visible en landscape */}
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Método
                 </th>
               </tr>
@@ -100,46 +106,58 @@ export default async function TransaccionesPage({
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--color-border)]">
+                {/* ID - Siempre visible */}
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   ID
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                {/* Fecha - Oculta en móvil portrait, visible en landscape */}
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Fecha
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                {/* Cliente - Oculta en móvil portrait, visible en landscape */}
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Cliente
                 </th>
+                {/* Monto - Siempre visible */}
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Monto
                 </th>
+                {/* Estado - Siempre visible */}
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   Estado
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
+                {/* Método - Oculta en móvil portrait, visible en landscape */}
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Método
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr className="border-b border-[var(--color-border)] opacity-60">
+                {/* ID - Siempre visible */}
                 <td className="py-3 px-4 text-sm font-mono text-[var(--color-textSecondary)]">
                   txn_123abc
                 </td>
-                <td className="py-3 px-4 text-sm text-[var(--color-textSecondary)]">
+                {/* Fecha - Oculta en móvil portrait, visible en landscape */}
+                <td className="py-3 px-4 text-sm text-[var(--color-textSecondary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   2025-11-06 10:30
                 </td>
-                <td className="py-3 px-4 text-sm text-[var(--color-textPrimary)]">
+                {/* Cliente - Oculta en móvil portrait, visible en landscape */}
+                <td className="py-3 px-4 text-sm text-[var(--color-textPrimary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Juan Pérez
                 </td>
+                {/* Monto - Siempre visible */}
                 <td className="py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   $1,250.00 MXN
                 </td>
+                {/* Estado - Siempre visible */}
                 <td className="py-3 px-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-success)]/20 text-[var(--color-success)]">
                     Exitoso
                   </span>
                 </td>
-                <td className="py-3 px-4 text-sm text-[var(--color-textSecondary)]">
+                {/* Método - Oculta en móvil portrait, visible en landscape */}
+                <td className="py-3 px-4 text-sm text-[var(--color-textSecondary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Tarjeta •••• 4242
                 </td>
               </tr>
