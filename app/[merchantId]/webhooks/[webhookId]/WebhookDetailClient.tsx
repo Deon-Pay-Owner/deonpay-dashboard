@@ -191,7 +191,7 @@ export default function WebhookDetailClient({
   }
 
   return (
-    <div className="container-dashboard py-4 sm:py-8">
+    <div className="container-dashboard pt-6 pb-4 sm:py-8">
       {/* Header */}
       <div className="mb-4 sm:mb-8">
         <Link

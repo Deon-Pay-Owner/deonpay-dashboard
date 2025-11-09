@@ -8,7 +8,7 @@ export default async function TransaccionesPage({
   const { merchantId } = await params
 
   return (
-    <div className="container-dashboard py-4 sm:py-8">
+    <div className="container-dashboard pt-6 pb-4 sm:py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 sm:mb-8">
         <div>
