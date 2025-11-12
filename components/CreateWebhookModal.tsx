@@ -11,10 +11,87 @@ interface CreateWebhookModalProps {
 }
 
 const AVAILABLE_EVENTS = [
-  { value: 'payment.succeeded', label: 'Pago exitoso', description: 'Se dispara cuando un pago se completa' },
-  { value: 'payment.failed', label: 'Pago fallido', description: 'Se dispara cuando un pago falla' },
-  { value: 'refund.created', label: 'Reembolso creado', description: 'Se dispara cuando se crea un reembolso' },
-  { value: 'customer.created', label: 'Cliente creado', description: 'Se dispara cuando se registra un cliente' },
+  // Payment Intent Events
+  {
+    value: 'payment_intent.created',
+    label: 'Intención de pago creada',
+    description: 'Se dispara cuando se crea una nueva intención de pago',
+    category: 'Payment Intent'
+  },
+  {
+    value: 'payment_intent.processing',
+    label: 'Pago en proceso',
+    description: 'Se dispara cuando el pago está siendo procesado por el adquirente',
+    category: 'Payment Intent'
+  },
+  {
+    value: 'payment_intent.requires_action',
+    label: 'Pago requiere acción (3DS)',
+    description: 'Se dispara cuando el pago requiere autenticación adicional (ej: 3D Secure)',
+    category: 'Payment Intent'
+  },
+  {
+    value: 'payment_intent.succeeded',
+    label: 'Pago exitoso',
+    description: 'Se dispara cuando un pago se completa exitosamente',
+    category: 'Payment Intent'
+  },
+  {
+    value: 'payment_intent.failed',
+    label: 'Pago fallido',
+    description: 'Se dispara cuando un pago falla o es rechazado',
+    category: 'Payment Intent'
+  },
+  {
+    value: 'payment_intent.canceled',
+    label: 'Pago cancelado',
+    description: 'Se dispara cuando un pago es cancelado',
+    category: 'Payment Intent'
+  },
+  // Charge Events
+  {
+    value: 'charge.authorized',
+    label: 'Cargo autorizado',
+    description: 'Se dispara cuando se autoriza un cargo (pre-autorización)',
+    category: 'Charge'
+  },
+  {
+    value: 'charge.captured',
+    label: 'Cargo capturado',
+    description: 'Se dispara cuando se captura un cargo previamente autorizado',
+    category: 'Charge'
+  },
+  {
+    value: 'charge.failed',
+    label: 'Cargo fallido',
+    description: 'Se dispara cuando un cargo falla',
+    category: 'Charge'
+  },
+  {
+    value: 'charge.voided',
+    label: 'Cargo anulado',
+    description: 'Se dispara cuando se anula un cargo autorizado',
+    category: 'Charge'
+  },
+  // Refund Events
+  {
+    value: 'refund.created',
+    label: 'Reembolso creado',
+    description: 'Se dispara cuando se inicia un reembolso',
+    category: 'Refund'
+  },
+  {
+    value: 'refund.succeeded',
+    label: 'Reembolso exitoso',
+    description: 'Se dispara cuando un reembolso se completa exitosamente',
+    category: 'Refund'
+  },
+  {
+    value: 'refund.failed',
+    label: 'Reembolso fallido',
+    description: 'Se dispara cuando un reembolso falla',
+    category: 'Refund'
+  },
 ]
 
 export default function CreateWebhookModal({ merchantId, isOpen, onClose, onSuccess }: CreateWebhookModalProps) {
@@ -145,30 +222,47 @@ export default function CreateWebhookModal({ merchantId, isOpen, onClose, onSucc
             <label className="label-field mb-3 block">
               Eventos a suscribir *
             </label>
-            <div className="space-y-2">
-              {AVAILABLE_EVENTS.map((event) => (
-                <label
-                  key={event.value}
-                  className="flex items-start gap-3 p-3 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] cursor-pointer hover:bg-[var(--color-surface)]/80 transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedEvents.includes(event.value)}
-                    onChange={() => toggleEvent(event.value)}
-                    className="mt-1"
-                    disabled={loading}
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium text-[var(--color-textPrimary)] text-sm">
-                      {event.label}
-                    </p>
-                    <p className="text-xs text-[var(--color-textSecondary)]">
-                      {event.description}
-                    </p>
+
+            {/* Group events by category */}
+            {['Payment Intent', 'Charge', 'Refund'].map((category) => {
+              const categoryEvents = AVAILABLE_EVENTS.filter(e => e.category === category)
+              return (
+                <div key={category} className="mb-4">
+                  <h3 className="text-sm font-semibold text-[var(--color-textPrimary)] mb-2 px-1">
+                    {category === 'Payment Intent' && '💳 Intenciones de Pago'}
+                    {category === 'Charge' && '⚡ Cargos'}
+                    {category === 'Refund' && '↩️ Reembolsos'}
+                  </h3>
+                  <div className="space-y-2">
+                    {categoryEvents.map((event) => (
+                      <label
+                        key={event.value}
+                        className="flex items-start gap-3 p-3 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] cursor-pointer hover:bg-[var(--color-surface)]/80 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedEvents.includes(event.value)}
+                          onChange={() => toggleEvent(event.value)}
+                          className="mt-1"
+                          disabled={loading}
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium text-[var(--color-textPrimary)] text-sm">
+                            {event.label}
+                          </p>
+                          <p className="text-xs text-[var(--color-textSecondary)]">
+                            {event.description}
+                          </p>
+                          <code className="text-[10px] text-[var(--color-textSecondary)] font-mono bg-[var(--color-background)] px-1 py-0.5 rounded mt-1 inline-block">
+                            {event.value}
+                          </code>
+                        </div>
+                      </label>
+                    ))}
                   </div>
-                </label>
-              ))}
-            </div>
+                </div>
+              )
+            })}
           </div>
 
           {/* Buttons */}

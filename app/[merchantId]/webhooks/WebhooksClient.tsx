@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Plus, Webhook as WebhookIcon, CheckCircle, XCircle, ExternalLink, Trash2, Power, PowerOff } from 'lucide-react'
+import { Plus, Webhook as WebhookIcon, CheckCircle, XCircle, ExternalLink, Trash2, Power, PowerOff, Info, AlertCircle } from 'lucide-react'
 import CreateWebhookModal from '@/components/CreateWebhookModal'
 
 interface Webhook {
@@ -208,52 +208,177 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
       {/* Events Reference */}
       <div className="mt-8 card">
         <h2 className="card-header">Eventos disponibles</h2>
-        <div className="space-y-3">
-          <div className="flex items-start gap-3 p-3 bg-[var(--color-success)]/5 rounded-lg border border-[var(--color-success)]/20">
-            <CheckCircle size={20} className="text-[var(--color-success)] flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
-                payment.succeeded
-              </p>
-              <p className="text-xs text-[var(--color-textSecondary)]">
-                Se dispara cuando un pago se completa exitosamente
-              </p>
+
+        {/* Payment Intent Events */}
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-[var(--color-textPrimary)] mb-3">💳 Intenciones de Pago (Payment Intent)</h3>
+          <div className="space-y-2">
+            <div className="flex items-start gap-3 p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+              <Info size={18} className="text-blue-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  payment_intent.created
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando se crea una nueva intención de pago
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-yellow-500/5 rounded-lg border border-yellow-500/20">
+              <AlertCircle size={18} className="text-yellow-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  payment_intent.processing
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando el pago está siendo procesado por el adquirente
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+              <AlertCircle size={18} className="text-purple-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  payment_intent.requires_action
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando el pago requiere autenticación adicional (ej: 3D Secure)
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-success)]/5 rounded-lg border border-[var(--color-success)]/20">
+              <CheckCircle size={18} className="text-[var(--color-success)] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  payment_intent.succeeded
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando un pago se completa exitosamente
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-danger)]/5 rounded-lg border border-[var(--color-danger)]/20">
+              <XCircle size={18} className="text-[var(--color-danger)] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  payment_intent.failed
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando un pago falla o es rechazado
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-gray-500/5 rounded-lg border border-gray-500/20">
+              <XCircle size={18} className="text-gray-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  payment_intent.canceled
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando un pago es cancelado
+                </p>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="flex items-start gap-3 p-3 bg-[var(--color-danger)]/5 rounded-lg border border-[var(--color-danger)]/20">
-            <XCircle size={20} className="text-[var(--color-danger)] flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
-                payment.failed
-              </p>
-              <p className="text-xs text-[var(--color-textSecondary)]">
-                Se dispara cuando un pago falla o es rechazado
-              </p>
+        {/* Charge Events */}
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-[var(--color-textPrimary)] mb-3">⚡ Cargos (Charge)</h3>
+          <div className="space-y-2">
+            <div className="flex items-start gap-3 p-3 bg-yellow-500/5 rounded-lg border border-yellow-500/20">
+              <CheckCircle size={18} className="text-yellow-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  charge.authorized
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando se autoriza un cargo (pre-autorización)
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-success)]/5 rounded-lg border border-[var(--color-success)]/20">
+              <CheckCircle size={18} className="text-[var(--color-success)] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  charge.captured
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando se captura un cargo previamente autorizado
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-danger)]/5 rounded-lg border border-[var(--color-danger)]/20">
+              <XCircle size={18} className="text-[var(--color-danger)] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  charge.failed
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando un cargo falla
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-gray-500/5 rounded-lg border border-gray-500/20">
+              <XCircle size={18} className="text-gray-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  charge.voided
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando se anula un cargo autorizado
+                </p>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="flex items-start gap-3 p-3 bg-[var(--color-info)]/5 rounded-lg border border-[var(--color-info)]/20">
-            <CheckCircle size={20} className="text-[var(--color-info)] flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
-                refund.created
-              </p>
-              <p className="text-xs text-[var(--color-textSecondary)]">
-                Se dispara cuando se crea un reembolso
-              </p>
+        {/* Refund Events */}
+        <div>
+          <h3 className="text-sm font-semibold text-[var(--color-textPrimary)] mb-3">↩️ Reembolsos (Refund)</h3>
+          <div className="space-y-2">
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-info)]/5 rounded-lg border border-[var(--color-info)]/20">
+              <Info size={18} className="text-[var(--color-info)] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  refund.created
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando se inicia un reembolso
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-start gap-3 p-3 bg-[var(--color-primary)]/5 rounded-lg border border-[var(--color-primary)]/20">
-            <CheckCircle size={20} className="text-[var(--color-primary)] flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
-                customer.created
-              </p>
-              <p className="text-xs text-[var(--color-textSecondary)]">
-                Se dispara cuando se registra un nuevo cliente
-              </p>
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-success)]/5 rounded-lg border border-[var(--color-success)]/20">
+              <CheckCircle size={18} className="text-[var(--color-success)] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  refund.succeeded
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando un reembolso se completa exitosamente
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-danger)]/5 rounded-lg border border-[var(--color-danger)]/20">
+              <XCircle size={18} className="text-[var(--color-danger)] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
+                  refund.failed
+                </p>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Se dispara cuando un reembolso falla
+                </p>
+              </div>
             </div>
           </div>
         </div>

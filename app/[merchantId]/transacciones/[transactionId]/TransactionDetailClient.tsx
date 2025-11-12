@@ -309,36 +309,36 @@ export default function TransactionDetailClient({
           <div className="space-y-6">
             {/* Payment Method Card */}
             {paymentIntent.payment_method && (
-              <div className="card">
+              <div className="card border-2 border-[var(--color-border)]">
                 <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
                   <CreditCard size={20} className="text-[var(--color-primary)]" />
                   Método de Pago
                 </h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Tipo</p>
-                    <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20">
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-2">Tipo de Tarjeta</p>
+                    <p className="text-lg font-semibold text-[var(--color-textPrimary)] capitalize">
                       {paymentIntent.payment_method.type || 'N/A'}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Marca</p>
+                  <div className="p-4 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20">
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-2">Marca</p>
                     <div className="flex items-center gap-2">
-                      <CardBrandIcon brand={paymentIntent.payment_method.brand} size={32} />
-                      <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
+                      <CardBrandIcon brand={paymentIntent.payment_method.brand} size={28} />
+                      <p className="text-lg font-semibold text-[var(--color-textPrimary)] capitalize">
                         {paymentIntent.payment_method.brand || 'N/A'}
                       </p>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Últimos 4 dígitos</p>
-                    <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
-                      •••• {paymentIntent.payment_method.last4 || '****'}
+                  <div className="p-4 rounded-lg bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20">
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-2">Número de Tarjeta</p>
+                    <p className="text-lg font-mono font-bold text-[var(--color-textPrimary)]">
+                      •••• •••• •••• {paymentIntent.payment_method.last4 || '****'}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Vencimiento</p>
-                    <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
+                  <div className="p-4 rounded-lg bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/20">
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-2">Vencimiento</p>
+                    <p className="text-lg font-mono font-bold text-[var(--color-textPrimary)]">
                       {paymentIntent.payment_method.exp_month?.toString().padStart(2, '0') || 'XX'}/
                       {paymentIntent.payment_method.exp_year || 'XXXX'}
                     </p>
@@ -349,24 +349,24 @@ export default function TransactionDetailClient({
 
             {/* Customer Info Card */}
             {paymentIntent.customer && (
-              <div className="card">
+              <div className="card border-2 border-[var(--color-border)] bg-gradient-to-br from-indigo-500/5 to-purple-500/5">
                 <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                  <User size={20} className="text-[var(--color-primary)]" />
-                  Cliente
+                  <User size={20} className="text-indigo-600" />
+                  Información del Cliente
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {paymentIntent.customer.name && (
-                    <div>
-                      <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Nombre</p>
-                      <p className="text-sm font-medium text-[var(--color-textPrimary)] break-words">
+                    <div className="p-3 rounded-lg bg-white/50 border border-indigo-500/20">
+                      <p className="text-xs text-[var(--color-textSecondary)] mb-1">Nombre Completo</p>
+                      <p className="text-base font-semibold text-[var(--color-textPrimary)] break-words">
                         {paymentIntent.customer.name}
                       </p>
                     </div>
                   )}
                   {paymentIntent.customer.email && (
-                    <div>
-                      <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Email</p>
-                      <p className="text-sm font-medium text-[var(--color-textPrimary)] break-all">
+                    <div className="p-3 rounded-lg bg-white/50 border border-indigo-500/20">
+                      <p className="text-xs text-[var(--color-textSecondary)] mb-1">Correo Electrónico</p>
+                      <p className="text-base font-semibold text-[var(--color-textPrimary)] break-all">
                         {paymentIntent.customer.email}
                       </p>
                     </div>

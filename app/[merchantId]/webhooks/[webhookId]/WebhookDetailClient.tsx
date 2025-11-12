@@ -59,6 +59,9 @@ export default function WebhookDetailClient({
   const [events, setEvents] = useState<WebhookEvent[]>(initialEvents)
   const [copiedSecret, setCopiedSecret] = useState(false)
   const [sendingTest, setSendingTest] = useState(false)
+  const [editingEvents, setEditingEvents] = useState(false)
+  const [selectedEvents, setSelectedEvents] = useState<string[]>(initialWebhook.events)
+  const [savingEvents, setSavingEvents] = useState(false)
   const [testResult, setTestResult] = useState<{
     success: boolean
     message: string
@@ -75,10 +78,74 @@ export default function WebhookDetailClient({
   const currentEvents = events.slice(0, maxEvents).slice(indexOfFirstEvent, indexOfLastEvent)
   const totalPages = Math.ceil(Math.min(events.length, maxEvents) / eventsPerPage)
 
+  // Available events (same as CreateWebhookModal)
+  const AVAILABLE_EVENTS = [
+    // Payment Intent Events
+    { value: 'payment_intent.created', label: 'Intención de pago creada', category: 'Payment Intent' },
+    { value: 'payment_intent.processing', label: 'Pago en proceso', category: 'Payment Intent' },
+    { value: 'payment_intent.requires_action', label: 'Pago requiere acción (3DS)', category: 'Payment Intent' },
+    { value: 'payment_intent.succeeded', label: 'Pago exitoso', category: 'Payment Intent' },
+    { value: 'payment_intent.failed', label: 'Pago fallido', category: 'Payment Intent' },
+    { value: 'payment_intent.canceled', label: 'Pago cancelado', category: 'Payment Intent' },
+    // Charge Events
+    { value: 'charge.authorized', label: 'Cargo autorizado', category: 'Charge' },
+    { value: 'charge.captured', label: 'Cargo capturado', category: 'Charge' },
+    { value: 'charge.failed', label: 'Cargo fallido', category: 'Charge' },
+    { value: 'charge.voided', label: 'Cargo anulado', category: 'Charge' },
+    // Refund Events
+    { value: 'refund.created', label: 'Reembolso creado', category: 'Refund' },
+    { value: 'refund.succeeded', label: 'Reembolso exitoso', category: 'Refund' },
+    { value: 'refund.failed', label: 'Reembolso fallido', category: 'Refund' },
+  ]
+
   const handleCopySecret = () => {
     navigator.clipboard.writeText(webhook.secret)
     setCopiedSecret(true)
     setTimeout(() => setCopiedSecret(false), 2000)
+  }
+
+  const handleToggleEvent = (eventValue: string) => {
+    setSelectedEvents(prev =>
+      prev.includes(eventValue)
+        ? prev.filter(e => e !== eventValue)
+        : [...prev, eventValue]
+    )
+  }
+
+  const handleSaveEvents = async () => {
+    if (selectedEvents.length === 0) {
+      alert('Debes seleccionar al menos un evento')
+      return
+    }
+
+    setSavingEvents(true)
+    try {
+      const response = await fetch(`/api/webhooks/${webhook.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          events: selectedEvents,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setWebhook(data.webhook)
+        setEditingEvents(false)
+      }
+    } catch (error) {
+      console.error('Error updating events:', error)
+      alert('Error al actualizar eventos')
+    } finally {
+      setSavingEvents(false)
+    }
+  }
+
+  const handleCancelEditEvents = () => {
+    setSelectedEvents(webhook.events)
+    setEditingEvents(false)
   }
 
   const handleToggleActive = async () => {
@@ -317,19 +384,90 @@ export default function WebhookDetailClient({
 
           {/* Events */}
           <div>
-            <label className="text-sm font-medium text-[var(--color-textSecondary)] block mb-2">
-              Eventos suscritos
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {webhook.events.map((event) => (
-                <span
-                  key={event}
-                  className="px-3 py-1 bg-[var(--color-primary)]/10 text-[var(--color-primary)] rounded-full text-sm font-medium"
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium text-[var(--color-textSecondary)]">
+                Eventos suscritos
+              </label>
+              {!editingEvents && (
+                <button
+                  onClick={() => setEditingEvents(true)}
+                  className="text-sm text-[var(--color-primary)] hover:underline flex items-center gap-1"
                 >
-                  {event}
-                </span>
-              ))}
+                  <Edit size={14} />
+                  Editar
+                </button>
+              )}
             </div>
+
+            {editingEvents ? (
+              <div className="space-y-4">
+                {/* Group events by category */}
+                {['Payment Intent', 'Charge', 'Refund'].map((category) => {
+                  const categoryEvents = AVAILABLE_EVENTS.filter(e => e.category === category)
+                  return (
+                    <div key={category}>
+                      <h4 className="text-sm font-semibold text-[var(--color-textPrimary)] mb-2">
+                        {category === 'Payment Intent' && '💳 Intenciones de Pago'}
+                        {category === 'Charge' && '⚡ Cargos'}
+                        {category === 'Refund' && '↩️ Reembolsos'}
+                      </h4>
+                      <div className="space-y-2">
+                        {categoryEvents.map((event) => (
+                          <label
+                            key={event.value}
+                            className="flex items-center gap-3 p-2 bg-[var(--color-surface)] rounded-lg border border-[var(--color-border)] cursor-pointer hover:bg-[var(--color-surface)]/80 transition-colors"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedEvents.includes(event.value)}
+                              onChange={() => handleToggleEvent(event.value)}
+                              className="cursor-pointer"
+                            />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-[var(--color-textPrimary)]">
+                                {event.label}
+                              </p>
+                              <code className="text-xs text-[var(--color-textSecondary)] font-mono">
+                                {event.value}
+                              </code>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {/* Action buttons */}
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={handleSaveEvents}
+                    disabled={savingEvents || selectedEvents.length === 0}
+                    className="btn-primary"
+                  >
+                    {savingEvents ? 'Guardando...' : 'Guardar cambios'}
+                  </button>
+                  <button
+                    onClick={handleCancelEditEvents}
+                    disabled={savingEvents}
+                    className="btn-ghost"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {webhook.events.map((event) => (
+                  <span
+                    key={event}
+                    className="px-3 py-1 bg-[var(--color-primary)]/10 text-[var(--color-primary)] rounded-full text-sm font-medium"
+                  >
+                    {event}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Secret */}
