@@ -11,6 +11,7 @@ type PaymentIntent = {
   amount: number
   currency: string
   status: string
+  metadata?: Record<string, any> | null
   payment_method?: {
     type?: string
     brand?: string
@@ -40,6 +41,10 @@ export default function TransaccionesClient({
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
+  const [showFilters, setShowFilters] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [dateFilter, setDateFilter] = useState<string>('all')
+  const [methodFilter, setMethodFilter] = useState<string>('all')
 
   useEffect(() => {
     loadTransactions()
@@ -73,15 +78,58 @@ export default function TransaccionesClient({
   }
 
   const filteredTransactions = transactions.filter((txn) => {
-    if (!searchTerm) return true
+    // Search filter
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase()
+      const matchesSearch =
+        txn.id.toLowerCase().includes(search) ||
+        txn.customer?.name?.toLowerCase().includes(search) ||
+        txn.customer?.email?.toLowerCase().includes(search) ||
+        (txn.metadata?.order_id && String(txn.metadata.order_id).toLowerCase().includes(search))
 
-    const search = searchTerm.toLowerCase()
-    return (
-      txn.id.toLowerCase().includes(search) ||
-      txn.customer?.name?.toLowerCase().includes(search) ||
-      txn.customer?.email?.toLowerCase().includes(search)
-    )
+      if (!matchesSearch) return false
+    }
+
+    // Status filter
+    if (statusFilter !== 'all' && txn.status !== statusFilter) {
+      return false
+    }
+
+    // Date filter
+    if (dateFilter !== 'all') {
+      const txnDate = new Date(txn.created_at)
+      const now = new Date()
+
+      if (dateFilter === 'today') {
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        if (txnDate < today) return false
+      } else if (dateFilter === 'week') {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        if (txnDate < weekAgo) return false
+      } else if (dateFilter === 'month') {
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        if (txnDate < monthAgo) return false
+      }
+    }
+
+    // Method filter
+    if (methodFilter !== 'all') {
+      if (methodFilter === 'card' && txn.payment_method?.type !== 'card') {
+        return false
+      }
+      // Add more payment method types as needed
+    }
+
+    return true
   })
+
+  const clearFilters = () => {
+    setStatusFilter('all')
+    setDateFilter('all')
+    setMethodFilter('all')
+  }
+
+  const hasActiveFilters = statusFilter !== 'all' || dateFilter !== 'all' || methodFilter !== 'all'
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
@@ -167,6 +215,11 @@ export default function TransaccionesClient({
     return payment_method.type || 'N/A'
   }
 
+  const getOrderId = (metadata?: PaymentIntent['metadata']) => {
+    if (!metadata || !metadata.order_id) return 'N/A'
+    return String(metadata.order_id)
+  }
+
   return (
     <div className="container-dashboard pt-8 pb-4 sm:py-8">
       {/* Header */}
@@ -200,18 +253,96 @@ export default function TransaccionesClient({
             />
             <input
               type="text"
-              placeholder="Buscar por ID, cliente, email..."
+              placeholder="Buscar por ID, cliente, email, orderId..."
               className="input-field pl-11 w-full"
               style={{ paddingLeft: '2.75rem' }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="btn-secondary flex items-center justify-center gap-2">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`btn-secondary flex items-center justify-center gap-2 relative ${hasActiveFilters ? 'border-[var(--color-primary)] text-[var(--color-primary)]' : ''}`}
+          >
             <Filter size={18} />
             <span>Filtros</span>
+            {hasActiveFilters && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-[var(--color-primary)] rounded-full"></span>
+            )}
           </button>
         </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Status Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-textPrimary)] mb-2">
+                  Estado
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="input-field w-full"
+                >
+                  <option value="all">Todos</option>
+                  <option value="succeeded">Exitoso</option>
+                  <option value="processing">Procesando</option>
+                  <option value="requires_payment_method">Pendiente</option>
+                  <option value="requires_confirmation">Requiere confirmación</option>
+                  <option value="requires_action">Requiere acción</option>
+                  <option value="canceled">Cancelado</option>
+                  <option value="failed">Fallido</option>
+                </select>
+              </div>
+
+              {/* Date Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-textPrimary)] mb-2">
+                  Período
+                </label>
+                <select
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="input-field w-full"
+                >
+                  <option value="all">Todos</option>
+                  <option value="today">Hoy</option>
+                  <option value="week">Última semana</option>
+                  <option value="month">Último mes</option>
+                </select>
+              </div>
+
+              {/* Payment Method Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-textPrimary)] mb-2">
+                  Método de pago
+                </label>
+                <select
+                  value={methodFilter}
+                  onChange={(e) => setMethodFilter(e.target.value)}
+                  className="input-field w-full"
+                >
+                  <option value="all">Todos</option>
+                  <option value="card">Tarjeta</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            {hasActiveFilters && (
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={clearFilters}
+                  className="text-sm text-[var(--color-textSecondary)] hover:text-[var(--color-primary)] transition-colors"
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Transactions Table */}
@@ -222,6 +353,9 @@ export default function TransaccionesClient({
               <tr className="border-b border-[var(--color-border)]">
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)]">
                   ID
+                </th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden landscape:table-cell md:table-cell">
+                  Order ID
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--color-textPrimary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                   Fecha
@@ -243,7 +377,7 @@ export default function TransaccionesClient({
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center">
+                  <td colSpan={7} className="py-16 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)] mx-auto"></div>
                     <p className="text-[var(--color-textSecondary)] mt-4">
                       Cargando transacciones...
@@ -252,19 +386,19 @@ export default function TransaccionesClient({
                 </tr>
               ) : filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center">
+                  <td colSpan={7} className="py-16 text-center">
                     <CreditCard
                       size={48}
                       className="mx-auto mb-4 text-[var(--color-border)]"
                     />
                     <p className="text-[var(--color-textSecondary)] font-medium mb-2">
-                      {searchTerm
+                      {searchTerm || hasActiveFilters
                         ? 'No se encontraron transacciones'
                         : 'No hay transacciones aún'}
                     </p>
                     <p className="text-sm text-[var(--color-textSecondary)] opacity-70">
-                      {searchTerm
-                        ? 'Intenta con otros términos de búsqueda'
+                      {searchTerm || hasActiveFilters
+                        ? 'Intenta con otros términos de búsqueda o filtros'
                         : 'Las transacciones aparecerán aquí cuando proceses tu primer pago'}
                     </p>
                   </td>
@@ -273,15 +407,24 @@ export default function TransaccionesClient({
                 filteredTransactions.map((txn) => (
                   <tr
                     key={txn.id}
-                    className="border-b border-[var(--color-border)] hover:bg-[var(--color-primary)]/5 transition-colors"
+                    onClick={() => {
+                      window.location.href = `/${merchantId}/transacciones/${txn.id}`
+                    }}
+                    className="border-b border-[var(--color-border)] hover:bg-[var(--color-primary)]/5 transition-colors cursor-pointer"
                   >
                     <td className="py-3 px-4 text-sm">
                       <Link
                         href={`/${merchantId}/transacciones/${txn.id}`}
                         className="font-mono text-[var(--color-primary)] hover:underline"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {txn.id.substring(0, 12)}...
                       </Link>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-[var(--color-textSecondary)] hidden landscape:table-cell md:table-cell">
+                      <span className="font-mono">
+                        {getOrderId(txn.metadata)}
+                      </span>
                     </td>
                     <td className="py-3 px-4 text-sm text-[var(--color-textSecondary)] hidden portrait:md:hidden landscape:table-cell md:table-cell">
                       {formatDate(txn.created_at)}
