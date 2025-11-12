@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase'
 import { TrendingUp, TrendingDown, DollarSign, Users, CreditCard, Activity } from 'lucide-react'
-import Link from 'next/link'
+import RecentTransactions from './RecentTransactions'
 
 export default async function GeneralPage({
   params,
@@ -26,37 +26,42 @@ export default async function GeneralPage({
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
   const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
 
-  // Get current month transactions
-  const { data: currentMonthTxns } = await supabase
+  // Get ALL transactions to calculate stats (not just current month)
+  const { data: allTransactions } = await supabase
     .from('payment_intents')
-    .select('amount, currency, status, customer')
+    .select('amount, currency, status, customer, created_at')
     .eq('merchant_id', merchantId)
-    .gte('created_at', startOfMonth.toISOString())
     .order('created_at', { ascending: false })
 
-  // Get last month transactions for comparison
-  const { data: lastMonthTxns } = await supabase
-    .from('payment_intents')
-    .select('amount, currency, status, customer')
-    .eq('merchant_id', merchantId)
-    .gte('created_at', startOfLastMonth.toISOString())
-    .lte('created_at', endOfLastMonth.toISOString())
+  // Filter transactions by date range
+  const currentMonthTxns = allTransactions?.filter(t => {
+    const txnDate = new Date(t.created_at)
+    return txnDate >= startOfMonth
+  }) || []
 
-  // Calculate stats
-  const currentMonthRevenue = currentMonthTxns?.filter(t => t.status === 'succeeded').reduce((sum, t) => sum + t.amount, 0) || 0
-  const lastMonthRevenue = lastMonthTxns?.filter(t => t.status === 'succeeded').reduce((sum, t) => sum + t.amount, 0) || 0
-  const revenueChange = lastMonthRevenue > 0 ? ((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue * 100) : 0
+  const lastMonthTxns = allTransactions?.filter(t => {
+    const txnDate = new Date(t.created_at)
+    return txnDate >= startOfLastMonth && txnDate <= endOfLastMonth
+  }) || []
 
-  const currentMonthCount = currentMonthTxns?.length || 0
-  const lastMonthCount = lastMonthTxns?.length || 0
-  const countChange = lastMonthCount > 0 ? ((currentMonthCount - lastMonthCount) / lastMonthCount * 100) : 0
+  // Calculate stats - use ALL TIME data if current month has no data
+  const currentPeriodTxns = currentMonthTxns.length > 0 ? currentMonthTxns : allTransactions || []
+  const isCurrentMonth = currentMonthTxns.length > 0
 
-  const uniqueCustomers = new Set(currentMonthTxns?.filter(t => t.customer).map(t => JSON.stringify(t.customer))).size
-  const lastMonthUniqueCustomers = new Set(lastMonthTxns?.filter(t => t.customer).map(t => JSON.stringify(t.customer))).size
+  const currentRevenue = currentPeriodTxns.filter(t => t.status === 'succeeded').reduce((sum, t) => sum + t.amount, 0)
+  const lastMonthRevenue = lastMonthTxns.filter(t => t.status === 'succeeded').reduce((sum, t) => sum + t.amount, 0)
+  const revenueChange = lastMonthRevenue > 0 ? ((currentRevenue - lastMonthRevenue) / lastMonthRevenue * 100) : 0
+
+  const currentCount = currentPeriodTxns.length
+  const lastMonthCount = lastMonthTxns.length
+  const countChange = lastMonthCount > 0 ? ((currentCount - lastMonthCount) / lastMonthCount * 100) : 0
+
+  const uniqueCustomers = new Set(currentPeriodTxns.filter(t => t.customer).map(t => JSON.stringify(t.customer))).size
+  const lastMonthUniqueCustomers = new Set(lastMonthTxns.filter(t => t.customer).map(t => JSON.stringify(t.customer))).size
   const customersChange = lastMonthUniqueCustomers > 0 ? ((uniqueCustomers - lastMonthUniqueCustomers) / lastMonthUniqueCustomers * 100) : 0
 
-  const successRate = currentMonthCount > 0 ? (currentMonthTxns?.filter(t => t.status === 'succeeded').length || 0) / currentMonthCount * 100 : 0
-  const lastMonthSuccessRate = lastMonthCount > 0 ? (lastMonthTxns?.filter(t => t.status === 'succeeded').length || 0) / lastMonthCount * 100 : 0
+  const successRate = currentCount > 0 ? currentPeriodTxns.filter(t => t.status === 'succeeded').length / currentCount * 100 : 0
+  const lastMonthSuccessRate = lastMonthCount > 0 ? lastMonthTxns.filter(t => t.status === 'succeeded').length / lastMonthCount * 100 : 0
   const successRateChange = successRate - lastMonthSuccessRate
 
   const formatCurrency = (amount: number) => {
@@ -68,21 +73,21 @@ export default async function GeneralPage({
 
   const stats = [
     {
-      name: 'Ventas del mes',
-      value: formatCurrency(currentMonthRevenue),
+      name: isCurrentMonth ? 'Ventas del mes' : 'Ventas totales',
+      value: formatCurrency(currentRevenue),
       change: `${revenueChange >= 0 ? '+' : ''}${revenueChange.toFixed(1)}%`,
       trend: revenueChange >= 0 ? 'up' : 'down',
       icon: DollarSign,
     },
     {
-      name: 'Transacciones',
-      value: currentMonthCount.toString(),
+      name: isCurrentMonth ? 'Transacciones del mes' : 'Total transacciones',
+      value: currentCount.toString(),
       change: `${countChange >= 0 ? '+' : ''}${countChange.toFixed(1)}%`,
       trend: countChange >= 0 ? 'up' : 'down',
       icon: CreditCard,
     },
     {
-      name: 'Clientes activos',
+      name: isCurrentMonth ? 'Clientes del mes' : 'Total clientes',
       value: uniqueCustomers.toString(),
       change: `${customersChange >= 0 ? '+' : ''}${customersChange.toFixed(1)}%`,
       trend: customersChange >= 0 ? 'up' : 'down',
@@ -97,34 +102,13 @@ export default async function GeneralPage({
     },
   ]
 
-  // Get recent transactions for the list
+  // Get recent transactions for the list - get more than 5 to enable pagination
   const { data: recentTransactions } = await supabase
     .from('payment_intents')
     .select('id, created_at, amount, currency, status, customer')
     .eq('merchant_id', merchantId)
     .order('created_at', { ascending: false })
-    .limit(5)
-
-  const formatDate = (date: string) => {
-    return new Intl.DateTimeFormat('es-MX', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date))
-  }
-
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; className: string }> = {
-      succeeded: { label: 'Exitoso', className: 'bg-[var(--color-success)]/20 text-[var(--color-success)]' },
-      processing: { label: 'Procesando', className: 'bg-[var(--color-warning)]/20 text-[var(--color-warning)]' },
-      requires_payment_method: { label: 'Pendiente', className: 'bg-[var(--color-textSecondary)]/20 text-[var(--color-textSecondary)]' },
-      failed: { label: 'Fallido', className: 'bg-[var(--color-error)]/20 text-[var(--color-error)]' },
-      canceled: { label: 'Cancelado', className: 'bg-[var(--color-textSecondary)]/20 text-[var(--color-textSecondary)]' },
-    }
-    const config = statusConfig[status] || statusConfig['requires_payment_method']
-    return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.className}`}>{config.label}</span>
-  }
+    .limit(20) // Get up to 20 transactions for pagination
 
   return (
     <div className="container-dashboard pt-8 pb-4 sm:py-8">
@@ -200,48 +184,10 @@ export default async function GeneralPage({
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {recentTransactions.map((txn) => (
-                <Link
-                  key={txn.id}
-                  href={`/${merchantId}/transacciones/${txn.id}`}
-                  className="block p-3 rounded-lg border border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-mono text-[var(--color-textSecondary)] truncate">
-                        {txn.id}
-                      </p>
-                      <p className="text-xs text-[var(--color-textSecondary)] mt-1">
-                        {formatDate(txn.created_at)}
-                      </p>
-                    </div>
-                    <div className="text-right ml-4">
-                      <p className="text-lg font-bold text-[var(--color-textPrimary)]">
-                        {formatCurrency(txn.amount)}
-                      </p>
-                      {getStatusBadge(txn.status)}
-                    </div>
-                  </div>
-                  {txn.customer && (
-                    <div className="flex items-center gap-2 text-xs text-[var(--color-textSecondary)]">
-                      <Users size={12} />
-                      <span className="truncate">
-                        {typeof txn.customer === 'object' && txn.customer !== null
-                          ? (txn.customer as any).email || (txn.customer as any).name || 'Cliente'
-                          : 'Cliente'}
-                      </span>
-                    </div>
-                  )}
-                </Link>
-              ))}
-              <Link
-                href={`/${merchantId}/transacciones`}
-                className="block text-center py-2 text-sm text-[var(--color-primary)] hover:text-[var(--color-primary)]/80 font-medium"
-              >
-                Ver todas las transacciones →
-              </Link>
-            </div>
+            <RecentTransactions
+              transactions={recentTransactions}
+              merchantId={merchantId}
+            />
           )}
         </div>
 
