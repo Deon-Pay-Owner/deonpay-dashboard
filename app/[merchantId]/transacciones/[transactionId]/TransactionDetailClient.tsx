@@ -209,56 +209,58 @@ export default function TransactionDetailClient({
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false)
 
   return (
-    <div className="container-dashboard py-8">
+    <div className="container-dashboard pt-6 sm:pt-8 pb-8 px-4 sm:px-6">
       {/* Back Button */}
       <Link
         href={`/${merchantId}/transacciones`}
-        className="inline-flex items-center gap-2 text-[var(--color-textSecondary)] hover:text-[var(--color-textPrimary)] mb-6 transition-colors"
+        className="inline-flex items-center gap-2 text-[var(--color-textSecondary)] hover:text-[var(--color-textPrimary)] mb-4 sm:mb-6 transition-colors text-sm sm:text-base"
       >
-        <ArrowLeft size={20} />
+        <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
         Volver a transacciones
       </Link>
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-textPrimary)] mb-2">
             Detalle de Transacción
           </h1>
-          <p className="text-[var(--color-textSecondary)] font-mono text-sm">
+          <p className="text-[var(--color-textSecondary)] font-mono text-xs sm:text-sm truncate">
             {paymentIntent.id}
           </p>
         </div>
-        {getStatusBadge(paymentIntent.status)}
+        <div className="flex-shrink-0">
+          {getStatusBadge(paymentIntent.status)}
+        </div>
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column - Main Info */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Payment Info Card */}
           <div className="card">
-            <h2 className="text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-              <CreditCard size={20} className="text-[var(--color-primary)]" />
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
+              <CreditCard size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
               Información del Pago
             </h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <p className="text-sm text-[var(--color-textSecondary)] mb-1">Monto</p>
-                <p className="text-2xl font-bold text-[var(--color-textPrimary)]">
+                <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Monto</p>
+                <p className="text-xl sm:text-2xl font-bold text-[var(--color-textPrimary)]">
                   {formatCurrency(paymentIntent.amount, paymentIntent.currency)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-[var(--color-textSecondary)] mb-1">Fecha</p>
-                <p className="text-sm font-medium text-[var(--color-textPrimary)]">
+                <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Fecha</p>
+                <p className="text-sm font-medium text-[var(--color-textPrimary)] break-words">
                   {formatDate(paymentIntent.created_at)}
                 </p>
               </div>
               {paymentIntent.description && (
-                <div className="col-span-2">
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Descripción</p>
-                  <p className="text-sm text-[var(--color-textPrimary)]">
+                <div className="col-span-1 sm:col-span-2">
+                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Descripción</p>
+                  <p className="text-sm text-[var(--color-textPrimary)] break-words">
                     {paymentIntent.description}
                   </p>
                 </div>
@@ -269,31 +271,31 @@ export default function TransactionDetailClient({
           {/* Payment Method Card */}
           {paymentIntent.payment_method && (
             <div className="card">
-              <h2 className="text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                <CreditCard size={20} className="text-[var(--color-primary)]" />
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
+                <CreditCard size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
                 Método de Pago
               </h2>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Tipo</p>
+                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Tipo</p>
                   <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
                     {paymentIntent.payment_method.type || 'N/A'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Marca</p>
+                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Marca</p>
                   <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
                     {paymentIntent.payment_method.brand || 'N/A'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Últimos 4 dígitos</p>
+                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Últimos 4 dígitos</p>
                   <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
                     •••• {paymentIntent.payment_method.last4 || '****'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Vencimiento</p>
+                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Vencimiento</p>
                   <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
                     {paymentIntent.payment_method.exp_month?.toString().padStart(2, '0') || 'XX'}/
                     {paymentIntent.payment_method.exp_year || 'XXXX'}
@@ -306,23 +308,23 @@ export default function TransactionDetailClient({
           {/* Customer Info Card */}
           {paymentIntent.customer && (
             <div className="card">
-              <h2 className="text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                <User size={20} className="text-[var(--color-primary)]" />
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
+                <User size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
                 Cliente
               </h2>
               <div className="space-y-3">
                 {paymentIntent.customer.name && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Nombre</p>
-                    <p className="text-sm font-medium text-[var(--color-textPrimary)]">
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Nombre</p>
+                    <p className="text-sm font-medium text-[var(--color-textPrimary)] break-words">
                       {paymentIntent.customer.name}
                     </p>
                   </div>
                 )}
                 {paymentIntent.customer.email && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Email</p>
-                    <p className="text-sm font-medium text-[var(--color-textPrimary)]">
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Email</p>
+                    <p className="text-sm font-medium text-[var(--color-textPrimary)] break-all">
                       {paymentIntent.customer.email}
                     </p>
                   </div>
@@ -335,14 +337,14 @@ export default function TransactionDetailClient({
           {/* Metadata Card */}
           {paymentIntent.metadata && Object.keys(paymentIntent.metadata).length > 0 && (
             <div className="card">
-              <h2 className="text-xl font-semibold text-[var(--color-textPrimary)] mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4">
                 Metadata
               </h2>
               <div className="space-y-2">
                 {Object.entries(paymentIntent.metadata).map(([key, value]) => (
-                  <div key={key} className="flex justify-between py-2 border-b border-[var(--color-border)] last:border-0">
-                    <span className="text-sm text-[var(--color-textSecondary)]">{key}</span>
-                    <span className="text-sm font-medium text-[var(--color-textPrimary)]">
+                  <div key={key} className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-2 border-b border-[var(--color-border)] last:border-0">
+                    <span className="text-xs sm:text-sm text-[var(--color-textSecondary)] font-medium">{key}</span>
+                    <span className="text-sm font-medium text-[var(--color-textPrimary)] break-all">
                       {typeof value === 'object' ? JSON.stringify(value) : String(value)}
                     </span>
                   </div>
@@ -353,23 +355,23 @@ export default function TransactionDetailClient({
         </div>
 
         {/* Right Column - Charge Details & Risk */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Charge Summary Card */}
           {charge && (
             <div className="card">
-              <h2 className="text-lg font-semibold text-[var(--color-textPrimary)] mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4">
                 Resumen del Cargo
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-2.5 sm:space-y-3">
                 <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">ID del Cargo</p>
+                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">ID del Cargo</p>
                   <p className="text-xs font-mono text-[var(--color-textPrimary)] break-all">
                     {charge.id}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Estado</p>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Estado</p>
+                  <span className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     charge.status === 'captured' ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]' :
                     charge.status === 'authorized' ? 'bg-[var(--color-warning)]/20 text-[var(--color-warning)]' :
                     'bg-[var(--color-error)]/20 text-[var(--color-error)]'
@@ -381,7 +383,7 @@ export default function TransactionDetailClient({
                 </div>
                 {charge.amount_authorized && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Monto Autorizado</p>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Monto Autorizado</p>
                     <p className="text-sm font-semibold text-[var(--color-textPrimary)]">
                       {formatCurrency(charge.amount_authorized, paymentIntent.currency)}
                     </p>
@@ -389,7 +391,7 @@ export default function TransactionDetailClient({
                 )}
                 {charge.amount_captured !== undefined && charge.amount_captured > 0 && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Monto Capturado</p>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Monto Capturado</p>
                     <p className="text-sm font-semibold text-[var(--color-success)]">
                       {formatCurrency(charge.amount_captured, paymentIntent.currency)}
                     </p>
@@ -397,7 +399,7 @@ export default function TransactionDetailClient({
                 )}
                 {charge.amount_refunded !== undefined && charge.amount_refunded > 0 && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Monto Reembolsado</p>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Monto Reembolsado</p>
                     <p className="text-sm font-semibold text-[var(--color-error)]">
                       {formatCurrency(charge.amount_refunded, paymentIntent.currency)}
                     </p>
@@ -405,15 +407,15 @@ export default function TransactionDetailClient({
                 )}
                 {charge.acquirer_reference && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Referencia Adquirente</p>
-                    <p className="text-xs font-mono text-[var(--color-textPrimary)]">
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Referencia Adquirente</p>
+                    <p className="text-xs font-mono text-[var(--color-textPrimary)] break-all">
                       {charge.acquirer_reference}
                     </p>
                   </div>
                 )}
                 {charge.authorization_code && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Código de Autorización</p>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Código de Autorización</p>
                     <p className="text-xs font-mono text-[var(--color-textPrimary)]">
                       {charge.authorization_code}
                     </p>
@@ -421,7 +423,7 @@ export default function TransactionDetailClient({
                 )}
                 {charge.network && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Red</p>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Red</p>
                     <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
                       {charge.network}
                     </p>
@@ -429,8 +431,8 @@ export default function TransactionDetailClient({
                 )}
                 {charge.acquirer_name && (
                   <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">Procesador</p>
-                    <p className="text-sm font-medium text-[var(--color-textPrimary)]">
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Procesador</p>
+                    <p className="text-sm font-medium text-[var(--color-textPrimary)] break-words">
                       {charge.acquirer_name}
                     </p>
                   </div>
@@ -449,34 +451,34 @@ export default function TransactionDetailClient({
 
             return (
               <div className="card bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20">
-                <h2 className="text-lg font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                  <Shield size={20} className="text-blue-400" />
+                <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
+                  <Shield size={18} className="sm:w-5 sm:h-5 text-blue-400" />
                   Análisis de Riesgo
                 </h2>
 
                 {/* Risk Score Overview - Simple for Non-Technical Users */}
-                <div className="space-y-4 mb-6">
+                <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                   {/* Risk Level Badge */}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-[var(--color-textSecondary)]">Nivel de Riesgo</span>
-                    <span className={`text-lg font-bold ${riskLevel.color}`}>
+                    <span className="text-xs sm:text-sm font-medium text-[var(--color-textSecondary)]">Nivel de Riesgo</span>
+                    <span className={`text-base sm:text-lg font-bold ${riskLevel.color}`}>
                       {riskLevel.level}
                     </span>
                   </div>
 
                   {/* Risk Score Progress Bar */}
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center justify-between text-[10px] sm:text-xs">
                       <span className="text-[var(--color-textSecondary)]">Puntuación de riesgo</span>
                       <span className={`font-mono font-bold ${riskLevel.color}`}>{riskScore}%</span>
                     </div>
-                    <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                    <div className="w-full h-2.5 sm:h-3 bg-white/10 rounded-full overflow-hidden">
                       <div
                         className={`h-full ${riskLevel.bgColor} transition-all duration-500 ease-out`}
                         style={{ width: `${riskScore}%` }}
                       />
                     </div>
-                    <div className="flex justify-between text-[10px] text-[var(--color-textSecondary)]">
+                    <div className="flex justify-between text-[9px] sm:text-[10px] text-[var(--color-textSecondary)]">
                       <span>Bajo</span>
                       <span>Medio</span>
                       <span>Alto</span>
@@ -484,17 +486,17 @@ export default function TransactionDetailClient({
                   </div>
 
                   {/* Risk Explanation */}
-                  <div className="p-3 bg-white/5 rounded-lg">
-                    <p className="text-xs text-[var(--color-textSecondary)] leading-relaxed">
+                  <div className="p-2.5 sm:p-3 bg-white/5 rounded-lg">
+                    <p className="text-[11px] sm:text-xs text-[var(--color-textSecondary)] leading-relaxed">
                       {riskLevel.description}
                     </p>
                   </div>
                 </div>
 
                 {/* Security Checks - Simplified */}
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
-                    <div className={`mt-0.5 ${
+                <div className="space-y-2.5 sm:space-y-3 mb-3 sm:mb-4">
+                  <div className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 bg-white/5 rounded-lg">
+                    <div className={`mt-0.5 text-sm sm:text-base ${
                       charge.processor_response.cvc_check?.toUpperCase() === 'M' ||
                       charge.processor_response.cvc_check?.toLowerCase() === 'pass'
                         ? 'text-green-400'
@@ -512,22 +514,22 @@ export default function TransactionDetailClient({
                         : '⚠'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-[var(--color-textPrimary)]">
+                      <div className="flex items-center justify-between mb-1 gap-2">
+                        <span className="text-xs sm:text-sm font-medium text-[var(--color-textPrimary)]">
                           Código de Seguridad (CVV)
                         </span>
-                        <span className="text-xs font-mono text-[var(--color-textSecondary)]">
+                        <span className="text-[10px] sm:text-xs font-mono text-[var(--color-textSecondary)] flex-shrink-0">
                           {charge.processor_response.cvc_check || 'N/A'}
                         </span>
                       </div>
-                      <p className="text-xs text-[var(--color-textSecondary)] leading-relaxed">
+                      <p className="text-[11px] sm:text-xs text-[var(--color-textSecondary)] leading-relaxed">
                         {getCVVExplanation(charge.processor_response.cvc_check)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
-                    <div className={`mt-0.5 ${
+                  <div className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 bg-white/5 rounded-lg">
+                    <div className={`mt-0.5 text-sm sm:text-base ${
                       charge.processor_response.avs_result?.toUpperCase() === 'Y' ||
                       charge.processor_response.avs_result?.toUpperCase() === 'X'
                         ? 'text-green-400'
@@ -543,15 +545,15 @@ export default function TransactionDetailClient({
                         : '⚠'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-[var(--color-textPrimary)]">
+                      <div className="flex items-center justify-between mb-1 gap-2">
+                        <span className="text-xs sm:text-sm font-medium text-[var(--color-textPrimary)]">
                           Verificación de Dirección (AVS)
                         </span>
-                        <span className="text-xs font-mono text-[var(--color-textSecondary)]">
+                        <span className="text-[10px] sm:text-xs font-mono text-[var(--color-textSecondary)] flex-shrink-0">
                           {charge.processor_response.avs_result || 'N/A'}
                         </span>
                       </div>
-                      <p className="text-xs text-[var(--color-textSecondary)] leading-relaxed">
+                      <p className="text-[11px] sm:text-xs text-[var(--color-textSecondary)] leading-relaxed">
                         {getAVSExplanation(charge.processor_response.avs_result)}
                       </p>
                     </div>
@@ -559,13 +561,13 @@ export default function TransactionDetailClient({
                 </div>
 
                 {/* Technical Details - Collapsible */}
-                <div className="border-t border-white/10 pt-4">
+                <div className="border-t border-white/10 pt-3 sm:pt-4">
                   <button
                     onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
                     className="w-full flex items-center justify-between p-2 hover:bg-white/5 rounded-lg transition-colors"
                   >
-                    <span className="text-sm font-medium text-[var(--color-textPrimary)] flex items-center gap-2">
-                      <Info size={16} className="text-blue-400" />
+                    <span className="text-xs sm:text-sm font-medium text-[var(--color-textPrimary)] flex items-center gap-2">
+                      <Info size={14} className="sm:w-4 sm:h-4 text-blue-400" />
                       Detalles Técnicos
                     </span>
                     {showTechnicalDetails ? (
