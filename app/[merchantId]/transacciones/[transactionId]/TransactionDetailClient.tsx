@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CreditCard, User, MapPin, Shield, Server, AlertCircle, CheckCircle2, XCircle } from 'lucide-react'
+import { ArrowLeft, CreditCard, User, MapPin, Shield, Server, AlertCircle, CheckCircle2, XCircle, ChevronDown, ChevronUp, Info } from 'lucide-react'
 
 type Charge = {
   id: string
@@ -110,7 +111,102 @@ export default function TransactionDetailClient({
     )
   }
 
+  // Risk scoring functions
+  const getCVVRiskScore = (cvcCheck: string | null | undefined): number => {
+    if (!cvcCheck) return 25 // Unknown = medium-low risk
+    const code = cvcCheck.toUpperCase()
+
+    // CyberSource CVV codes
+    if (code === 'M' || code === 'PASS') return 0  // Match = no risk
+    if (code === 'N' || code === 'FAIL') return 50 // No match = high risk
+    if (code === 'P') return 30 // Not processed = medium risk
+    if (code === 'U' || code === 'S') return 20 // Unknown/Not supported = low-medium risk
+
+    return 25 // Default for unknown codes
+  }
+
+  const getAVSRiskScore = (avsResult: string | null | undefined): number => {
+    if (!avsResult) return 25 // Unknown = medium-low risk
+    const code = avsResult.toUpperCase()
+
+    // CyberSource/Visa AVS codes
+    if (code === 'Y' || code === 'X') return 0  // Full match = no risk
+    if (code === 'Z') return 15 // Zip match only = low risk
+    if (code === 'A') return 15 // Address match only = low risk
+    if (code === 'W') return 10 // 9-digit zip match = very low risk
+    if (code === 'N') return 40 // No match = high risk
+    if (code === 'U' || code === 'R' || code === 'S') return 25 // Unavailable/Retry/Not supported = medium risk
+    if (code === 'E') return 30 // Error = medium-high risk
+
+    return 25 // Default for unknown codes
+  }
+
+  const calculateRiskScore = (cvcCheck: string | null | undefined, avsResult: string | null | undefined): number => {
+    const cvvScore = getCVVRiskScore(cvcCheck)
+    const avsScore = getAVSRiskScore(avsResult)
+
+    // Weighted average: CVV is slightly more important (60/40 split)
+    return Math.round((cvvScore * 0.6) + (avsScore * 0.4))
+  }
+
+  const getRiskLevel = (score: number): { level: string; color: string; bgColor: string; description: string } => {
+    if (score <= 25) {
+      return {
+        level: 'Riesgo Bajo',
+        color: 'text-green-400',
+        bgColor: 'bg-green-400',
+        description: 'Esta transacción tiene baja probabilidad de fraude. Las verificaciones de seguridad fueron exitosas.'
+      }
+    } else if (score <= 50) {
+      return {
+        level: 'Riesgo Medio',
+        color: 'text-yellow-400',
+        bgColor: 'bg-yellow-400',
+        description: 'Esta transacción requiere atención. Algunas verificaciones de seguridad no pudieron completarse o fallaron parcialmente.'
+      }
+    } else {
+      return {
+        level: 'Riesgo Alto',
+        color: 'text-red-400',
+        bgColor: 'bg-red-400',
+        description: 'Esta transacción tiene alta probabilidad de fraude. Se recomienda revisión manual antes de procesar.'
+      }
+    }
+  }
+
+  const getCVVExplanation = (cvcCheck: string | null | undefined): string => {
+    if (!cvcCheck) return 'No se realizó verificación del código de seguridad (CVV).'
+    const code = cvcCheck.toUpperCase()
+
+    if (code === 'M' || code === 'PASS') return 'El código CVV coincide correctamente. Esto indica que el cliente tiene acceso a la tarjeta física.'
+    if (code === 'N' || code === 'FAIL') return 'El código CVV NO coincide. Esto puede indicar que el cliente no tiene acceso a la tarjeta física o ingresó el código incorrectamente.'
+    if (code === 'P') return 'El código CVV no fue procesado por el banco emisor.'
+    if (code === 'U') return 'El banco emisor no está certificado para verificar CVV o no proporcionó la clave de encriptación.'
+    if (code === 'S') return 'El CVV debería estar en la tarjeta pero no fue indicado en la transacción.'
+
+    return `Código CVV desconocido: ${cvcCheck}`
+  }
+
+  const getAVSExplanation = (avsResult: string | null | undefined): string => {
+    if (!avsResult) return 'No se realizó verificación de dirección (AVS).'
+    const code = avsResult.toUpperCase()
+
+    if (code === 'Y') return 'Dirección y código postal coinciden perfectamente.'
+    if (code === 'X') return 'Dirección y código postal de 9 dígitos coinciden perfectamente.'
+    if (code === 'A') return 'La dirección coincide, pero el código postal NO coincide.'
+    if (code === 'Z') return 'El código postal coincide, pero la dirección NO coincide.'
+    if (code === 'W') return 'El código postal de 9 dígitos coincide, pero la dirección NO coincide.'
+    if (code === 'N') return 'Ni la dirección ni el código postal coinciden.'
+    if (code === 'U') return 'Información de dirección no disponible del banco emisor.'
+    if (code === 'R') return 'Sistema de verificación de dirección no disponible temporalmente. Reintentar.'
+    if (code === 'S') return 'El banco emisor no soporta verificación de dirección (AVS).'
+    if (code === 'E') return 'Error en el sistema de verificación de dirección.'
+
+    return `Código AVS: ${avsResult}`
+  }
+
   const charge = paymentIntent.charges?.[0]
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false)
 
   return (
     <div className="container-dashboard py-8">
@@ -394,40 +490,194 @@ export default function TransactionDetailClient({
             </div>
           )}
 
-          {/* Risk Analysis Card */}
-          {charge?.processor_response && (
-            <div className="card bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20">
-              <h2 className="text-lg font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                <Shield size={20} className="text-blue-400" />
-                Análisis de Riesgo
-              </h2>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                  <span className="text-sm text-[var(--color-textSecondary)]">Verificación CVV</span>
-                  <span className={`text-sm font-semibold ${
-                    charge.processor_response.cvc_check === 'pass' ? 'text-green-400' :
-                    charge.processor_response.cvc_check === 'fail' ? 'text-red-400' :
-                    'text-yellow-400'
-                  }`}>
-                    {charge.processor_response.cvc_check === 'pass' ? '✓ Aprobado' :
-                     charge.processor_response.cvc_check === 'fail' ? '✗ Rechazado' :
-                     charge.processor_response.cvc_check || '— Sin verificar'}
-                  </span>
+          {/* Risk Analysis Card - Enhanced */}
+          {charge?.processor_response && (() => {
+            const riskScore = calculateRiskScore(
+              charge.processor_response.cvc_check,
+              charge.processor_response.avs_result
+            )
+            const riskLevel = getRiskLevel(riskScore)
+
+            return (
+              <div className="card bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20">
+                <h2 className="text-lg font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                  <Shield size={20} className="text-blue-400" />
+                  Análisis de Riesgo
+                </h2>
+
+                {/* Risk Score Overview - Simple for Non-Technical Users */}
+                <div className="space-y-4 mb-6">
+                  {/* Risk Level Badge */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-[var(--color-textSecondary)]">Nivel de Riesgo</span>
+                    <span className={`text-lg font-bold ${riskLevel.color}`}>
+                      {riskLevel.level}
+                    </span>
+                  </div>
+
+                  {/* Risk Score Progress Bar */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[var(--color-textSecondary)]">Puntuación de riesgo</span>
+                      <span className={`font-mono font-bold ${riskLevel.color}`}>{riskScore}%</span>
+                    </div>
+                    <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${riskLevel.bgColor} transition-all duration-500 ease-out`}
+                        style={{ width: `${riskScore}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-[var(--color-textSecondary)]">
+                      <span>Bajo</span>
+                      <span>Medio</span>
+                      <span>Alto</span>
+                    </div>
+                  </div>
+
+                  {/* Risk Explanation */}
+                  <div className="p-3 bg-white/5 rounded-lg">
+                    <p className="text-xs text-[var(--color-textSecondary)] leading-relaxed">
+                      {riskLevel.description}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                  <span className="text-sm text-[var(--color-textSecondary)]">Verificación AVS</span>
-                  <span className="text-sm font-semibold text-yellow-400">
-                    {charge.processor_response.avs_result || '— Sin verificar'}
-                  </span>
+
+                {/* Security Checks - Simplified */}
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                    <div className={`mt-0.5 ${
+                      charge.processor_response.cvc_check?.toUpperCase() === 'M' ||
+                      charge.processor_response.cvc_check?.toLowerCase() === 'pass'
+                        ? 'text-green-400'
+                        : charge.processor_response.cvc_check?.toUpperCase() === 'N' ||
+                          charge.processor_response.cvc_check?.toLowerCase() === 'fail'
+                        ? 'text-red-400'
+                        : 'text-yellow-400'
+                    }`}>
+                      {charge.processor_response.cvc_check?.toUpperCase() === 'M' ||
+                       charge.processor_response.cvc_check?.toLowerCase() === 'pass'
+                        ? '✓'
+                        : charge.processor_response.cvc_check?.toUpperCase() === 'N' ||
+                          charge.processor_response.cvc_check?.toLowerCase() === 'fail'
+                        ? '✗'
+                        : '⚠'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-[var(--color-textPrimary)]">
+                          Código de Seguridad (CVV)
+                        </span>
+                        <span className="text-xs font-mono text-[var(--color-textSecondary)]">
+                          {charge.processor_response.cvc_check || 'N/A'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[var(--color-textSecondary)] leading-relaxed">
+                        {getCVVExplanation(charge.processor_response.cvc_check)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
+                    <div className={`mt-0.5 ${
+                      charge.processor_response.avs_result?.toUpperCase() === 'Y' ||
+                      charge.processor_response.avs_result?.toUpperCase() === 'X'
+                        ? 'text-green-400'
+                        : charge.processor_response.avs_result?.toUpperCase() === 'N'
+                        ? 'text-red-400'
+                        : 'text-yellow-400'
+                    }`}>
+                      {charge.processor_response.avs_result?.toUpperCase() === 'Y' ||
+                       charge.processor_response.avs_result?.toUpperCase() === 'X'
+                        ? '✓'
+                        : charge.processor_response.avs_result?.toUpperCase() === 'N'
+                        ? '✗'
+                        : '⚠'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-[var(--color-textPrimary)]">
+                          Verificación de Dirección (AVS)
+                        </span>
+                        <span className="text-xs font-mono text-[var(--color-textSecondary)]">
+                          {charge.processor_response.avs_result || 'N/A'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[var(--color-textSecondary)] leading-relaxed">
+                        {getAVSExplanation(charge.processor_response.avs_result)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-4 p-3 bg-blue-500/10 rounded-lg">
-                  <p className="text-xs text-blue-400">
-                    Los datos de riesgo son provistos por el procesador de pagos y ayudan a identificar transacciones potencialmente fraudulentas.
-                  </p>
+
+                {/* Technical Details - Collapsible */}
+                <div className="border-t border-white/10 pt-4">
+                  <button
+                    onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+                    className="w-full flex items-center justify-between p-2 hover:bg-white/5 rounded-lg transition-colors"
+                  >
+                    <span className="text-sm font-medium text-[var(--color-textPrimary)] flex items-center gap-2">
+                      <Info size={16} className="text-blue-400" />
+                      Detalles Técnicos
+                    </span>
+                    {showTechnicalDetails ? (
+                      <ChevronUp size={16} className="text-[var(--color-textSecondary)]" />
+                    ) : (
+                      <ChevronDown size={16} className="text-[var(--color-textSecondary)]" />
+                    )}
+                  </button>
+
+                  {showTechnicalDetails && (
+                    <div className="mt-3 space-y-3 animate-fadeIn">
+                      {/* Processor Response Code */}
+                      {charge.processor_response.code && (
+                        <div className="p-3 bg-black/20 rounded-lg">
+                          <span className="text-xs text-[var(--color-textSecondary)]">Código del Procesador</span>
+                          <p className="text-sm font-mono text-[var(--color-textPrimary)] mt-1">
+                            {charge.processor_response.code}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Processor Message */}
+                      {charge.processor_response.message && (
+                        <div className="p-3 bg-black/20 rounded-lg">
+                          <span className="text-xs text-[var(--color-textSecondary)]">Mensaje del Procesador</span>
+                          <p className="text-sm text-[var(--color-textPrimary)] mt-1">
+                            {charge.processor_response.message}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Raw Response */}
+                      {charge.processor_response.raw_response && (
+                        <div className="p-3 bg-black/20 rounded-lg">
+                          <span className="text-xs text-[var(--color-textSecondary)] mb-2 block">
+                            Respuesta Completa (JSON)
+                          </span>
+                          <pre className="text-[10px] font-mono text-gray-300 overflow-x-auto">
+                            {JSON.stringify(charge.processor_response.raw_response, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+
+                      {/* Risk Scoring Info */}
+                      <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                        <div className="flex items-start gap-2">
+                          <Info size={14} className="text-blue-400 mt-0.5 flex-shrink-0" />
+                          <div className="text-xs text-blue-400 leading-relaxed">
+                            <p className="font-medium mb-1">Cálculo de Puntuación:</p>
+                            <p>• CVV: {getCVVRiskScore(charge.processor_response.cvc_check)} puntos (peso 60%)</p>
+                            <p>• AVS: {getAVSRiskScore(charge.processor_response.avs_result)} puntos (peso 40%)</p>
+                            <p className="mt-1">Score Total: {riskScore}% = {riskLevel.level}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
         </div>
       </div>
     </div>
