@@ -37,7 +37,7 @@ export default async function GeneralPage({
   // Get last month transactions for comparison
   const { data: lastMonthTxns } = await supabase
     .from('payment_intents')
-    .select('amount, currency, status')
+    .select('amount, currency, status, customer')
     .eq('merchant_id', merchantId)
     .gte('created_at', startOfLastMonth.toISOString())
     .lte('created_at', endOfLastMonth.toISOString())
