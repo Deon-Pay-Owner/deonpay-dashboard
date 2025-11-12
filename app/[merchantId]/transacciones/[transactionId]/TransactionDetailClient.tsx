@@ -208,7 +208,8 @@ export default function TransactionDetailClient({
 
   const charge = paymentIntent.charges?.[0]
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false)
-  const [showFullJSON, setShowFullJSON] = useState(false)
+  const [showRawResponse, setShowRawResponse] = useState(false)
+  const [showPaymentIntentJSON, setShowPaymentIntentJSON] = useState(false)
   const [activeTab, setActiveTab] = useState<'admin' | 'technical'>('admin')
 
   return (
@@ -267,131 +268,136 @@ export default function TransactionDetailClient({
 
       {/* Administrative View */}
       {activeTab === 'admin' && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-        {/* Left Column - Main Info */}
-        <div className="space-y-6">
-          {/* Payment Info Card */}
-          <div className="card">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-              <CreditCard size={20} className="text-[var(--color-primary)]" />
-              Información del Pago
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Monto</p>
-                <p className="text-xl sm:text-2xl font-bold text-[var(--color-textPrimary)]">
-                  {formatCurrency(paymentIntent.amount, paymentIntent.currency)}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Fecha</p>
-                <p className="text-sm font-medium text-[var(--color-textPrimary)] break-words">
-                  {formatDate(paymentIntent.created_at)}
-                </p>
-              </div>
-              {paymentIntent.description && (
-                <div className="col-span-1 sm:col-span-2">
-                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Descripción</p>
-                  <p className="text-sm text-[var(--color-textPrimary)] break-words">
-                    {paymentIntent.description}
-                  </p>
-                </div>
-              )}
+      <div className="space-y-6 pb-6">
+        {/* Payment Info Card - Full Width */}
+        <div className="card bg-gradient-to-br from-[var(--color-primary)]/5 to-[var(--color-primary)]/10 border-[var(--color-primary)]/20">
+          <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+            <CreditCard size={20} className="text-[var(--color-primary)]" />
+            Información del Pago
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Monto</p>
+              <p className="text-xl sm:text-2xl font-bold text-[var(--color-textPrimary)]">
+                {formatCurrency(paymentIntent.amount, paymentIntent.currency)}
+              </p>
             </div>
+            <div>
+              <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Fecha</p>
+              <p className="text-sm font-medium text-[var(--color-textPrimary)] break-words">
+                {formatDate(paymentIntent.created_at)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Estado</p>
+              {getStatusBadge(paymentIntent.status)}
+            </div>
+            {paymentIntent.description && (
+              <div className="col-span-1 sm:col-span-3">
+                <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Descripción</p>
+                <p className="text-sm text-[var(--color-textPrimary)] break-words">
+                  {paymentIntent.description}
+                </p>
+              </div>
+            )}
           </div>
-
-          {/* Payment Method Card */}
-          {paymentIntent.payment_method && (
-            <div className="card">
-              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                <CreditCard size={20} className="text-[var(--color-primary)]" />
-                Método de Pago
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Tipo</p>
-                  <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
-                    {paymentIntent.payment_method.type || 'N/A'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Marca</p>
-                  <div className="flex items-center gap-2">
-                    <CardBrandIcon brand={paymentIntent.payment_method.brand} size={32} />
-                    <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
-                      {paymentIntent.payment_method.brand || 'N/A'}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Últimos 4 dígitos</p>
-                  <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
-                    •••• {paymentIntent.payment_method.last4 || '****'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Vencimiento</p>
-                  <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
-                    {paymentIntent.payment_method.exp_month?.toString().padStart(2, '0') || 'XX'}/
-                    {paymentIntent.payment_method.exp_year || 'XXXX'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Customer Info Card */}
-          {paymentIntent.customer && (
-            <div className="card">
-              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                <User size={20} className="text-[var(--color-primary)]" />
-                Cliente
-              </h2>
-              <div className="space-y-4">
-                {paymentIntent.customer.name && (
-                  <div>
-                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Nombre</p>
-                    <p className="text-sm font-medium text-[var(--color-textPrimary)] break-words">
-                      {paymentIntent.customer.name}
-                    </p>
-                  </div>
-                )}
-                {paymentIntent.customer.email && (
-                  <div>
-                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Email</p>
-                    <p className="text-sm font-medium text-[var(--color-textPrimary)] break-all">
-                      {paymentIntent.customer.email}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-
-          {/* Metadata Card */}
-          {paymentIntent.metadata && Object.keys(paymentIntent.metadata).length > 0 && (
-            <div className="card">
-              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                <Info size={20} className="text-[var(--color-primary)]" />
-                Metadata
-              </h2>
-              <div className="space-y-3">
-                {Object.entries(paymentIntent.metadata).map(([key, value]) => (
-                  <div key={key} className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-2 border-b border-[var(--color-border)] last:border-0">
-                    <span className="text-xs sm:text-sm text-[var(--color-textSecondary)] font-medium">{key}</span>
-                    <span className="text-sm font-medium text-[var(--color-textPrimary)] break-all">
-                      {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Right Column - Charge Details & Risk */}
-        <div className="space-y-6">
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="space-y-6">
+            {/* Payment Method Card */}
+            {paymentIntent.payment_method && (
+              <div className="card">
+                <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                  <CreditCard size={20} className="text-[var(--color-primary)]" />
+                  Método de Pago
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Tipo</p>
+                    <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
+                      {paymentIntent.payment_method.type || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Marca</p>
+                    <div className="flex items-center gap-2">
+                      <CardBrandIcon brand={paymentIntent.payment_method.brand} size={32} />
+                      <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
+                        {paymentIntent.payment_method.brand || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Últimos 4 dígitos</p>
+                    <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
+                      •••• {paymentIntent.payment_method.last4 || '****'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Vencimiento</p>
+                    <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
+                      {paymentIntent.payment_method.exp_month?.toString().padStart(2, '0') || 'XX'}/
+                      {paymentIntent.payment_method.exp_year || 'XXXX'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Customer Info Card */}
+            {paymentIntent.customer && (
+              <div className="card">
+                <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                  <User size={20} className="text-[var(--color-primary)]" />
+                  Cliente
+                </h2>
+                <div className="space-y-4">
+                  {paymentIntent.customer.name && (
+                    <div>
+                      <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Nombre</p>
+                      <p className="text-sm font-medium text-[var(--color-textPrimary)] break-words">
+                        {paymentIntent.customer.name}
+                      </p>
+                    </div>
+                  )}
+                  {paymentIntent.customer.email && (
+                    <div>
+                      <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Email</p>
+                      <p className="text-sm font-medium text-[var(--color-textPrimary)] break-all">
+                        {paymentIntent.customer.email}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Metadata Card */}
+            {paymentIntent.metadata && Object.keys(paymentIntent.metadata).length > 0 && (
+              <div className="card">
+                <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                  <Info size={20} className="text-[var(--color-primary)]" />
+                  Metadata
+                </h2>
+                <div className="space-y-3">
+                  {Object.entries(paymentIntent.metadata).map(([key, value]) => (
+                    <div key={key} className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-2 border-b border-[var(--color-border)] last:border-0">
+                      <span className="text-xs sm:text-sm text-[var(--color-textSecondary)] font-medium">{key}</span>
+                      <span className="text-sm font-medium text-[var(--color-textPrimary)] break-all">
+                        {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Charge Details & Risk */}
+          <div className="space-y-6">
           {/* Charge Summary Card */}
           {charge && (
             <div className="card">
@@ -666,6 +672,7 @@ export default function TransactionDetailClient({
               </div>
             )
           })()}
+          </div>
         </div>
       </div>
       )}
@@ -673,6 +680,36 @@ export default function TransactionDetailClient({
       {/* Technical View */}
       {activeTab === 'technical' && (
       <div className="space-y-6 pb-6">
+        {/* Transaction Overview - Technical */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="card bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
+            <p className="text-xs text-[var(--color-textSecondary)] mb-2">Transaction ID</p>
+            <p className="text-xs font-mono text-[var(--color-textPrimary)] break-all leading-tight">
+              {paymentIntent.id}
+            </p>
+          </div>
+          {charge && (
+            <div className="card bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/20">
+              <p className="text-xs text-[var(--color-textSecondary)] mb-2">Charge ID</p>
+              <p className="text-xs font-mono text-[var(--color-textPrimary)] break-all leading-tight">
+                {charge.id}
+              </p>
+            </div>
+          )}
+          <div className="card bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
+            <p className="text-xs text-[var(--color-textSecondary)] mb-2">Timestamp</p>
+            <p className="text-xs font-mono text-[var(--color-textPrimary)]">
+              {new Date(paymentIntent.created_at).toISOString()}
+            </p>
+          </div>
+          <div className="card bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-orange-500/20">
+            <p className="text-xs text-[var(--color-textSecondary)] mb-2">Environment</p>
+            <p className="text-sm font-semibold text-[var(--color-textPrimary)]">
+              {process.env.NEXT_PUBLIC_ENVIRONMENT || 'Production'}
+            </p>
+          </div>
+        </div>
+
         {/* Processor Response Summary - Grid Layout */}
         {charge && charge.processor_response && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -717,6 +754,16 @@ export default function TransactionDetailClient({
                 Información Técnica del Cargo
               </h2>
               <div className="space-y-4">
+                <div>
+                  <p className="text-xs text-[var(--color-textSecondary)] mb-1">Status del Cargo</p>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    charge.status === 'captured' ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]' :
+                    charge.status === 'authorized' ? 'bg-[var(--color-warning)]/20 text-[var(--color-warning)]' :
+                    'bg-[var(--color-error)]/20 text-[var(--color-error)]'
+                  }`}>
+                    {charge.status}
+                  </span>
+                </div>
                 {charge.network && (
                   <div>
                     <p className="text-xs text-[var(--color-textSecondary)] mb-1">Red de Procesamiento</p>
@@ -725,7 +772,7 @@ export default function TransactionDetailClient({
                 )}
                 {charge.acquirer_name && (
                   <div>
-                    <p className="text-xs text-[var(--color-textSecondary)] mb-1">Procesador</p>
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-1">Procesador / Adquirente</p>
                     <p className="text-sm font-medium text-[var(--color-textPrimary)]">{charge.acquirer_name}</p>
                   </div>
                 )}
@@ -746,64 +793,243 @@ export default function TransactionDetailClient({
           </div>
         )}
 
-        {/* Raw Response JSON */}
-        {charge?.processor_response?.raw_response && (
+        {/* Payment Method Technical Details */}
+        {paymentIntent.payment_method && (
           <div className="card">
             <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-              <Code size={20} className="text-[var(--color-primary)]" />
-              Raw Response (Procesador)
+              <CreditCard size={20} className="text-[var(--color-primary)]" />
+              Detalles Técnicos del Método de Pago
             </h2>
-            <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto border border-[var(--color-border)]">
-              <pre className="text-xs font-mono text-gray-300 leading-relaxed">
-                {JSON.stringify(charge.processor_response.raw_response, null, 2)}
-              </pre>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(JSON.stringify(charge.processor_response.raw_response, null, 2))
-                }}
-                className="btn-secondary text-xs py-2 px-3"
-              >
-                Copiar JSON
-              </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-3 rounded-lg bg-[var(--color-background)]/50 border border-[var(--color-border)]">
+                <p className="text-xs text-[var(--color-textSecondary)] mb-1">Tipo de Método</p>
+                <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)] capitalize">
+                  {paymentIntent.payment_method.type || 'N/A'}
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-[var(--color-background)]/50 border border-[var(--color-border)]">
+                <p className="text-xs text-[var(--color-textSecondary)] mb-1">Marca de la Tarjeta</p>
+                <div className="flex items-center gap-2">
+                  <CardBrandIcon brand={paymentIntent.payment_method.brand} size={24} />
+                  <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)] capitalize">
+                    {paymentIntent.payment_method.brand || 'N/A'}
+                  </p>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg bg-[var(--color-background)]/50 border border-[var(--color-border)]">
+                <p className="text-xs text-[var(--color-textSecondary)] mb-1">PAN (Últimos 4)</p>
+                <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
+                  •••• •••• •••• {paymentIntent.payment_method.last4 || '****'}
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-[var(--color-background)]/50 border border-[var(--color-border)]">
+                <p className="text-xs text-[var(--color-textSecondary)] mb-1">Fecha de Expiración</p>
+                <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
+                  {paymentIntent.payment_method.exp_month?.toString().padStart(2, '0')}/{paymentIntent.payment_method.exp_year}
+                </p>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Full Payment Intent JSON */}
-        <div className="card">
-          <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-            <Code size={20} className="text-[var(--color-primary)]" />
-            Payment Intent Completo
-          </h2>
-          <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto border border-[var(--color-border)]">
-            <pre className="text-xs font-mono text-gray-300 leading-relaxed">
-              {JSON.stringify(paymentIntent, null, 2)}
-            </pre>
+        {/* Amount Breakdown */}
+        {charge && (
+          <div className="card">
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+              <Info size={20} className="text-[var(--color-primary)]" />
+              Desglose de Montos
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {charge.amount_authorized !== undefined && (
+                <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
+                  <p className="text-xs text-[var(--color-textSecondary)] mb-2">Monto Autorizado</p>
+                  <p className="text-xl font-bold text-blue-400">
+                    {formatCurrency(charge.amount_authorized, paymentIntent.currency)}
+                  </p>
+                  <p className="text-xs font-mono text-[var(--color-textSecondary)] mt-1">
+                    {charge.amount_authorized} centavos
+                  </p>
+                </div>
+              )}
+              {charge.amount_captured !== undefined && (
+                <div className="p-4 rounded-lg bg-green-500/5 border border-green-500/20">
+                  <p className="text-xs text-[var(--color-textSecondary)] mb-2">Monto Capturado</p>
+                  <p className="text-xl font-bold text-green-400">
+                    {formatCurrency(charge.amount_captured, paymentIntent.currency)}
+                  </p>
+                  <p className="text-xs font-mono text-[var(--color-textSecondary)] mt-1">
+                    {charge.amount_captured} centavos
+                  </p>
+                </div>
+              )}
+              {charge.amount_refunded !== undefined && (
+                <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
+                  <p className="text-xs text-[var(--color-textSecondary)] mb-2">Monto Reembolsado</p>
+                  <p className="text-xl font-bold text-red-400">
+                    {formatCurrency(charge.amount_refunded, paymentIntent.currency)}
+                  </p>
+                  <p className="text-xs font-mono text-[var(--color-textSecondary)] mt-1">
+                    {charge.amount_refunded} centavos
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
+        )}
+
+        {/* Raw Response JSON - Accordion */}
+        {charge?.processor_response?.raw_response && (
+          <div className="card border-2 border-[var(--color-border)]">
             <button
-              onClick={() => {
-                navigator.clipboard.writeText(JSON.stringify(paymentIntent, null, 2))
-              }}
-              className="btn-secondary text-xs py-2 px-3"
+              onClick={() => setShowRawResponse(!showRawResponse)}
+              className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-background)]/50 rounded-lg transition-colors"
             >
-              Copiar JSON
+              <div className="flex items-center gap-3">
+                <Code size={20} className="text-[var(--color-primary)]" />
+                <div className="text-left">
+                  <h3 className="text-base sm:text-lg font-semibold text-[var(--color-textPrimary)]">
+                    Raw Response (Procesador)
+                  </h3>
+                  <p className="text-xs text-[var(--color-textSecondary)]">
+                    Respuesta completa del procesador de pagos
+                  </p>
+                </div>
+              </div>
+              {showRawResponse ? (
+                <ChevronUp size={20} className="text-[var(--color-textSecondary)] flex-shrink-0" />
+              ) : (
+                <ChevronDown size={20} className="text-[var(--color-textSecondary)] flex-shrink-0" />
+              )}
             </button>
-            <button
-              onClick={() => {
-                const blob = new Blob([JSON.stringify(paymentIntent, null, 2)], { type: 'application/json' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `transaction-${paymentIntent.id}.json`
-                a.click()
-              }}
-              className="btn-secondary text-xs py-2 px-3"
-            >
-              Descargar JSON
-            </button>
+
+            {showRawResponse && (
+              <div className="px-4 pb-4 space-y-3 animate-fadeIn">
+                <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto border border-[var(--color-border)] max-h-96 overflow-y-auto">
+                  <pre className="text-xs font-mono text-gray-300 leading-relaxed">
+                    {JSON.stringify(charge.processor_response.raw_response, null, 2)}
+                  </pre>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      if (charge?.processor_response?.raw_response) {
+                        navigator.clipboard.writeText(JSON.stringify(charge.processor_response.raw_response, null, 2))
+                      }
+                    }}
+                    className="btn-secondary text-xs py-2 px-3"
+                  >
+                    Copiar JSON
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (charge?.processor_response?.raw_response) {
+                        const blob = new Blob([JSON.stringify(charge.processor_response.raw_response, null, 2)], { type: 'application/json' })
+                        const url = URL.createObjectURL(blob)
+                        const a = document.createElement('a')
+                        a.href = url
+                        a.download = `processor-response-${charge.id}.json`
+                        a.click()
+                      }
+                    }}
+                    className="btn-secondary text-xs py-2 px-3"
+                  >
+                    Descargar JSON
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Full Payment Intent JSON - Accordion */}
+        <div className="card border-2 border-[var(--color-border)]">
+          <button
+            onClick={() => setShowPaymentIntentJSON(!showPaymentIntentJSON)}
+            className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-background)]/50 rounded-lg transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Code size={20} className="text-[var(--color-primary)]" />
+              <div className="text-left">
+                <h3 className="text-base sm:text-lg font-semibold text-[var(--color-textPrimary)]">
+                  Payment Intent Completo
+                </h3>
+                <p className="text-xs text-[var(--color-textSecondary)]">
+                  Objeto completo de la transacción incluyendo todos los datos
+                </p>
+              </div>
+            </div>
+            {showPaymentIntentJSON ? (
+              <ChevronUp size={20} className="text-[var(--color-textSecondary)] flex-shrink-0" />
+            ) : (
+              <ChevronDown size={20} className="text-[var(--color-textSecondary)] flex-shrink-0" />
+            )}
+          </button>
+
+          {showPaymentIntentJSON && (
+            <div className="px-4 pb-4 space-y-3 animate-fadeIn">
+              <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto border border-[var(--color-border)] max-h-96 overflow-y-auto">
+                <pre className="text-xs font-mono text-gray-300 leading-relaxed">
+                  {JSON.stringify(paymentIntent, null, 2)}
+                </pre>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(JSON.stringify(paymentIntent, null, 2))
+                  }}
+                  className="btn-secondary text-xs py-2 px-3"
+                >
+                  Copiar JSON
+                </button>
+                <button
+                  onClick={() => {
+                    const blob = new Blob([JSON.stringify(paymentIntent, null, 2)], { type: 'application/json' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `transaction-${paymentIntent.id}.json`
+                    a.click()
+                  }}
+                  className="btn-secondary text-xs py-2 px-3"
+                >
+                  Descargar JSON
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* API Integration Info */}
+        <div className="card bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-500/20">
+          <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+            <Info size={20} className="text-indigo-400" />
+            Información para Desarrolladores
+          </h2>
+          <div className="space-y-3 text-xs sm:text-sm text-[var(--color-textSecondary)]">
+            <div className="flex items-start gap-2">
+              <span className="text-indigo-400 mt-0.5">•</span>
+              <p>
+                <strong className="text-[var(--color-textPrimary)]">Idempotencia:</strong> Usa el ID de la transacción para operaciones idempotentes
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-indigo-400 mt-0.5">•</span>
+              <p>
+                <strong className="text-[var(--color-textPrimary)]">Webhooks:</strong> Asegúrate de validar la firma de los webhooks antes de procesar
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-indigo-400 mt-0.5">•</span>
+              <p>
+                <strong className="text-[var(--color-textPrimary)]">Reintento:</strong> Los códigos de respuesta del procesador indican si es seguro reintentar
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-indigo-400 mt-0.5">•</span>
+              <p>
+                <strong className="text-[var(--color-textPrimary)]">Security:</strong> CVV y AVS son verificaciones críticas para prevenir fraude
+              </p>
+            </div>
           </div>
         </div>
       </div>
