@@ -27,18 +27,22 @@ export default async function GeneralPage({
   const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
 
   // Get ALL transactions to calculate stats (not just current month)
-  const { data: allTransactions, error: txnError } = await supabase
+  const { data: allTransactions, error: txnError, count: totalCount } = await supabase
     .from('payment_intents')
-    .select('amount, currency, status, customer, created_at')
+    .select('*', { count: 'exact' })
     .eq('merchant_id', merchantId)
     .order('created_at', { ascending: false })
 
   // Debug logging
   console.log('General Page Debug:', {
     merchantId,
+    user: user?.id,
     transactionCount: allTransactions?.length || 0,
+    totalCount,
     error: txnError,
-    firstTransaction: allTransactions?.[0]
+    errorDetails: txnError ? JSON.stringify(txnError) : null,
+    firstTransaction: allTransactions?.[0],
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL
   })
 
   // Filter transactions by date range
@@ -111,12 +115,18 @@ export default async function GeneralPage({
   ]
 
   // Get recent transactions for the list - get more than 5 to enable pagination
-  const { data: recentTransactions } = await supabase
+  const { data: recentTransactions, error: recentTxnError } = await supabase
     .from('payment_intents')
-    .select('id, created_at, amount, currency, status, customer')
+    .select('*')
     .eq('merchant_id', merchantId)
     .order('created_at', { ascending: false })
     .limit(20) // Get up to 20 transactions for pagination
+
+  console.log('Recent Transactions Debug:', {
+    count: recentTransactions?.length || 0,
+    error: recentTxnError,
+    merchantId
+  })
 
   return (
     <div className="container-dashboard pt-8 pb-4 sm:py-8">
@@ -131,19 +141,29 @@ export default async function GeneralPage({
         {/* Debug info */}
         {!allTransactions || allTransactions.length === 0 ? (
           <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-            <p className="text-sm text-yellow-600">
-              ⚠️ No se encontraron transacciones para este merchant. MerchantID: {merchantId}
+            <p className="text-sm text-yellow-600 font-medium mb-2">
+              ⚠️ No se encontraron transacciones para este merchant
             </p>
-            {txnError && (
-              <p className="text-xs text-red-600 mt-1">
-                Error: {txnError.message}
-              </p>
-            )}
+            <div className="text-xs space-y-1">
+              <p className="font-mono">MerchantID: {merchantId}</p>
+              <p className="font-mono">UserID: {user?.id || 'No user'}</p>
+              <p>Total Count: {totalCount || 0}</p>
+              {txnError && (
+                <p className="text-red-600 mt-2">
+                  <strong>Error:</strong> {JSON.stringify(txnError)}
+                </p>
+              )}
+              {recentTxnError && (
+                <p className="text-red-600 mt-2">
+                  <strong>Recent Txn Error:</strong> {JSON.stringify(recentTxnError)}
+                </p>
+              )}
+            </div>
           </div>
         ) : (
           <div className="mt-3 p-2 bg-green-500/10 border border-green-500/20 rounded-lg">
             <p className="text-xs text-green-600">
-              ✓ {allTransactions.length} transacciones encontradas | Mostrando: {isCurrentMonth ? 'Datos del mes actual' : 'Datos históricos completos'}
+              ✓ {allTransactions.length} transacciones ({totalCount} total) | Mostrando: {isCurrentMonth ? 'Datos del mes actual' : 'Datos históricos completos'}
             </p>
           </div>
         )}
