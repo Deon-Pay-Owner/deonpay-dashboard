@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CreditCard, User, MapPin, Shield, AlertCircle, CheckCircle2, XCircle, ChevronDown, ChevronUp, Info } from 'lucide-react'
+import { ArrowLeft, CreditCard, User, MapPin, Shield, AlertCircle, CheckCircle2, XCircle, ChevronDown, ChevronUp, Info, Code } from 'lucide-react'
+import CardBrandIcon from '@/components/CardBrandIcon'
 
 type Charge = {
   id: string
@@ -207,6 +208,7 @@ export default function TransactionDetailClient({
 
   const charge = paymentIntent.charges?.[0]
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false)
+  const [showFullJSON, setShowFullJSON] = useState(false)
 
   return (
     <div className="container-dashboard pt-6 sm:pt-8 pb-8 px-4 sm:px-6">
@@ -235,9 +237,9 @@ export default function TransactionDetailClient({
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left Column - Main Info */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Payment Info Card */}
           <div className="card">
             <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
@@ -284,9 +286,12 @@ export default function TransactionDetailClient({
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Marca</p>
-                  <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
-                    {paymentIntent.payment_method.brand || 'N/A'}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <CardBrandIcon brand={paymentIntent.payment_method.brand} size={32} />
+                    <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
+                      {paymentIntent.payment_method.brand || 'N/A'}
+                    </p>
+                  </div>
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Últimos 4 dígitos</p>
@@ -629,6 +634,62 @@ export default function TransactionDetailClient({
               </div>
             )
           })()}
+        </div>
+      </div>
+
+      {/* Technical Data Section - Full JSON */}
+      <div className="mt-6">
+        <div className="card">
+          <button
+            onClick={() => setShowFullJSON(!showFullJSON)}
+            className="w-full flex items-center justify-between group"
+          >
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] flex items-center gap-2">
+              <Code size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
+              Datos Técnicos Completos
+            </h2>
+            {showFullJSON ? (
+              <ChevronUp size={20} className="text-[var(--color-textSecondary)] group-hover:text-[var(--color-primary)] transition-colors" />
+            ) : (
+              <ChevronDown size={20} className="text-[var(--color-textSecondary)] group-hover:text-[var(--color-primary)] transition-colors" />
+            )}
+          </button>
+
+          {showFullJSON && (
+            <div className="mt-4 animate-fadeIn">
+              <p className="text-xs text-[var(--color-textSecondary)] mb-3">
+                Respuesta completa del servidor en formato JSON
+              </p>
+              <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto">
+                <pre className="text-xs font-mono text-gray-300 leading-relaxed">
+                  {JSON.stringify(paymentIntent, null, 2)}
+                </pre>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(JSON.stringify(paymentIntent, null, 2))
+                  }}
+                  className="btn-secondary text-xs py-2 px-3"
+                >
+                  Copiar JSON
+                </button>
+                <button
+                  onClick={() => {
+                    const blob = new Blob([JSON.stringify(paymentIntent, null, 2)], { type: 'application/json' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `transaction-${paymentIntent.id}.json`
+                    a.click()
+                  }}
+                  className="btn-secondary text-xs py-2 px-3"
+                >
+                  Descargar JSON
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
