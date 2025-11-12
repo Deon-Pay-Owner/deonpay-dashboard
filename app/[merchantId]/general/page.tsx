@@ -27,11 +27,19 @@ export default async function GeneralPage({
   const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
 
   // Get ALL transactions to calculate stats (not just current month)
-  const { data: allTransactions } = await supabase
+  const { data: allTransactions, error: txnError } = await supabase
     .from('payment_intents')
     .select('amount, currency, status, customer, created_at')
     .eq('merchant_id', merchantId)
     .order('created_at', { ascending: false })
+
+  // Debug logging
+  console.log('General Page Debug:', {
+    merchantId,
+    transactionCount: allTransactions?.length || 0,
+    error: txnError,
+    firstTransaction: allTransactions?.[0]
+  })
 
   // Filter transactions by date range
   const currentMonthTxns = allTransactions?.filter(t => {
@@ -120,6 +128,25 @@ export default async function GeneralPage({
         <p className="text-[var(--color-textSecondary)]">
           Resumen de tu actividad y métricas principales
         </p>
+        {/* Debug info */}
+        {!allTransactions || allTransactions.length === 0 ? (
+          <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+            <p className="text-sm text-yellow-600">
+              ⚠️ No se encontraron transacciones para este merchant. MerchantID: {merchantId}
+            </p>
+            {txnError && (
+              <p className="text-xs text-red-600 mt-1">
+                Error: {txnError.message}
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="mt-3 p-2 bg-green-500/10 border border-green-500/20 rounded-lg">
+            <p className="text-xs text-green-600">
+              ✓ {allTransactions.length} transacciones encontradas | Mostrando: {isCurrentMonth ? 'Datos del mes actual' : 'Datos históricos completos'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Stats Grid */}
@@ -149,25 +176,6 @@ export default async function GeneralPage({
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="card mb-8">
-        <h2 className="card-header">Acciones rápidas</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-          <button className="btn-primary text-left">
-            Crear link de pago
-          </button>
-          <button className="btn-secondary text-left">
-            Ver documentación API
-          </button>
-          <button className="btn-secondary text-left">
-            Configurar webhook
-          </button>
-          <button className="btn-secondary text-left">
-            Invitar miembro del equipo
-          </button>
-        </div>
       </div>
 
       {/* Activity Cards */}
