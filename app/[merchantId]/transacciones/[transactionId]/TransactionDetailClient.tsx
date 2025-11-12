@@ -267,16 +267,16 @@ export default function TransactionDetailClient({
 
       {/* Administrative View */}
       {activeTab === 'admin' && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
         {/* Left Column - Main Info */}
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6">
           {/* Payment Info Card */}
           <div className="card">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
-              <CreditCard size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+              <CreditCard size={20} className="text-[var(--color-primary)]" />
               Información del Pago
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Monto</p>
                 <p className="text-xl sm:text-2xl font-bold text-[var(--color-textPrimary)]">
@@ -303,11 +303,11 @@ export default function TransactionDetailClient({
           {/* Payment Method Card */}
           {paymentIntent.payment_method && (
             <div className="card">
-              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
-                <CreditCard size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                <CreditCard size={20} className="text-[var(--color-primary)]" />
                 Método de Pago
               </h2>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Tipo</p>
                   <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">
@@ -343,11 +343,11 @@ export default function TransactionDetailClient({
           {/* Customer Info Card */}
           {paymentIntent.customer && (
             <div className="card">
-              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
-                <User size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                <User size={20} className="text-[var(--color-primary)]" />
                 Cliente
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {paymentIntent.customer.name && (
                   <div>
                     <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">Nombre</p>
@@ -372,10 +372,11 @@ export default function TransactionDetailClient({
           {/* Metadata Card */}
           {paymentIntent.metadata && Object.keys(paymentIntent.metadata).length > 0 && (
             <div className="card">
-              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                <Info size={20} className="text-[var(--color-primary)]" />
                 Metadata
               </h2>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {Object.entries(paymentIntent.metadata).map(([key, value]) => (
                   <div key={key} className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-2 border-b border-[var(--color-border)] last:border-0">
                     <span className="text-xs sm:text-sm text-[var(--color-textSecondary)] font-medium">{key}</span>
@@ -390,14 +391,15 @@ export default function TransactionDetailClient({
         </div>
 
         {/* Right Column - Charge Details & Risk */}
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6">
           {/* Charge Summary Card */}
           {charge && (
             <div className="card">
-              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-3 sm:mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                <Shield size={20} className="text-[var(--color-primary)]" />
                 Resumen del Cargo
               </h2>
-              <div className="space-y-2.5 sm:space-y-3">
+              <div className="space-y-4">
                 <div>
                   <p className="text-xs sm:text-sm text-[var(--color-textSecondary)] mb-1">ID del Cargo</p>
                   <p className="text-xs font-mono text-[var(--color-textPrimary)] break-all">
@@ -670,39 +672,76 @@ export default function TransactionDetailClient({
 
       {/* Technical View */}
       {activeTab === 'technical' && (
-      <div className="space-y-6">
-        {/* Charge Technical Details */}
+      <div className="space-y-6 pb-6">
+        {/* Processor Response Summary - Grid Layout */}
         {charge && charge.processor_response && (
-          <div className="card">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-              <Shield size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
-              Respuesta del Procesador
-            </h2>
-            <div className="space-y-4">
-              {charge.processor_response.code && (
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Código</p>
-                  <p className="text-base font-mono text-[var(--color-textPrimary)]">{charge.processor_response.code}</p>
-                </div>
-              )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left: Key Technical Fields */}
+            <div className="card">
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                <Shield size={20} className="text-[var(--color-primary)]" />
+                Respuesta del Procesador
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                {charge.processor_response.code && (
+                  <div className="p-3 rounded-lg bg-[var(--color-primary)]/5 border border-[var(--color-border)]">
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-2">Código</p>
+                    <p className="text-lg font-mono font-bold text-[var(--color-textPrimary)]">{charge.processor_response.code}</p>
+                  </div>
+                )}
+                {charge.processor_response.cvc_check && (
+                  <div className="p-3 rounded-lg bg-[var(--color-primary)]/5 border border-[var(--color-border)]">
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-2">CVV Check</p>
+                    <p className="text-lg font-mono font-bold text-[var(--color-textPrimary)]">{charge.processor_response.cvc_check}</p>
+                  </div>
+                )}
+                {charge.processor_response.avs_result && (
+                  <div className="p-3 rounded-lg bg-[var(--color-primary)]/5 border border-[var(--color-border)]">
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-2">AVS Result</p>
+                    <p className="text-lg font-mono font-bold text-[var(--color-textPrimary)]">{charge.processor_response.avs_result}</p>
+                  </div>
+                )}
+              </div>
               {charge.processor_response.message && (
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Mensaje</p>
-                  <p className="text-base text-[var(--color-textPrimary)]">{charge.processor_response.message}</p>
+                <div className="mt-4 p-3 rounded-lg bg-blue-500/5 border border-blue-500/20">
+                  <p className="text-xs text-[var(--color-textSecondary)] mb-2">Mensaje del Procesador</p>
+                  <p className="text-sm text-[var(--color-textPrimary)]">{charge.processor_response.message}</p>
                 </div>
               )}
-              {charge.processor_response.cvc_check && (
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">CVV Check</p>
-                  <p className="text-base font-mono text-[var(--color-textPrimary)]">{charge.processor_response.cvc_check}</p>
-                </div>
-              )}
-              {charge.processor_response.avs_result && (
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">AVS Result</p>
-                  <p className="text-base font-mono text-[var(--color-textPrimary)]">{charge.processor_response.avs_result}</p>
-                </div>
-              )}
+            </div>
+
+            {/* Right: Charge Technical Info */}
+            <div className="card">
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
+                <Info size={20} className="text-[var(--color-primary)]" />
+                Información Técnica del Cargo
+              </h2>
+              <div className="space-y-4">
+                {charge.network && (
+                  <div>
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-1">Red de Procesamiento</p>
+                    <p className="text-sm font-medium text-[var(--color-textPrimary)] capitalize">{charge.network}</p>
+                  </div>
+                )}
+                {charge.acquirer_name && (
+                  <div>
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-1">Procesador</p>
+                    <p className="text-sm font-medium text-[var(--color-textPrimary)]">{charge.acquirer_name}</p>
+                  </div>
+                )}
+                {charge.authorization_code && (
+                  <div>
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-1">Código de Autorización</p>
+                    <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">{charge.authorization_code}</p>
+                  </div>
+                )}
+                {charge.acquirer_reference && (
+                  <div>
+                    <p className="text-xs text-[var(--color-textSecondary)] mb-1">Referencia del Adquirente</p>
+                    <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)] break-all">{charge.acquirer_reference}</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -711,13 +750,23 @@ export default function TransactionDetailClient({
         {charge?.processor_response?.raw_response && (
           <div className="card">
             <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-              <Code size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
+              <Code size={20} className="text-[var(--color-primary)]" />
               Raw Response (Procesador)
             </h2>
-            <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto">
+            <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto border border-[var(--color-border)]">
               <pre className="text-xs font-mono text-gray-300 leading-relaxed">
                 {JSON.stringify(charge.processor_response.raw_response, null, 2)}
               </pre>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(JSON.stringify(charge.processor_response.raw_response, null, 2))
+                }}
+                className="btn-secondary text-xs py-2 px-3"
+              >
+                Copiar JSON
+              </button>
             </div>
           </div>
         )}
@@ -725,15 +774,15 @@ export default function TransactionDetailClient({
         {/* Full Payment Intent JSON */}
         <div className="card">
           <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-            <Code size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
-            Payment Intent Completo (JSON)
+            <Code size={20} className="text-[var(--color-primary)]" />
+            Payment Intent Completo
           </h2>
-          <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto">
+          <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto border border-[var(--color-border)]">
             <pre className="text-xs font-mono text-gray-300 leading-relaxed">
               {JSON.stringify(paymentIntent, null, 2)}
             </pre>
           </div>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <button
               onClick={() => {
                 navigator.clipboard.writeText(JSON.stringify(paymentIntent, null, 2))
