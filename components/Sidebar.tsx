@@ -11,6 +11,7 @@ import {
   Settings,
   Menu,
   X,
+  BookOpen,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -32,6 +33,7 @@ export default function Sidebar({ merchantId }: SidebarProps) {
   const developerNav = [
     { name: 'API Keys', href: `/${merchantId}/desarrolladores`, icon: Code },
     { name: 'Webhooks', href: `/${merchantId}/webhooks`, icon: Webhook },
+    { name: 'Documentación', href: `/${merchantId}/documentacion`, icon: BookOpen },
   ]
 
   return (

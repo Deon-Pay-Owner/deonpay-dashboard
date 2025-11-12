@@ -5,8 +5,9 @@ import TransactionDetailClient from './TransactionDetailClient'
 export default async function TransactionDetailPage({
   params,
 }: {
-  params: { merchantId: string; transactionId: string }
+  params: Promise<{ merchantId: string; transactionId: string }>
 }) {
+  const { merchantId, transactionId } = await params
   const supabase = await createClient()
 
   // Fetch payment intent with charges
@@ -16,18 +17,18 @@ export default async function TransactionDetailPage({
       *,
       charges (*)
     `)
-    .eq('id', params.transactionId)
-    .eq('merchant_id', params.merchantId)
+    .eq('id', transactionId)
+    .eq('merchant_id', merchantId)
     .single()
 
   if (error || !paymentIntent) {
-    redirect(`/${params.merchantId}/transacciones`)
+    redirect(`/${merchantId}/transacciones`)
   }
 
   return (
     <TransactionDetailClient
       paymentIntent={paymentIntent}
-      merchantId={params.merchantId}
+      merchantId={merchantId}
     />
   )
 }
