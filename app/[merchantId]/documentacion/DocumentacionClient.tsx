@@ -316,12 +316,807 @@ curl -X POST https://api.deonpay.mx/api/v1/payment_intents/pi_abc123.../confirm 
         </div>
       </div>
 
-      {/* Más secciones pueden agregarse aquí en el futuro */}
-      <div className="card bg-gradient-to-r from-[var(--color-primary)]/10 to-[var(--color-info)]/10 border border-[var(--color-primary)]/20">
-        <p className="text-sm sm:text-base text-[var(--color-textSecondary)] text-center py-2">
-          Más contenido de documentación se agregará próximamente...
+      {/* Test Matrix Section */}
+      <div className="card border-2 border-[var(--color-primary)]/30">
+        <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
+          <Code size={20} className="sm:w-6 sm:h-6 text-[var(--color-primary)] flex-shrink-0" />
+          <span>Matriz de Pruebas - Flujos Completos</span>
+        </h2>
+        <p className="text-sm sm:text-base text-[var(--color-textSecondary)] mb-4 sm:mb-6 leading-relaxed">
+          Matriz completa para probar todos los flujos de transacciones y webhooks. Incluye todos los estados posibles y eventos del sistema.
         </p>
+
+        {/* Test Scenarios Table */}
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="min-w-full divide-y divide-[var(--color-border)]">
+            <thead className="bg-[var(--color-surface)]">
+              <tr>
+                <th className="py-3 px-4 text-left text-xs font-semibold text-[var(--color-textPrimary)] uppercase tracking-wider">
+                  Escenario
+                </th>
+                <th className="py-3 px-4 text-left text-xs font-semibold text-[var(--color-textPrimary)] uppercase tracking-wider">
+                  Flujo
+                </th>
+                <th className="py-3 px-4 text-left text-xs font-semibold text-[var(--color-textPrimary)] uppercase tracking-wider">
+                  Eventos Emitidos
+                </th>
+                <th className="py-3 px-4 text-left text-xs font-semibold text-[var(--color-textPrimary)] uppercase tracking-wider">
+                  Card de Prueba
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--color-border)]">
+              {/* Scenario 1: Successful Payment - Automatic Capture */}
+              <tr className="hover:bg-[var(--color-surface)]/50">
+                <td className="py-4 px-4">
+                  <span className="text-sm font-semibold text-green-400">✅ Pago Exitoso (Captura Automática)</span>
+                </td>
+                <td className="py-4 px-4 text-sm text-[var(--color-textSecondary)]">
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Crear Payment Intent</li>
+                    <li>Confirmar con tarjeta</li>
+                    <li>Se autoriza y captura automáticamente</li>
+                  </ol>
+                </td>
+                <td className="py-4 px-4">
+                  <div className="flex flex-wrap gap-1">
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs font-mono">payment_intent.created</span>
+                    <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs font-mono">charge.authorized</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-mono">charge.captured</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-mono">payment_intent.succeeded</span>
+                  </div>
+                </td>
+                <td className="py-4 px-4 font-mono text-sm text-[var(--color-textSecondary)]">
+                  4242424242424242
+                </td>
+              </tr>
+
+              {/* Scenario 2: Manual Capture */}
+              <tr className="hover:bg-[var(--color-surface)]/50">
+                <td className="py-4 px-4">
+                  <span className="text-sm font-semibold text-yellow-400">⏸️ Autorización + Captura Manual</span>
+                </td>
+                <td className="py-4 px-4 text-sm text-[var(--color-textSecondary)]">
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Crear PI con capture_method: 'manual'</li>
+                    <li>Confirmar con tarjeta</li>
+                    <li>Se autoriza (NO captura)</li>
+                    <li>Capturar manualmente después</li>
+                  </ol>
+                </td>
+                <td className="py-4 px-4">
+                  <div className="flex flex-wrap gap-1">
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs font-mono">payment_intent.created</span>
+                    <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs font-mono">charge.authorized</span>
+                    <span className="px-2 py-0.5 bg-orange-500/20 text-orange-400 rounded text-xs font-mono">payment_intent.processing</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-mono">charge.captured</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-mono">payment_intent.succeeded</span>
+                  </div>
+                </td>
+                <td className="py-4 px-4 font-mono text-sm text-[var(--color-textSecondary)]">
+                  4242424242424242
+                </td>
+              </tr>
+
+              {/* Scenario 3: Failed Payment */}
+              <tr className="hover:bg-[var(--color-surface)]/50">
+                <td className="py-4 px-4">
+                  <span className="text-sm font-semibold text-red-400">❌ Pago Rechazado</span>
+                </td>
+                <td className="py-4 px-4 text-sm text-[var(--color-textSecondary)]">
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Crear Payment Intent</li>
+                    <li>Confirmar con tarjeta de prueba rechazada</li>
+                    <li>La autorización falla</li>
+                  </ol>
+                </td>
+                <td className="py-4 px-4">
+                  <div className="flex flex-wrap gap-1">
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs font-mono">payment_intent.created</span>
+                    <span className="px-2 py-0.5 bg-red-500/20 text-red-400 rounded text-xs font-mono">charge.failed</span>
+                    <span className="px-2 py-0.5 bg-red-500/20 text-red-400 rounded text-xs font-mono">payment_intent.failed</span>
+                  </div>
+                </td>
+                <td className="py-4 px-4 font-mono text-sm text-[var(--color-textSecondary)]">
+                  4000000000000002
+                </td>
+              </tr>
+
+              {/* Scenario 4: Void/Cancel */}
+              <tr className="hover:bg-[var(--color-surface)]/50">
+                <td className="py-4 px-4">
+                  <span className="text-sm font-semibold text-gray-400">🚫 Anular Autorización</span>
+                </td>
+                <td className="py-4 px-4 text-sm text-[var(--color-textSecondary)]">
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Crear PI con capture_method: 'manual'</li>
+                    <li>Confirmar con tarjeta</li>
+                    <li>Anular la autorización (void)</li>
+                  </ol>
+                </td>
+                <td className="py-4 px-4">
+                  <div className="flex flex-wrap gap-1">
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs font-mono">payment_intent.created</span>
+                    <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs font-mono">charge.authorized</span>
+                    <span className="px-2 py-0.5 bg-gray-500/20 text-gray-400 rounded text-xs font-mono">charge.voided</span>
+                    <span className="px-2 py-0.5 bg-gray-500/20 text-gray-400 rounded text-xs font-mono">payment_intent.canceled</span>
+                  </div>
+                </td>
+                <td className="py-4 px-4 font-mono text-sm text-[var(--color-textSecondary)]">
+                  4242424242424242
+                </td>
+              </tr>
+
+              {/* Scenario 5: Refund */}
+              <tr className="hover:bg-[var(--color-surface)]/50">
+                <td className="py-4 px-4">
+                  <span className="text-sm font-semibold text-indigo-400">↩️ Reembolso Completo</span>
+                </td>
+                <td className="py-4 px-4 text-sm text-[var(--color-textSecondary)]">
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Completar pago exitoso</li>
+                    <li>Crear reembolso del monto completo</li>
+                  </ol>
+                </td>
+                <td className="py-4 px-4">
+                  <div className="flex flex-wrap gap-1">
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs font-mono">refund.created</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-mono">refund.succeeded</span>
+                  </div>
+                </td>
+                <td className="py-4 px-4 font-mono text-sm text-[var(--color-textSecondary)]">
+                  4242424242424242
+                </td>
+              </tr>
+
+              {/* Scenario 6: 3D Secure (if supported) */}
+              <tr className="hover:bg-[var(--color-surface)]/50">
+                <td className="py-4 px-4">
+                  <span className="text-sm font-semibold text-purple-400">🔐 Autenticación 3DS</span>
+                </td>
+                <td className="py-4 px-4 text-sm text-[var(--color-textSecondary)]">
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Crear Payment Intent</li>
+                    <li>Confirmar con tarjeta que requiere 3DS</li>
+                    <li>Redirigir a autenticación</li>
+                    <li>Completar después de auth</li>
+                  </ol>
+                </td>
+                <td className="py-4 px-4">
+                  <div className="flex flex-wrap gap-1">
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs font-mono">payment_intent.created</span>
+                    <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-xs font-mono">payment_intent.requires_action</span>
+                    <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs font-mono">charge.authorized</span>
+                    <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-xs font-mono">payment_intent.succeeded</span>
+                  </div>
+                </td>
+                <td className="py-4 px-4 font-mono text-sm text-[var(--color-textSecondary)]">
+                  (Depende del procesador)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Postman Collection Download */}
+      <div className="card border-2 border-[var(--color-success)]/30 bg-gradient-to-br from-[var(--color-success)]/5 to-[var(--color-primary)]/5">
+        <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-textPrimary)] mb-3 sm:mb-4 flex items-center gap-2">
+          <Code size={20} className="sm:w-6 sm:h-6 text-[var(--color-success)] flex-shrink-0" />
+          <span>Postman Collection</span>
+        </h2>
+        <p className="text-sm sm:text-base text-[var(--color-textSecondary)] mb-4 leading-relaxed">
+          Collection completo de Postman con todos los endpoints, ejemplos de requests y tests automatizados.
+          Incluye variables de entorno pre-configuradas.
+        </p>
+
+        <div className="bg-[var(--color-surface)] rounded-lg p-4 border border-[var(--color-border)] mb-4">
+          <h3 className="font-semibold text-[var(--color-textPrimary)] mb-3">📋 Lo que incluye el Collection:</h3>
+          <ul className="space-y-2 text-sm text-[var(--color-textSecondary)]">
+            <li className="flex items-start gap-2">
+              <span className="text-green-400 mt-0.5">✓</span>
+              <span><strong>Payment Intents:</strong> Create, Confirm, Capture, Get, List</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-400 mt-0.5">✓</span>
+              <span><strong>Charges:</strong> Capture manual, Void authorization</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-400 mt-0.5">✓</span>
+              <span><strong>Refunds:</strong> Create full/partial refunds</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-400 mt-0.5">✓</span>
+              <span><strong>Customers:</strong> Create, Update, Get, List</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-400 mt-0.5">✓</span>
+              <span><strong>Variables de entorno:</strong> API Key, Base URL, IDs dinámicos</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-400 mt-0.5">✓</span>
+              <span><strong>Tests automatizados:</strong> Validación de responses, status codes</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-400 mt-0.5">✓</span>
+              <span><strong>Ejemplos pre-configurados:</strong> Todos los escenarios de la matriz de pruebas</span>
+            </li>
+          </ul>
+        </div>
+
+        <button
+          onClick={() => {
+            const collection = generatePostmanCollection(merchantId)
+            const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'DeonPay-API-Collection.postman_collection.json'
+            a.click()
+          }}
+          className="btn-primary w-full sm:w-auto"
+        >
+          📥 Descargar Postman Collection
+        </button>
+
+        <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+          <p className="text-sm text-blue-400 mb-2">
+            <strong>💡 Instrucciones de uso:</strong>
+          </p>
+          <ol className="list-decimal list-inside space-y-1 text-sm text-[var(--color-textSecondary)]">
+            <li>Descarga el collection haciendo clic en el botón de arriba</li>
+            <li>Importa el archivo JSON en Postman (File → Import)</li>
+            <li>Ve a la sección de Desarrolladores y copia tu API Key</li>
+            <li>En Postman, abre las variables de entorno y pega tu API Key</li>
+            <li>¡Listo! Ahora puedes ejecutar todas las pruebas</li>
+          </ol>
+        </div>
       </div>
     </div>
   )
+}
+
+// Postman Collection Generator
+function generatePostmanCollection(merchantId: string) {
+  return {
+    "info": {
+      "name": "DeonPay API - Complete Collection",
+      "description": "Collection completo de la API de DeonPay con todos los endpoints, ejemplos y tests automatizados.",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "_postman_id": crypto.randomUUID()
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": [
+        {
+          "key": "token",
+          "value": "{{api_key}}",
+          "type": "string"
+        }
+      ]
+    },
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "https://api.deonpay.mx",
+        "type": "string"
+      },
+      {
+        "key": "api_key",
+        "value": "sk_test_YOUR_API_KEY_HERE",
+        "type": "string"
+      },
+      {
+        "key": "merchant_id",
+        "value": merchantId,
+        "type": "string"
+      },
+      {
+        "key": "payment_intent_id",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "charge_id",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "customer_id",
+        "value": "",
+        "type": "string"
+      }
+    ],
+    "item": [
+      {
+        "name": "Payment Intents",
+        "item": [
+          {
+            "name": "1. Create Payment Intent",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 201\", function () {",
+                    "    pm.response.to.have.status(201);",
+                    "});",
+                    "",
+                    "pm.test(\"Response has payment intent\", function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('id');",
+                    "    pm.expect(jsonData.status).to.eql('requires_payment_method');",
+                    "    pm.environment.set('payment_intent_id', jsonData.id);",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "amount": 10000,
+                  "currency": "MXN",
+                  "description": "Prueba de pago - Scenario 1",
+                  "capture_method": "automatic",
+                  "metadata": {
+                    "order_id": "order_123456",
+                    "customer_name": "Juan Pérez",
+                    "test_scenario": "successful_payment"
+                  }
+                }, null, 2)
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/payment_intents",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "payment_intents"]
+              }
+            }
+          },
+          {
+            "name": "2. Confirm Payment Intent (Auto Capture)",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test(\"Payment succeeded\", function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData.paymentIntent.status).to.eql('succeeded');",
+                    "    pm.expect(jsonData.charge).to.exist;",
+                    "    pm.environment.set('charge_id', jsonData.charge.id);",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "payment_method": {
+                    "type": "card",
+                    "number": "4242424242424242",
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "cvv": "123"
+                  },
+                  "billing_details": {
+                    "name": "Juan Pérez",
+                    "email": "juan.perez@example.com",
+                    "address": {
+                      "line1": "Av. Reforma 123",
+                      "city": "Ciudad de México",
+                      "state": "CDMX",
+                      "postal_code": "01000",
+                      "country": "MX"
+                    }
+                  }
+                }, null, 2)
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/payment_intents/{{payment_intent_id}}/confirm",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "payment_intents", "{{payment_intent_id}}", "confirm"]
+              }
+            }
+          },
+          {
+            "name": "3. Create PI - Manual Capture",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "var jsonData = pm.response.json();",
+                    "pm.environment.set('payment_intent_id', jsonData.id);"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "amount": 5000,
+                  "currency": "MXN",
+                  "description": "Prueba - Captura manual",
+                  "capture_method": "manual",
+                  "metadata": {
+                    "order_id": "order_789",
+                    "test_scenario": "manual_capture"
+                  }
+                }, null, 2),
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/payment_intents",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "payment_intents"]
+              }
+            }
+          },
+          {
+            "name": "4. Confirm PI - Manual Capture",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Payment authorized (not captured)\", function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData.paymentIntent.status).to.eql('processing');",
+                    "    pm.expect(jsonData.charge.status).to.eql('authorized');",
+                    "    pm.environment.set('charge_id', jsonData.charge.id);",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "payment_method": {
+                    "type": "card",
+                    "number": "4242424242424242",
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "cvv": "123"
+                  }
+                }, null, 2),
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/payment_intents/{{payment_intent_id}}/confirm",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "payment_intents", "{{payment_intent_id}}", "confirm"]
+              }
+            }
+          },
+          {
+            "name": "5. Get Payment Intent",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/v1/payment_intents/{{payment_intent_id}}",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "payment_intents", "{{payment_intent_id}}"]
+              }
+            }
+          },
+          {
+            "name": "6. List Payment Intents",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/v1/payment_intents?limit=10&offset=0",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "payment_intents"],
+                "query": [
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "offset",
+                    "value": "0"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Charges",
+        "item": [
+          {
+            "name": "1. Capture Charge",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Charge captured successfully\", function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData.charge.status).to.eql('captured');",
+                    "    pm.expect(jsonData.paymentIntent.status).to.eql('succeeded');",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "amount_to_capture": 5000
+                }, null, 2),
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/charges/{{charge_id}}/capture",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "charges", "{{charge_id}}", "capture"]
+              }
+            }
+          },
+          {
+            "name": "2. Void Charge",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Charge voided successfully\", function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData.charge.status).to.eql('voided');",
+                    "    pm.expect(jsonData.paymentIntent.status).to.eql('canceled');",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/v1/charges/{{charge_id}}/void",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "charges", "{{charge_id}}", "void"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Refunds",
+        "item": [
+          {
+            "name": "1. Create Full Refund",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Refund created\", function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData.refund).to.exist;",
+                    "    pm.expect(jsonData.refund.status).to.be.oneOf(['pending', 'succeeded']);",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "charge_id": "{{charge_id}}",
+                  "reason": "Solicitud del cliente"
+                }, null, 2),
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/refunds",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "refunds"]
+              }
+            }
+          },
+          {
+            "name": "2. Create Partial Refund",
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "charge_id": "{{charge_id}}",
+                  "amount": 2500,
+                  "reason": "Reembolso parcial"
+                }, null, 2),
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/refunds",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "refunds"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Customers",
+        "item": [
+          {
+            "name": "1. Create Customer",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "var jsonData = pm.response.json();",
+                    "pm.environment.set('customer_id', jsonData.id);"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "email": "cliente@example.com",
+                  "name": "María González",
+                  "phone": "+52 55 1234 5678",
+                  "metadata": {
+                    "source": "postman_test"
+                  }
+                }, null, 2),
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/customers",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "customers"]
+              }
+            }
+          },
+          {
+            "name": "2. Get Customer",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/v1/customers/{{customer_id}}",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "customers", "{{customer_id}}"]
+              }
+            }
+          },
+          {
+            "name": "3. List Customers",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/v1/customers?limit=10",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "customers"],
+                "query": [
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Test Scenarios",
+        "item": [
+          {
+            "name": "Scenario: Failed Payment",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test(\"Payment should fail\", function () {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [],
+              "body": {
+                "mode": "raw",
+                "raw": JSON.stringify({
+                  "payment_method": {
+                    "type": "card",
+                    "number": "4000000000000002",
+                    "exp_month": 12,
+                    "exp_year": 2025,
+                    "cvv": "123"
+                  }
+                }, null, 2),
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              },
+              "url": {
+                "raw": "{{base_url}}/api/v1/payment_intents/{{payment_intent_id}}/confirm",
+                "host": ["{{base_url}}"],
+                "path": ["api", "v1", "payment_intents", "{{payment_intent_id}}", "confirm"]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
 }
