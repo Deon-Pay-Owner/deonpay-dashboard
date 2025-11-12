@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CreditCard, User, MapPin, Shield, Server, AlertCircle, CheckCircle2, XCircle, ChevronDown, ChevronUp, Info } from 'lucide-react'
+import { ArrowLeft, CreditCard, User, MapPin, Shield, AlertCircle, CheckCircle2, XCircle, ChevronDown, ChevronUp, Info } from 'lucide-react'
 
 type Charge = {
   id: string
@@ -331,57 +331,6 @@ export default function TransactionDetailClient({
             </div>
           )}
 
-          {/* Processor Response Card */}
-          {charge?.processor_response && (
-            <div className="card">
-              <h2 className="text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-                <Server size={20} className="text-[var(--color-primary)]" />
-                Respuesta del Procesador
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Código</p>
-                  <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
-                    {charge.processor_response.code || 'N/A'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Mensaje</p>
-                  <p className="text-sm font-medium text-[var(--color-textPrimary)]">
-                    {charge.processor_response.message || 'N/A'}
-                  </p>
-                </div>
-                {charge.processor_response.avs_result && (
-                  <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">AVS (Verificación de dirección)</p>
-                    <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
-                      {charge.processor_response.avs_result}
-                    </p>
-                  </div>
-                )}
-                {charge.processor_response.cvc_check && (
-                  <div>
-                    <p className="text-sm text-[var(--color-textSecondary)] mb-1">CVC Check</p>
-                    <p className="text-sm font-mono font-medium text-[var(--color-textPrimary)]">
-                      {charge.processor_response.cvc_check}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Raw Response (if available) */}
-              {charge.processor_response.raw_response && (
-                <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-2">Respuesta completa:</p>
-                  <pre className="bg-[#1e1e1e] p-4 rounded-lg overflow-x-auto text-xs">
-                    <code className="text-gray-300">
-                      {JSON.stringify(charge.processor_response.raw_response, null, 2)}
-                    </code>
-                  </pre>
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Metadata Card */}
           {paymentIntent.metadata && Object.keys(paymentIntent.metadata).length > 0 && (
