@@ -268,6 +268,7 @@ export default function TransactionDetailClient({
       {/* Administrative View */}
       {activeTab === 'admin' && (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left Column - Main Info */}
         <div className="space-y-4 sm:space-y-6">
           {/* Payment Info Card */}
@@ -666,100 +667,62 @@ export default function TransactionDetailClient({
           })()}
         </div>
       </div>
-      )}
 
-      {/* Technical View */}
-      {activeTab === 'technical' && (
-      <div className="space-y-6">
-        {/* Charge Technical Details */}
-        {charge && charge.processor_response && (
-          <div className="card">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-              <Shield size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
-              Respuesta del Procesador
-            </h2>
-            <div className="space-y-4">
-              {charge.processor_response.code && (
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Código</p>
-                  <p className="text-base font-mono text-[var(--color-textPrimary)]">{charge.processor_response.code}</p>
-                </div>
-              )}
-              {charge.processor_response.message && (
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">Mensaje</p>
-                  <p className="text-base text-[var(--color-textPrimary)]">{charge.processor_response.message}</p>
-                </div>
-              )}
-              {charge.processor_response.cvc_check && (
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">CVV Check</p>
-                  <p className="text-base font-mono text-[var(--color-textPrimary)]">{charge.processor_response.cvc_check}</p>
-                </div>
-              )}
-              {charge.processor_response.avs_result && (
-                <div>
-                  <p className="text-sm text-[var(--color-textSecondary)] mb-1">AVS Result</p>
-                  <p className="text-base font-mono text-[var(--color-textPrimary)]">{charge.processor_response.avs_result}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Raw Response JSON */}
-        {charge?.processor_response?.raw_response && (
-          <div className="card">
-            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-              <Code size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
-              Raw Response (Procesador)
-            </h2>
-            <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto">
-              <pre className="text-xs font-mono text-gray-300 leading-relaxed">
-                {JSON.stringify(charge.processor_response.raw_response, null, 2)}
-              </pre>
-            </div>
-          </div>
-        )}
-
-        {/* Full Payment Intent JSON */}
+      {/* Technical Data Section - Full JSON */}
+      <div className="mt-6">
         <div className="card">
-          <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] mb-4 flex items-center gap-2">
-            <Code size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
-            Payment Intent Completo (JSON)
-          </h2>
-          <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto">
-            <pre className="text-xs font-mono text-gray-300 leading-relaxed">
-              {JSON.stringify(paymentIntent, null, 2)}
-            </pre>
-          </div>
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(JSON.stringify(paymentIntent, null, 2))
-              }}
-              className="btn-secondary text-xs py-2 px-3"
-            >
-              Copiar JSON
-            </button>
-            <button
-              onClick={() => {
-                const blob = new Blob([JSON.stringify(paymentIntent, null, 2)], { type: 'application/json' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `transaction-${paymentIntent.id}.json`
-                a.click()
-              }}
-              className="btn-secondary text-xs py-2 px-3"
-            >
-              Descargar JSON
-            </button>
-          </div>
+          <button
+            onClick={() => setShowFullJSON(!showFullJSON)}
+            className="w-full flex items-center justify-between group"
+          >
+            <h2 className="text-lg sm:text-xl font-semibold text-[var(--color-textPrimary)] flex items-center gap-2">
+              <Code size={18} className="sm:w-5 sm:h-5 text-[var(--color-primary)]" />
+              Datos Técnicos Completos
+            </h2>
+            {showFullJSON ? (
+              <ChevronUp size={20} className="text-[var(--color-textSecondary)] group-hover:text-[var(--color-primary)] transition-colors" />
+            ) : (
+              <ChevronDown size={20} className="text-[var(--color-textSecondary)] group-hover:text-[var(--color-primary)] transition-colors" />
+            )}
+          </button>
+
+          {showFullJSON && (
+            <div className="mt-4 animate-fadeIn">
+              <p className="text-xs text-[var(--color-textSecondary)] mb-3">
+                Respuesta completa del servidor en formato JSON
+              </p>
+              <div className="bg-[#1e1e1e] rounded-lg p-4 overflow-x-auto">
+                <pre className="text-xs font-mono text-gray-300 leading-relaxed">
+                  {JSON.stringify(paymentIntent, null, 2)}
+                </pre>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(JSON.stringify(paymentIntent, null, 2))
+                  }}
+                  className="btn-secondary text-xs py-2 px-3"
+                >
+                  Copiar JSON
+                </button>
+                <button
+                  onClick={() => {
+                    const blob = new Blob([JSON.stringify(paymentIntent, null, 2)], { type: 'application/json' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `transaction-${paymentIntent.id}.json`
+                    a.click()
+                  }}
+                  className="btn-secondary text-xs py-2 px-3"
+                >
+                  Descargar JSON
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      )}
     </div>
   )
 }
-
