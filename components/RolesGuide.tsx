@@ -46,7 +46,7 @@ export default function RolesGuide() {
                     style={{ color: role.color }}
                   >
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-2xl">{role.icon}</span>
+                      <role.icon size={24} />
                       <span>{role.name}</span>
                     </div>
                   </th>
@@ -106,13 +106,13 @@ export default function RolesGuide() {
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
                       style={{
                         backgroundColor: `${role.color}20`,
                         color: role.color,
                       }}
                     >
-                      {role.icon}
+                      <role.icon size={24} />
                     </div>
                     <div className="text-left">
                       <h4

@@ -187,7 +187,7 @@ export default function TransaccionesClient({
       },
       failed: {
         label: 'Fallido',
-        className: 'bg-[var(--color-error)]/20 text-[var(--color-error)]',
+        className: 'bg-[var(--color-danger)]/20 text-[var(--color-danger)]',
       },
     }
 

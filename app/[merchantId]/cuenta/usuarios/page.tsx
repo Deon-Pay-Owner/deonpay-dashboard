@@ -230,13 +230,13 @@ export default function UsuariosPage({
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 flex-1">
                         <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
+                          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                           style={{
                             backgroundColor: `${roleInfo.color}20`,
                             color: roleInfo.color,
                           }}
                         >
-                          {roleInfo.icon}
+                          <roleInfo.icon size={20} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -332,13 +332,13 @@ export default function UsuariosPage({
                     >
                       <div className="flex items-start gap-3">
                         <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
+                          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                           style={{
                             backgroundColor: `${roleInfo.color}20`,
                             color: roleInfo.color,
                           }}
                         >
-                          {roleInfo.icon}
+                          <roleInfo.icon size={20} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-[var(--color-textPrimary)] truncate mb-1">
@@ -412,7 +412,7 @@ export default function UsuariosPage({
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xl">{role.icon}</span>
+                          <role.icon size={20} style={{ color: role.color }} />
                           <span
                             className="font-semibold text-sm"
                             style={{ color: role.color }}

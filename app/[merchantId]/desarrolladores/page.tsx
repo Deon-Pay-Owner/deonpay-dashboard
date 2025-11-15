@@ -159,10 +159,10 @@ export default async function DesarrolladoresPage({
       </div>
 
       {/* Code Example */}
-      <div className="card bg-[#1e1e1e] text-[#d4d4d4] border-[#333]">
-        <h2 className="text-lg font-semibold mb-4">Ejemplo rápido</h2>
-        <pre className="text-sm overflow-x-auto">
-          <code>{`// Instalar el SDK
+      <div className="card bg-[var(--color-surface)] border-[var(--color-border)]">
+        <h2 className="text-lg font-semibold mb-4 text-[var(--color-textPrimary)]">Ejemplo rápido</h2>
+        <pre className="text-sm overflow-x-auto bg-black/20 p-4 rounded-lg">
+          <code className="text-[var(--color-textPrimary)]">{`// Instalar el SDK
 npm install @deonpay/sdk
 
 // Crear un pago

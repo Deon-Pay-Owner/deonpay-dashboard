@@ -111,8 +111,8 @@ export default async function CuentaPage({
                 <span className={`
                   inline-block px-2 py-1 rounded-full text-xs font-medium
                   ${merchant?.status === 'active'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-yellow-100 text-yellow-800'
+                    ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]'
+                    : 'bg-[var(--color-warning)]/20 text-[var(--color-warning)]'
                   }
                 `}>
                   {merchant?.status === 'active' ? 'Activo' : 'Borrador'}

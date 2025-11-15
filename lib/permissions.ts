@@ -3,6 +3,16 @@
  * Defines all roles, permissions, and access control for the dashboard
  */
 
+import {
+  Crown,
+  Zap,
+  DollarSign,
+  Code2,
+  Headphones,
+  Eye,
+  type LucideIcon
+} from 'lucide-react'
+
 export type Role = 'owner' | 'admin' | 'finance' | 'developer' | 'support' | 'viewer'
 
 export type Permission =
@@ -42,7 +52,7 @@ export interface RoleDefinition {
   name: string
   description: string
   color: string
-  icon: string
+  icon: LucideIcon
   permissions: Permission[]
 }
 
@@ -52,7 +62,7 @@ export const ROLE_DEFINITIONS: Record<Role, RoleDefinition> = {
     name: 'Propietario',
     description: 'Control total del merchant. Único rol con acceso a configuraciones críticas y gestión de usuarios.',
     color: 'var(--color-primary)',
-    icon: '👑',
+    icon: Crown,
     permissions: [
       'view_dashboard',
       'view_transactions',
@@ -84,7 +94,7 @@ export const ROLE_DEFINITIONS: Record<Role, RoleDefinition> = {
     name: 'Administrador',
     description: 'Gestión operativa completa. Puede administrar transacciones, clientes y webhooks.',
     color: 'var(--color-info)',
-    icon: '⚡',
+    icon: Zap,
     permissions: [
       'view_dashboard',
       'view_transactions',
@@ -112,7 +122,7 @@ export const ROLE_DEFINITIONS: Record<Role, RoleDefinition> = {
     name: 'Finanzas',
     description: 'Enfocado en aspectos financieros. Gestiona transacciones, reembolsos y reportes.',
     color: 'var(--color-success)',
-    icon: '💰',
+    icon: DollarSign,
     permissions: [
       'view_dashboard',
       'view_transactions',
@@ -130,7 +140,7 @@ export const ROLE_DEFINITIONS: Record<Role, RoleDefinition> = {
     name: 'Desarrollador',
     description: 'Enfocado en integración técnica. Gestiona API keys, webhooks y documentación.',
     color: 'var(--color-warning)',
-    icon: '💻',
+    icon: Code2,
     permissions: [
       'view_dashboard',
       'view_transactions',
@@ -151,7 +161,7 @@ export const ROLE_DEFINITIONS: Record<Role, RoleDefinition> = {
     name: 'Soporte',
     description: 'Atención al cliente. Visualiza transacciones y clientes sin realizar modificaciones.',
     color: 'var(--color-info)',
-    icon: '🎧',
+    icon: Headphones,
     permissions: [
       'view_dashboard',
       'view_transactions',
@@ -167,7 +177,7 @@ export const ROLE_DEFINITIONS: Record<Role, RoleDefinition> = {
     name: 'Solo Lectura',
     description: 'Vista general sin modificaciones. Solo puede visualizar información básica.',
     color: 'var(--color-textSecondary)',
-    icon: '👀',
+    icon: Eye,
     permissions: [
       'view_dashboard',
       'view_transactions',

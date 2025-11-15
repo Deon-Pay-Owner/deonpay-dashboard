@@ -148,8 +148,8 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
                       <span
                         className={`px-2 py-0.5 rounded-full text-xs font-medium self-start sm:self-auto whitespace-nowrap ${
                           webhook.is_active
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-700'
+                            ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]'
+                            : 'bg-[var(--color-textSecondary)]/20 text-[var(--color-textSecondary)]'
                         }`}
                       >
                         {webhook.is_active ? 'Activo' : 'Inactivo'}
@@ -213,8 +213,8 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-[var(--color-textPrimary)] mb-3">💳 Intenciones de Pago (Payment Intent)</h3>
           <div className="space-y-2">
-            <div className="flex items-start gap-3 p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
-              <Info size={18} className="text-blue-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-info)]/5 rounded-lg border border-[var(--color-info)]/20">
+              <Info size={18} className="text-[var(--color-info)] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
                   payment_intent.created
@@ -225,8 +225,8 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-yellow-500/5 rounded-lg border border-yellow-500/20">
-              <AlertCircle size={18} className="text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-warning)]/5 rounded-lg border border-[var(--color-warning)]/20">
+              <AlertCircle size={18} className="text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
                   payment_intent.processing
@@ -237,8 +237,8 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
-              <AlertCircle size={18} className="text-purple-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-primary)]/5 rounded-lg border border-[var(--color-primary)]/20">
+              <AlertCircle size={18} className="text-[var(--color-primary)] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
                   payment_intent.requires_action
@@ -273,8 +273,8 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-gray-500/5 rounded-lg border border-gray-500/20">
-              <XCircle size={18} className="text-gray-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-textSecondary)]/5 rounded-lg border border-[var(--color-textSecondary)]/20">
+              <XCircle size={18} className="text-[var(--color-textSecondary)] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
                   payment_intent.canceled
@@ -291,8 +291,8 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-[var(--color-textPrimary)] mb-3">⚡ Cargos (Charge)</h3>
           <div className="space-y-2">
-            <div className="flex items-start gap-3 p-3 bg-yellow-500/5 rounded-lg border border-yellow-500/20">
-              <CheckCircle size={18} className="text-yellow-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-warning)]/5 rounded-lg border border-[var(--color-warning)]/20">
+              <CheckCircle size={18} className="text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
                   charge.authorized
@@ -327,8 +327,8 @@ export default function WebhooksClient({ merchantId, initialWebhooks }: Webhooks
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-gray-500/5 rounded-lg border border-gray-500/20">
-              <XCircle size={18} className="text-gray-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-[var(--color-textSecondary)]/5 rounded-lg border border-[var(--color-textSecondary)]/20">
+              <XCircle size={18} className="text-[var(--color-textSecondary)] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-[var(--color-textPrimary)] text-sm">
                   charge.voided
