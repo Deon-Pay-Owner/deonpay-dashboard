@@ -6,10 +6,8 @@ import {
   LayoutDashboard,
   CreditCard,
   Users,
-  UserCog,
   Webhook,
   Code,
-  Settings,
   Menu,
   X,
   BookOpen,
@@ -24,12 +22,10 @@ export default function Sidebar({ merchantId }: SidebarProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
-  const administrativeNav = [
+  const operationsNav = [
     { name: 'General', href: `/${merchantId}/general`, icon: LayoutDashboard },
     { name: 'Transacciones', href: `/${merchantId}/transacciones`, icon: CreditCard },
     { name: 'Clientes', href: `/${merchantId}/clientes`, icon: Users },
-    { name: 'Usuarios', href: `/${merchantId}/cuenta/usuarios`, icon: UserCog },
-    { name: 'Cuenta', href: `/${merchantId}/cuenta`, icon: Settings },
   ]
 
   const developerNav = [
@@ -87,13 +83,13 @@ export default function Sidebar({ merchantId }: SidebarProps) {
 
           {/* Navigation - Smooth hover effects */}
           <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20">
-            {/* Administrative Section */}
+            {/* Operations Section */}
             <div>
               <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider px-4 mb-3">
-                Administración
+                Operaciones
               </h3>
               <div className="space-y-2">
-                {administrativeNav.map((item) => {
+                {operationsNav.map((item) => {
                   const isActive = pathname === item.href
                   return (
                     <Link
