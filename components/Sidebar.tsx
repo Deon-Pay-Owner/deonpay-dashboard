@@ -73,8 +73,8 @@ export default function Sidebar({ merchantId }: SidebarProps) {
         `}
       >
         <div className="flex flex-col h-full">
-          {/* Logo - Modern with gradient */}
-          <div className="flex items-center gap-3 h-20 px-6 border-b border-white/10">
+          {/* Logo - Modern with gradient - matched to header height (h-16) */}
+          <div className="flex items-center gap-3 h-16 px-6 border-b border-white/10">
             <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-info)] rounded-xl flex items-center justify-center shadow-lg">
               <CreditCard className="w-6 h-6 text-white" />
             </div>

@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase'
 import { TrendingUp, TrendingDown, DollarSign, Users, CreditCard, Activity } from 'lucide-react'
 import RecentTransactions from './RecentTransactions'
+import RevenueChart from '@/components/charts/RevenueChart'
+import PaymentMethodsChart from '@/components/charts/PaymentMethodsChart'
+import SuccessRateChart from '@/components/charts/SuccessRateChart'
 
 export default async function GeneralPage({
   params,
@@ -26,24 +29,12 @@ export default async function GeneralPage({
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
   const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
 
-  // Get ALL transactions to calculate stats (not just current month)
+  // Get ALL transactions to calculate stats
   const { data: allTransactions, error: txnError, count: totalCount } = await supabase
     .from('payment_intents')
     .select('*', { count: 'exact' })
     .eq('merchant_id', merchantId)
     .order('created_at', { ascending: false })
-
-  // Debug logging
-  console.log('General Page Debug:', {
-    merchantId,
-    user: user?.id,
-    transactionCount: allTransactions?.length || 0,
-    totalCount,
-    error: txnError,
-    errorDetails: txnError ? JSON.stringify(txnError) : null,
-    firstTransaction: allTransactions?.[0],
-    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL
-  })
 
   // Filter transactions by date range
   const currentMonthTxns = allTransactions?.filter(t => {
@@ -114,19 +105,72 @@ export default async function GeneralPage({
     },
   ]
 
-  // Get recent transactions for the list - get more than 5 to enable pagination
-  const { data: recentTransactions, error: recentTxnError } = await supabase
+  // Prepare chart data - Revenue over last 30 days
+  const revenueChartData = []
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(now)
+    date.setDate(date.getDate() - i)
+    const dayStart = new Date(date.setHours(0, 0, 0, 0))
+    const dayEnd = new Date(date.setHours(23, 59, 59, 999))
+
+    const dayTransactions = allTransactions?.filter(t => {
+      const txnDate = new Date(t.created_at)
+      return txnDate >= dayStart && txnDate <= dayEnd && t.status === 'succeeded'
+    }) || []
+
+    const amount = dayTransactions.reduce((sum, t) => sum + t.amount, 0) / 100
+
+    revenueChartData.push({
+      date: `${dayStart.getDate()}/${dayStart.getMonth() + 1}`,
+      amount,
+    })
+  }
+
+  // Prepare payment methods data
+  const paymentMethodsMap = new Map<string, number>()
+  currentPeriodTxns.forEach(t => {
+    if (t.payment_method?.card?.brand) {
+      const brand = t.payment_method.card.brand.charAt(0).toUpperCase() + t.payment_method.card.brand.slice(1)
+      paymentMethodsMap.set(brand, (paymentMethodsMap.get(brand) || 0) + 1)
+    } else {
+      paymentMethodsMap.set('Tarjeta', (paymentMethodsMap.get('Tarjeta') || 0) + 1)
+    }
+  })
+
+  const paymentMethodsData = Array.from(paymentMethodsMap.entries()).map(([method, count]) => ({
+    method,
+    count,
+    percentage: (count / currentPeriodTxns.length) * 100,
+  }))
+
+  // Prepare success rate data over last 14 days
+  const successRateChartData = []
+  for (let i = 13; i >= 0; i--) {
+    const date = new Date(now)
+    date.setDate(date.getDate() - i)
+    const dayStart = new Date(date.setHours(0, 0, 0, 0))
+    const dayEnd = new Date(date.setHours(23, 59, 59, 999))
+
+    const dayTransactions = allTransactions?.filter(t => {
+      const txnDate = new Date(t.created_at)
+      return txnDate >= dayStart && txnDate <= dayEnd
+    }) || []
+
+    successRateChartData.push({
+      date: `${dayStart.getDate()}/${dayStart.getMonth() + 1}`,
+      successful: dayTransactions.filter(t => t.status === 'succeeded').length,
+      failed: dayTransactions.filter(t => t.status === 'failed' || t.status === 'canceled').length,
+      pending: dayTransactions.filter(t => t.status === 'pending' || t.status === 'requires_action').length,
+    })
+  }
+
+  // Get recent transactions for the list
+  const { data: recentTransactions } = await supabase
     .from('payment_intents')
     .select('*')
     .eq('merchant_id', merchantId)
     .order('created_at', { ascending: false })
-    .limit(20) // Get up to 20 transactions for pagination
-
-  console.log('Recent Transactions Debug:', {
-    count: recentTransactions?.length || 0,
-    error: recentTxnError,
-    merchantId
-  })
+    .limit(20)
 
   return (
     <div className="container-dashboard pt-8 pb-4 sm:py-8">
@@ -138,35 +182,6 @@ export default async function GeneralPage({
         <p className="text-[var(--color-textSecondary)]">
           Resumen de tu actividad y métricas principales
         </p>
-        {/* Debug info */}
-        {!allTransactions || allTransactions.length === 0 ? (
-          <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-            <p className="text-sm text-yellow-600 font-medium mb-2">
-              ⚠️ No se encontraron transacciones para este merchant
-            </p>
-            <div className="text-xs space-y-1">
-              <p className="font-mono">MerchantID: {merchantId}</p>
-              <p className="font-mono">UserID: {user?.id || 'No user'}</p>
-              <p>Total Count: {totalCount || 0}</p>
-              {txnError && (
-                <p className="text-red-600 mt-2">
-                  <strong>Error:</strong> {JSON.stringify(txnError)}
-                </p>
-              )}
-              {recentTxnError && (
-                <p className="text-red-600 mt-2">
-                  <strong>Recent Txn Error:</strong> {JSON.stringify(recentTxnError)}
-                </p>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="mt-3 p-2 bg-green-500/10 border border-green-500/20 rounded-lg">
-            <p className="text-xs text-green-600">
-              ✓ {allTransactions.length} transacciones ({totalCount} total) | Mostrando: {isCurrentMonth ? 'Datos del mes actual' : 'Datos históricos completos'}
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Stats Grid */}
@@ -198,8 +213,20 @@ export default async function GeneralPage({
         ))}
       </div>
 
-      {/* Activity Cards */}
+      {/* Analytics Charts - 2 column grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Revenue Trend */}
+        <RevenueChart data={revenueChartData} title="Ingresos últimos 30 días" />
+
+        {/* Success Rate */}
+        <SuccessRateChart data={successRateChartData} title="Tasa de éxito últimos 14 días" />
+      </div>
+
+      {/* Second row - Payment Methods and Recent Transactions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Payment Methods */}
+        <PaymentMethodsChart data={paymentMethodsData} />
+
         {/* Recent Transactions */}
         <div className="card">
           <h2 className="card-header">Transacciones recientes</h2>
@@ -217,52 +244,6 @@ export default async function GeneralPage({
               merchantId={merchantId}
             />
           )}
-        </div>
-
-        {/* Getting Started Guide */}
-        <div className="card bg-[var(--color-primary)]/5 border-[var(--color-primary)]/20">
-          <h2 className="card-header text-[var(--color-primary)]">Primeros pasos</h2>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
-                1
-              </div>
-              <div>
-                <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
-                  Obtén tus credenciales API
-                </h3>
-                <p className="text-sm text-[var(--color-textSecondary)]">
-                  Ve a la sección de Desarrolladores para obtener tus API keys
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
-                2
-              </div>
-              <div>
-                <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
-                  Configura tu primer webhook
-                </h3>
-                <p className="text-sm text-[var(--color-textSecondary)]">
-                  Recibe notificaciones de pagos en tiempo real
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm font-bold">
-                3
-              </div>
-              <div>
-                <h3 className="font-semibold text-[var(--color-textPrimary)] mb-1">
-                  Procesa tu primera transacción
-                </h3>
-                <p className="text-sm text-[var(--color-textSecondary)]">
-                  Usa nuestra API o crea un link de pago para empezar
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
