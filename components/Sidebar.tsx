@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   CreditCard,
   Users,
+  UserCog,
   Webhook,
   Code,
   Settings,
@@ -27,6 +28,7 @@ export default function Sidebar({ merchantId }: SidebarProps) {
     { name: 'General', href: `/${merchantId}/general`, icon: LayoutDashboard },
     { name: 'Transacciones', href: `/${merchantId}/transacciones`, icon: CreditCard },
     { name: 'Clientes', href: `/${merchantId}/clientes`, icon: Users },
+    { name: 'Usuarios', href: `/${merchantId}/cuenta/usuarios`, icon: UserCog },
     { name: 'Cuenta', href: `/${merchantId}/cuenta`, icon: Settings },
   ]
 

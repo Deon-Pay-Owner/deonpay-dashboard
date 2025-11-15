@@ -280,16 +280,34 @@ curl -X POST https://api.deonpay.mx/api/v1/payment_intents/pi_abc123.../confirm 
                     <td className="py-2 sm:py-3 px-2 sm:px-4 text-[var(--color-textSecondary)]">Visa</td>
                     <td className="py-2 sm:py-3 px-2 sm:px-4">
                       <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-green-500/20 text-green-400 whitespace-nowrap">
-                        Aprobada
+                        Aprobada (Sin 3DS)
                       </span>
                     </td>
                   </tr>
-                  <tr>
-                    <td className="py-2 sm:py-3 px-2 sm:px-4 font-mono text-[var(--color-textSecondary)] text-[11px] sm:text-sm">5555555555554444</td>
+                  <tr className="bg-purple-500/5">
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 font-mono text-[var(--color-textSecondary)] text-[11px] sm:text-sm">5200828282828210</td>
                     <td className="py-2 sm:py-3 px-2 sm:px-4 text-[var(--color-textSecondary)]">Mastercard</td>
                     <td className="py-2 sm:py-3 px-2 sm:px-4">
-                      <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-green-500/20 text-green-400 whitespace-nowrap">
-                        Aprobada
+                      <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-purple-500/20 text-purple-400 whitespace-nowrap">
+                        3DS Challenge
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="bg-purple-500/5">
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 font-mono text-[var(--color-textSecondary)] text-[11px] sm:text-sm">4000020000000000</td>
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 text-[var(--color-textSecondary)]">Visa</td>
+                    <td className="py-2 sm:py-3 px-2 sm:px-4">
+                      <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-purple-500/20 text-purple-400 whitespace-nowrap">
+                        3DS Frictionless
+                      </span>
+                    </td>
+                  </tr>
+                  <tr className="bg-yellow-500/5">
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 font-mono text-[var(--color-textSecondary)] text-[11px] sm:text-sm">4000000000001091</td>
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 text-[var(--color-textSecondary)]">Visa</td>
+                    <td className="py-2 sm:py-3 px-2 sm:px-4">
+                      <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-yellow-500/20 text-yellow-400 whitespace-nowrap">
+                        Fraud Review
                       </span>
                     </td>
                   </tr>
@@ -308,10 +326,15 @@ curl -X POST https://api.deonpay.mx/api/v1/payment_intents/pi_abc123.../confirm 
           </div>
 
           <div className="mt-3 sm:mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 sm:p-4">
-            <p className="text-xs sm:text-sm text-yellow-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-yellow-400 leading-relaxed mb-2">
               <strong>Nota:</strong> Para todas las tarjetas de prueba, usa cualquier fecha de vencimiento futura
               y cualquier CVV de 3 dígitos.
             </p>
+            <ul className="text-xs sm:text-sm text-yellow-400 space-y-1 ml-4 list-disc">
+              <li><strong>3DS Challenge (5200828282828210):</strong> Requiere autenticación 3D Secure con challenge del usuario</li>
+              <li><strong>3DS Frictionless (4000020000000000):</strong> Completa 3DS sin challenge visible al usuario</li>
+              <li><strong>Fraud Review (4000000000001091):</strong> La transacción se autoriza pero queda en revisión de fraude (status AUTHORIZED_PENDING_REVIEW)</li>
+            </ul>
           </div>
         </div>
       </div>
