@@ -13,6 +13,7 @@ import {
   BookOpen,
 } from 'lucide-react'
 import { useState } from 'react'
+import { DeonPayIcon } from './icons/DeonPayLogo'
 
 interface SidebarProps {
   merchantId: string
@@ -71,11 +72,9 @@ export default function Sidebar({ merchantId }: SidebarProps) {
         `}
       >
         <div className="flex flex-col h-full">
-          {/* Logo - Modern with gradient - matched to header height (h-16) */}
+          {/* Logo - Official DeonPay branding - matched to header height (h-16) */}
           <div className="flex items-center gap-3 h-16 px-6 border-b border-white/10">
-            <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-info)] rounded-xl flex items-center justify-center shadow-lg">
-              <CreditCard className="w-6 h-6 text-white" />
-            </div>
+            <DeonPayIcon size={40} className="flex-shrink-0" />
             <h1 className="text-2xl font-bold text-white font-[family-name:var(--font-heading)]">
               DeonPay
             </h1>
