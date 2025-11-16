@@ -48,6 +48,33 @@ export default function DesarrolladoresClient({
   const publicKeys = apiKeys.filter(k => k.type === 'public')
   const secretKeys = apiKeys.filter(k => k.type === 'secret')
 
+  const codeExample = `// Instalar el SDK
+npm install @deonpay/sdk
+
+// Crear un Payment Intent
+import { DeonPay } from '@deonpay/sdk'
+
+const deonpay = new DeonPay('${secretKeys[0]?.key || 'sk_live_xxxxx'}')
+
+const paymentIntent = await deonpay.paymentIntents.create({
+  amount: 10000, // $100.00 MXN (en centavos)
+  currency: 'mxn',
+  customer: {
+    email: 'cliente@ejemplo.com',
+    name: 'Juan Pérez'
+  },
+  metadata: {
+    order_id: '123',
+    product: 'Curso de programación'
+  }
+})
+
+console.log('Payment Intent creado:', paymentIntent.id)
+console.log('Client Secret:', paymentIntent.client_secret)
+
+// Usar el client_secret en el frontend con DeonPay Elements
+// https://elements.deonpay.mx`
+
   const copyToClipboard = async (key: string, keyId: string) => {
     try {
       await navigator.clipboard.writeText(key)
@@ -478,30 +505,3 @@ export default function DesarrolladoresClient({
     </div>
   )
 }
-
-  const codeExample = `// Instalar el SDK
-npm install @deonpay/sdk
-
-// Crear un Payment Intent
-import { DeonPay } from '@deonpay/sdk'
-
-const deonpay = new DeonPay('${secretKeys[0]?.key || 'sk_live_xxxxx'}')
-
-const paymentIntent = await deonpay.paymentIntents.create({
-  amount: 10000, // $100.00 MXN (en centavos)
-  currency: 'mxn',
-  customer: {
-    email: 'cliente@ejemplo.com',
-    name: 'Juan Pérez'
-  },
-  metadata: {
-    order_id: '123',
-    product: 'Curso de programación'
-  }
-})
-
-console.log('Payment Intent creado:', paymentIntent.id)
-console.log('Client Secret:', paymentIntent.client_secret)
-
-// Usar el client_secret en el frontend con DeonPay Elements
-// https://elements.deonpay.mx`

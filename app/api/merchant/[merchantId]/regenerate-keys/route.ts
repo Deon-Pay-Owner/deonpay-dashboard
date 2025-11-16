@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { merchantId: string } }
+  { params }: { params: Promise<{ merchantId: string }> }
 ) {
   try {
     const supabase = await createClient()
