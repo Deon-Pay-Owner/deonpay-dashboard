@@ -79,7 +79,7 @@ export async function POST(
     // Return payment link with full URL
     return NextResponse.json({
       ...paymentLink,
-      url: `https://checkout.deonpay.mx/link/${paymentLink.url_key}`
+      url: `https://dashboard.deonpay.mx/link/${paymentLink.url_key}`
     })
   } catch (error) {
     console.error('Error in payment-links POST:', error)
@@ -161,7 +161,7 @@ export async function GET(
     // Add URLs to each link
     const linksWithUrls = paymentLinks?.map(link => ({
       ...link,
-      url: `https://checkout.deonpay.mx/link/${link.url_key}`
+      url: `https://dashboard.deonpay.mx/link/${link.url_key}`
     }))
 
     return NextResponse.json({ data: linksWithUrls })
