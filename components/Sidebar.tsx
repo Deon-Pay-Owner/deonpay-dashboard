@@ -12,6 +12,7 @@ import {
   X,
   BookOpen,
   Package,
+  Link2,
 } from 'lucide-react'
 import { useState } from 'react'
 import { DeonPayIcon } from './icons/DeonPayLogo'
@@ -28,6 +29,7 @@ export default function Sidebar({ merchantId }: SidebarProps) {
     { name: 'General', href: `/${merchantId}/general`, icon: LayoutDashboard },
     { name: 'Transacciones', href: `/${merchantId}/transacciones`, icon: CreditCard },
     { name: 'Productos', href: `/${merchantId}/productos`, icon: Package },
+    { name: 'Links de Pago', href: `/${merchantId}/links-de-pago`, icon: Link2 },
     { name: 'Clientes', href: `/${merchantId}/clientes`, icon: Users },
   ]
 
