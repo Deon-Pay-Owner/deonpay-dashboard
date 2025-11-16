@@ -138,7 +138,7 @@ export async function GET(
     // Build query
     let query = supabase
       .from('payment_links')
-      .select('*, products(*)')
+      .select('*')
       .eq('merchant_id', merchantId)
       .order('created_at', { ascending: false })
       .limit(limit)
@@ -158,11 +158,41 @@ export async function GET(
       )
     }
 
-    // Add URLs to each link
-    const linksWithUrls = paymentLinks?.map(link => ({
-      ...link,
-      url: `https://dashboard.deonpay.mx/link/${link.url_key}`
-    }))
+    // Get all unique product IDs from line_items
+    const productIds = new Set<string>()
+    paymentLinks?.forEach(link => {
+      const lineItems = link.line_items as Array<{ product_id: string }>
+      lineItems?.forEach(item => {
+        if (item.product_id) productIds.add(item.product_id)
+      })
+    })
+
+    // Fetch all products in one query
+    let productsMap = new Map()
+    if (productIds.size > 0) {
+      const { data: products } = await supabase
+        .from('products')
+        .select('*')
+        .in('id', Array.from(productIds))
+
+      products?.forEach(product => {
+        productsMap.set(product.id, product)
+      })
+    }
+
+    // Add URLs and products to each link
+    const linksWithUrls = paymentLinks?.map(link => {
+      const lineItems = link.line_items as Array<{ product_id: string }>
+      const firstProduct = lineItems?.[0]?.product_id
+        ? productsMap.get(lineItems[0].product_id)
+        : null
+
+      return {
+        ...link,
+        url: `https://dashboard.deonpay.mx/link/${link.url_key}`,
+        products: firstProduct
+      }
+    })
 
     return NextResponse.json({ data: linksWithUrls })
   } catch (error) {
