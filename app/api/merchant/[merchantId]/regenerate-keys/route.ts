@@ -56,15 +56,16 @@ export async function POST(
       )
     }
 
-    // Call the generate_api_key function twice (once for public, once for secret)
-    const { data: publicKeyData, error: publicKeyError } = await supabase
-      .rpc('generate_api_key', {
+    // Call the generate_api_keys function twice (once for public, once for secret)
+    const { data: publicKeyResult, error: publicKeyError } = await supabase
+      .rpc('generate_api_keys', {
         p_merchant_id: merchantId,
-        p_type: 'public',
+        p_key_type: 'public',
         p_name: 'Public Key'
       })
+      .single()
 
-    if (publicKeyError) {
+    if (publicKeyError || !publicKeyResult) {
       console.error('Error generating public key:', publicKeyError)
       return NextResponse.json(
         { error: 'Failed to generate public key' },
@@ -72,14 +73,15 @@ export async function POST(
       )
     }
 
-    const { data: secretKeyData, error: secretKeyError } = await supabase
-      .rpc('generate_api_key', {
+    const { data: secretKeyResult, error: secretKeyError } = await supabase
+      .rpc('generate_api_keys', {
         p_merchant_id: merchantId,
-        p_type: 'secret',
+        p_key_type: 'secret',
         p_name: 'Secret Key'
       })
+      .single()
 
-    if (secretKeyError) {
+    if (secretKeyError || !secretKeyResult) {
       console.error('Error generating secret key:', secretKeyError)
       return NextResponse.json(
         { error: 'Failed to generate secret key' },
@@ -90,8 +92,9 @@ export async function POST(
     return NextResponse.json({
       success: true,
       message: 'API keys regenerated successfully',
-      public_key: publicKeyData,
-      secret_key_prefix: secretKeyData?.substring(0, 12) + '...',
+      public_key: publicKeyResult.key,
+      secret_key: secretKeyResult.key,
+      secret_key_prefix: secretKeyResult.prefix,
     })
   } catch (error) {
     console.error('Error regenerating API keys:', error)

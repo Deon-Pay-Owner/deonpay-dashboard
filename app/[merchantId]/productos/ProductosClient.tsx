@@ -45,21 +45,8 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
   const fetchProducts = async () => {
     setLoading(true)
     try {
-      // Get the merchant's API key from the Next.js API route
-      const apiKeyResponse = await fetch(`/api/merchant/${merchantId}/api-key`)
-
-      if (!apiKeyResponse.ok) {
-        const error = await apiKeyResponse.json().catch(() => ({}))
-        console.error('Failed to get API key:', error)
-        setProducts([])
-        return
-      }
-
-      const { api_key: apiKey } = await apiKeyResponse.json()
-
       // Build query params
       const params = new URLSearchParams({
-        merchant_id: merchantId,
         limit: '100',
       })
 
@@ -69,12 +56,7 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
         params.append('active', 'false')
       }
 
-      const response = await fetch(`https://api.deonpay.mx/api/v1/products?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await fetch(`/api/merchant/${merchantId}/products?${params}`)
 
       if (!response.ok) {
         throw new Error(`Failed to fetch products: ${response.statusText}`)
