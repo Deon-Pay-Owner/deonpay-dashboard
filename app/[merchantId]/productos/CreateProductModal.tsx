@@ -50,15 +50,15 @@ export default function CreateProductModal({
         payload.recurring_interval_count = parseInt(formData.recurring_interval_count)
       }
 
-      // Get the merchant's API key from cookies
-      const apiKey = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('deonpay_api_key='))
-        ?.split('=')[1]
+      // Get the merchant's API key from the Next.js API route
+      const apiKeyResponse = await fetch(`/api/merchant/${merchantId}/api-key`)
 
-      if (!apiKey) {
-        throw new Error('No se encontró la API key. Por favor inicia sesión nuevamente.')
+      if (!apiKeyResponse.ok) {
+        const error = await apiKeyResponse.json().catch(() => ({}))
+        throw new Error(error.error || 'No se pudo obtener la API key. Por favor verifica que tengas una API key activa.')
       }
+
+      const { api_key: apiKey } = await apiKeyResponse.json()
 
       // Call the API to create the product
       const response = await fetch('https://api.deonpay.mx/api/v1/products', {

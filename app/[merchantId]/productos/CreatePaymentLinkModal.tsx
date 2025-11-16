@@ -73,21 +73,38 @@ export default function CreatePaymentLinkModal({
         }
       }
 
-      // This would call the API with the merchant's API key
-      // For now, we'll simulate success
-      console.log('Creating payment link:', payload)
+      // Get the merchant's API key from the Next.js API route
+      const apiKeyResponse = await fetch(`/api/merchant/${merchantId}/api-key`)
 
-      // Simulate API response
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      const mockLink = {
-        id: 'pl_' + Math.random().toString(36).substring(7),
-        url: `https://pay.deonpay.mx/link/${formData.custom_url || 'demo-link'}`,
-        qr_code_url: `https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=${encodeURIComponent(`https://pay.deonpay.mx/link/${formData.custom_url || 'demo-link'}`)}&choe=UTF-8`,
-        ...payload,
+      if (!apiKeyResponse.ok) {
+        const error = await apiKeyResponse.json().catch(() => ({}))
+        throw new Error(error.error || 'No se pudo obtener la API key. Por favor verifica que tengas una API key activa.')
       }
 
-      setPaymentLink(mockLink)
+      const { api_key: apiKey } = await apiKeyResponse.json()
+
+      // Call the API to create the payment link
+      const response = await fetch('https://api.deonpay.mx/api/v1/payment-links', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...payload,
+          merchant_id: merchantId,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error?.message || 'Error al crear el payment link')
+      }
+
+      const link = await response.json()
+      console.log('Payment link created:', link)
+
+      setPaymentLink(link)
       setStep('success')
     } catch (err: any) {
       setError(err.message || 'Error al crear el payment link')

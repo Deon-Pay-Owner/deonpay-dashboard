@@ -45,17 +45,17 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
   const fetchProducts = async () => {
     setLoading(true)
     try {
-      // Get the merchant's API key from cookies
-      const apiKey = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('deonpay_api_key='))
-        ?.split('=')[1]
+      // Get the merchant's API key from the Next.js API route
+      const apiKeyResponse = await fetch(`/api/merchant/${merchantId}/api-key`)
 
-      if (!apiKey) {
-        console.error('No API key found')
+      if (!apiKeyResponse.ok) {
+        const error = await apiKeyResponse.json().catch(() => ({}))
+        console.error('Failed to get API key:', error)
         setProducts([])
         return
       }
+
+      const { api_key: apiKey } = await apiKeyResponse.json()
 
       // Build query params
       const params = new URLSearchParams({
