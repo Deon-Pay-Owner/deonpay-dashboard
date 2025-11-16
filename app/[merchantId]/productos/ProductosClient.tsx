@@ -8,12 +8,10 @@ import {
   MoreVertical,
   Edit,
   Trash2,
-  Link as LinkIcon,
   Eye,
   EyeOff
 } from 'lucide-react'
 import CreateProductModal from './CreateProductModal'
-import CreatePaymentLinkModal from './CreatePaymentLinkModal'
 
 interface Product {
   id: string
@@ -34,8 +32,6 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showPaymentLinkModal, setShowPaymentLinkModal] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all')
 
   useEffect(() => {
@@ -290,17 +286,7 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
                   {/* Actions */}
                   <div className="flex gap-2 pt-3 border-t border-[var(--color-border)]">
                     <button
-                      className="flex-1 px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-sm font-medium"
-                      onClick={() => {
-                        setSelectedProduct(product)
-                        setShowPaymentLinkModal(true)
-                      }}
-                    >
-                      <LinkIcon size={14} />
-                      Crear Link
-                    </button>
-                    <button
-                      className="px-3 py-2 bg-[var(--color-surface)] text-[var(--color-textPrimary)] rounded-lg hover:bg-[var(--color-surfaceHover)] transition-colors"
+                      className="flex-1 px-3 py-2 bg-[var(--color-surface)] text-[var(--color-textPrimary)] rounded-lg hover:bg-[var(--color-surfaceHover)] transition-colors"
                       title="Editar"
                     >
                       <Edit size={16} />
@@ -327,21 +313,6 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
           onSuccess={() => {
             setShowCreateModal(false)
             fetchProducts()
-          }}
-        />
-      )}
-
-      {showPaymentLinkModal && selectedProduct && (
-        <CreatePaymentLinkModal
-          merchantId={merchantId}
-          product={selectedProduct}
-          onClose={() => {
-            setShowPaymentLinkModal(false)
-            setSelectedProduct(null)
-          }}
-          onSuccess={() => {
-            setShowPaymentLinkModal(false)
-            setSelectedProduct(null)
           }}
         />
       )}
