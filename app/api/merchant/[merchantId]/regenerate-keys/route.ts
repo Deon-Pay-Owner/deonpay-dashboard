@@ -63,7 +63,7 @@ export async function POST(
         p_key_type: 'public',
         p_name: 'Public Key'
       })
-      .single()
+      .single<{ key: string; prefix: string }>()
 
     if (publicKeyError || !publicKeyResult) {
       console.error('Error generating public key:', publicKeyError)
@@ -79,7 +79,7 @@ export async function POST(
         p_key_type: 'secret',
         p_name: 'Secret Key'
       })
-      .single()
+      .single<{ key: string; prefix: string }>()
 
     if (secretKeyError || !secretKeyResult) {
       console.error('Error generating secret key:', secretKeyError)
