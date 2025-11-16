@@ -73,26 +73,18 @@ export default function CreatePaymentLinkModal({
         }
       }
 
-      // Get the merchant's API key from the Next.js API route
-      const apiKeyResponse = await fetch(`/api/merchant/${merchantId}/api-key`)
-
-      if (!apiKeyResponse.ok) {
-        const error = await apiKeyResponse.json().catch(() => ({}))
-        throw new Error(error.error || 'No se pudo obtener la API key. Por favor verifica que tengas una API key activa.')
-      }
-
-      const { api_key: apiKey } = await apiKeyResponse.json()
-
-      // Call the API to create the payment link
-      const response = await fetch('https://api.deonpay.mx/api/v1/payment-links', {
+      // Call the dashboard API to create the payment link
+      const response = await fetch(`/api/merchant/${merchantId}/payment-links`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          product_id: product.id,
+          name: product.name,
+          amount: product.unit_amount,
+          currency: product.currency,
           ...payload,
-          merchant_id: merchantId,
         }),
       })
 
