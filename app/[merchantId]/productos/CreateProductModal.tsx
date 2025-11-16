@@ -50,12 +50,36 @@ export default function CreateProductModal({
         payload.recurring_interval_count = parseInt(formData.recurring_interval_count)
       }
 
-      // This would call the API with the merchant's API key
-      // For now, we'll just simulate success
-      console.log('Creating product:', payload)
+      // Get the merchant's API key from cookies
+      const apiKey = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('deonpay_api_key='))
+        ?.split('=')[1]
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      if (!apiKey) {
+        throw new Error('No se encontró la API key. Por favor inicia sesión nuevamente.')
+      }
+
+      // Call the API to create the product
+      const response = await fetch('https://api.deonpay.mx/api/v1/products', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...payload,
+          merchant_id: merchantId,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error?.message || 'Error al crear el producto')
+      }
+
+      const result = await response.json()
+      console.log('Product created:', result)
 
       onSuccess()
     } catch (err: any) {

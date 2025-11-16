@@ -45,11 +45,46 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
   const fetchProducts = async () => {
     setLoading(true)
     try {
-      // This would call the API with the merchant's API key
-      // For now, we'll use an empty array
-      setProducts([])
+      // Get the merchant's API key from cookies
+      const apiKey = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('deonpay_api_key='))
+        ?.split('=')[1]
+
+      if (!apiKey) {
+        console.error('No API key found')
+        setProducts([])
+        return
+      }
+
+      // Build query params
+      const params = new URLSearchParams({
+        merchant_id: merchantId,
+        limit: '100',
+      })
+
+      if (activeFilter === 'active') {
+        params.append('active', 'true')
+      } else if (activeFilter === 'inactive') {
+        params.append('active', 'false')
+      }
+
+      const response = await fetch(`https://api.deonpay.mx/api/v1/products?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch products: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      setProducts(data.data || [])
     } catch (error) {
       console.error('Error fetching products:', error)
+      setProducts([])
     } finally {
       setLoading(false)
     }
