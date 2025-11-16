@@ -44,24 +44,26 @@ export async function POST(
     // Get request body
     const body = await request.json()
 
-    // Generate a unique link ID
-    const linkId = `link_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    // Build line_items array
+    const lineItems = [{
+      product_id: body.product_id,
+      quantity: 1
+    }]
 
     // Create payment link
     const { data: paymentLink, error: createError } = await supabase
       .from('payment_links')
       .insert({
         merchant_id: merchantId,
-        product_id: body.product_id,
-        link_id: linkId,
-        name: body.name,
-        description: body.description,
-        amount: body.amount,
-        currency: body.currency,
+        line_items: lineItems,
+        currency: body.currency || 'MXN',
         active: body.active !== undefined ? body.active : true,
-        metadata: body.metadata || {},
-        max_uses: body.max_uses,
-        expires_at: body.expires_at
+        custom_url: body.custom_url,
+        after_completion_url: body.after_completion?.redirect?.url,
+        after_completion_message: body.after_completion?.hosted_confirmation?.custom_message,
+        billing_address_collection: body.billing_address_collection || 'auto',
+        phone_number_collection: body.phone_number_collection || false,
+        type: 'payment'
       })
       .select()
       .single()
@@ -77,7 +79,7 @@ export async function POST(
     // Return payment link with full URL
     return NextResponse.json({
       ...paymentLink,
-      url: `https://checkout.deonpay.mx/${linkId}`
+      url: `https://checkout.deonpay.mx/link/${paymentLink.url_key}`
     })
   } catch (error) {
     console.error('Error in payment-links POST:', error)
@@ -159,7 +161,7 @@ export async function GET(
     // Add URLs to each link
     const linksWithUrls = paymentLinks?.map(link => ({
       ...link,
-      url: `https://checkout.deonpay.mx/${link.link_id}`
+      url: `https://checkout.deonpay.mx/link/${link.url_key}`
     }))
 
     return NextResponse.json({ data: linksWithUrls })
