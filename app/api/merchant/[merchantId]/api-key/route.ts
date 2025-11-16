@@ -47,7 +47,7 @@ export async function GET(
       .select('key')
       .eq('merchant_id', merchantId)
       .eq('type', 'secret')
-      .eq('active', true)
+      .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(1)
       .single()
