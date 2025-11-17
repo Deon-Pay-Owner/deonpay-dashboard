@@ -58,7 +58,8 @@ export async function POST(
         line_items: lineItems,
         currency: body.currency || 'MXN',
         active: body.active !== undefined ? body.active : true,
-        custom_url: body.custom_url,
+        // Ensure custom_url is null if empty or undefined to avoid unique constraint conflicts
+        custom_url: body.custom_url && body.custom_url.trim() !== '' ? body.custom_url.trim() : null,
         after_completion_url: body.after_completion?.redirect?.url,
         after_completion_message: body.after_completion?.hosted_confirmation?.custom_message,
         billing_address_collection: body.billing_address_collection || 'auto',
@@ -70,6 +71,15 @@ export async function POST(
 
     if (createError) {
       console.error('Error creating payment link:', createError)
+
+      // Check if it's a duplicate custom_url error
+      if (createError.code === '23505' && createError.message.includes('idx_payment_links_merchant_custom_url')) {
+        return NextResponse.json(
+          { error: { message: 'Esta URL personalizada ya está en uso. Por favor elige otra.' } },
+          { status: 409 }
+        )
+      }
+
       return NextResponse.json(
         { error: { message: createError.message } },
         { status: 500 }
