@@ -129,7 +129,7 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
 
       {/* Search and Filters */}
       <div className="card mb-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-4">
           {/* Search */}
           <div className="relative">
             <Search
@@ -138,7 +138,7 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
             />
             <input
               type="text"
-              placeholder="Buscar productos por nombre o descripción..."
+              placeholder="Buscar productos..."
               className="input-field pl-11 w-full"
               style={{ paddingLeft: '2.75rem' }}
               value={searchTerm}
@@ -147,9 +147,9 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
           </div>
 
           {/* Filters */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             <button
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeFilter === 'all'
                   ? 'bg-[var(--color-primary)] text-white'
                   : 'bg-[var(--color-surface)] text-[var(--color-textSecondary)] hover:bg-[var(--color-surfaceHover)]'
@@ -159,7 +159,7 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
               Todos
             </button>
             <button
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeFilter === 'active'
                   ? 'bg-[var(--color-primary)] text-white'
                   : 'bg-[var(--color-surface)] text-[var(--color-textSecondary)] hover:bg-[var(--color-surfaceHover)]'
@@ -169,7 +169,7 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
               Activos
             </button>
             <button
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeFilter === 'inactive'
                   ? 'bg-[var(--color-primary)] text-white'
                   : 'bg-[var(--color-surface)] text-[var(--color-textSecondary)] hover:bg-[var(--color-surfaceHover)]'
@@ -227,7 +227,7 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6">
             {filteredProducts.map((product) => (
               <div
                 key={product.id}

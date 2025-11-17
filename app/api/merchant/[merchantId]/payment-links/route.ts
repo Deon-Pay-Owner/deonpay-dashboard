@@ -79,7 +79,7 @@ export async function POST(
     // Return payment link with full URL
     return NextResponse.json({
       ...paymentLink,
-      url: `https://dashboard.deonpay.mx/link/${paymentLink.url_key}`
+      url: `https://link.deonpay.mx/${paymentLink.url_key}`
     })
   } catch (error) {
     console.error('Error in payment-links POST:', error)
@@ -189,7 +189,7 @@ export async function GET(
 
       return {
         ...link,
-        url: `https://dashboard.deonpay.mx/link/${link.url_key}`,
+        url: `https://link.deonpay.mx/${link.url_key}`,
         products: firstProduct
       }
     })

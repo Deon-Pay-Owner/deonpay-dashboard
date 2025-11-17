@@ -75,7 +75,7 @@ export async function PUT(
     // Return with full URL
     return NextResponse.json({
       ...paymentLink,
-      url: `https://dashboard.deonpay.mx/link/${paymentLink.url_key}`
+      url: `https://link.deonpay.mx/${paymentLink.url_key}`
     })
   } catch (error) {
     console.error('Error in payment-links PUT:', error)

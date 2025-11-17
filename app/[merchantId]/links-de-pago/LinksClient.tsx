@@ -160,25 +160,25 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
-                  <Link2 className="w-6 h-6 text-white" />
+                  <Link2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 Links de Pago
               </h1>
-              <p className="mt-2 text-slate-600 dark:text-slate-400">
+              <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400">
                 Crea y gestiona links de pago para tus productos
               </p>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl w-full sm:w-auto"
             >
               <Plus className="w-5 h-5" />
-              Crear Link
+              <span>Crear Link</span>
             </button>
           </div>
         </div>
@@ -196,10 +196,10 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             <button
               onClick={() => setActiveFilter('all')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeFilter === 'all'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -209,7 +209,7 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
             </button>
             <button
               onClick={() => setActiveFilter('active')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeFilter === 'active'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -219,7 +219,7 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
             </button>
             <button
               onClick={() => setActiveFilter('inactive')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeFilter === 'inactive'
                   ? 'bg-blue-600 text-white'
                   : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
