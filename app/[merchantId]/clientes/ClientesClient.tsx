@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Search, UserPlus, Users as UsersIcon, Mail, Phone, Calendar } from 'lucide-react'
+import NewCustomerModal from './NewCustomerModal'
 
 interface Customer {
   id: string
@@ -26,6 +27,7 @@ export default function ClientesClient({ merchantId }: { merchantId: string }) {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [searchDebounced, setSearchDebounced] = useState('')
+  const [showNewCustomerModal, setShowNewCustomerModal] = useState(false)
 
   // Debounce search
   useEffect(() => {
@@ -91,7 +93,10 @@ export default function ClientesClient({ merchantId }: { merchantId: string }) {
             Gestiona tu base de clientes y su información
           </p>
         </div>
-        <button className="btn-primary flex items-center gap-2">
+        <button
+          onClick={() => setShowNewCustomerModal(true)}
+          className="btn-primary flex items-center gap-2"
+        >
           <UserPlus size={18} />
           Nuevo Cliente
         </button>
@@ -178,7 +183,10 @@ export default function ClientesClient({ merchantId }: { merchantId: string }) {
                         : 'Los clientes se crearán automáticamente con cada transacción'}
                     </p>
                     {!search && (
-                      <button className="btn-primary mx-auto">
+                      <button
+                        onClick={() => setShowNewCustomerModal(true)}
+                        className="btn-primary mx-auto"
+                      >
                         Crear primer cliente
                       </button>
                     )}
@@ -258,6 +266,14 @@ export default function ClientesClient({ merchantId }: { merchantId: string }) {
           💡 Cambia a modo landscape para ver todas las columnas
         </p>
       </div>
+
+      {/* New Customer Modal */}
+      <NewCustomerModal
+        merchantId={merchantId}
+        isOpen={showNewCustomerModal}
+        onClose={() => setShowNewCustomerModal(false)}
+        onSuccess={fetchCustomers}
+      />
     </div>
   )
 }
