@@ -15,7 +15,7 @@ export default async function PaymentLinkPage({
   // Fetch the payment link
   const { data: paymentLink, error: linkError } = await supabase
     .from('payment_links')
-    .select('*, products(*)')
+    .select('*')
     .eq('url_key', urlKey)
     .eq('active', true)
     .single()
