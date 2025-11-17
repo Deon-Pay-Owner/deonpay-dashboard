@@ -224,10 +224,17 @@ curl -X DELETE "https://dashboard.deonpay.mx/api/webhooks/xxx-xxx-xxx" \
 
 Subscribe to one or more of these events:
 
+### Payment Events
 - `payment.succeeded` - Triggered when a payment is successfully completed
 - `payment.failed` - Triggered when a payment fails or is rejected
+
+### Refund Events
 - `refund.created` - Triggered when a refund is created
-- `customer.created` - Triggered when a new customer is registered
+
+### Customer Events
+- `customer.created` - Triggered when a new customer is registered (manual creation or auto-creation from checkout)
+- `customer.updated` - Triggered when customer information is modified
+- `customer.deleted` - Triggered when a customer is deleted
 
 ---
 
