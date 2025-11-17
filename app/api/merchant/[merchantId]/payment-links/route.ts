@@ -87,8 +87,8 @@ export async function POST(
     }
 
     // Generate full URL for the payment link
-    // Use custom_url if available, otherwise use url_key
-    const urlSlug = paymentLink.custom_url || paymentLink.url_key
+    // Use custom_url if available, otherwise use the payment link ID
+    const urlSlug = paymentLink.custom_url || paymentLink.id
     const fullUrl = `https://link.deonpay.mx/${urlSlug}`
 
     // Generate QR code URL using QR Server API
@@ -217,8 +217,8 @@ export async function GET(
         ? productsMap.get(lineItems[0].product_id)
         : null
 
-      // Use custom_url if available, otherwise use url_key
-      const urlSlug = link.custom_url || link.url_key
+      // Use custom_url if available, otherwise use the payment link ID
+      const urlSlug = link.custom_url || link.id
       const fullUrl = `https://link.deonpay.mx/${urlSlug}`
       const qrCodeUrl = link.qr_code_url || `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(fullUrl)}`
 
