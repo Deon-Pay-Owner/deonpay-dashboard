@@ -17,7 +17,7 @@ export async function GET(
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (authError || \!user) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -31,7 +31,7 @@ export async function GET(
       .eq('id', merchantId)
       .single()
 
-    if (merchantError || \!merchant) {
+    if (merchantError || !merchant) {
       return NextResponse.json(
         { error: 'Merchant not found' },
         { status: 404 }
@@ -39,7 +39,7 @@ export async function GET(
     }
 
     // Check if user is owner (can be expanded to check merchant_members later)
-    if (merchant.owner_user_id \!== user.id) {
+    if (merchant.owner_user_id !== user.id) {
       return NextResponse.json(
         { error: 'Access denied' },
         { status: 403 }
@@ -57,7 +57,7 @@ export async function GET(
       .limit(1)
       .single()
 
-    if (apiKeyError || \!apiKey) {
+    if (apiKeyError || !apiKey) {
       return NextResponse.json(
         { error: 'No active API key found. Please create an API key first.' },
         { status: 404 }
