@@ -316,7 +316,7 @@ export default function CreatePaymentLinkModal({
             </label>
             <div className="flex items-center gap-2">
               <span className="text-sm text-[var(--color-textSecondary)] whitespace-nowrap">
-                pay.deonpay.mx/l/
+                link.deonpay.mx/
               </span>
               <input
                 type="text"
