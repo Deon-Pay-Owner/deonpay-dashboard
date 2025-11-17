@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Link2, Package, Plus, CheckCircle2 } from 'lucide-react'
+import { X, Link2, Package, Plus, CheckCircle2, Image as ImageIcon, Trash2 } from 'lucide-react'
 
 interface Product {
   id: string
@@ -66,6 +66,7 @@ export default function CreateLinkModal({
     recurring_interval: 'month',
     recurring_interval_count: '1',
     active: true,
+    images: ['', '', ''] as string[],
   })
 
   useEffect(() => {
@@ -98,6 +99,9 @@ export default function CreateLinkModal({
     try {
       const amountInCents = Math.round(parseFloat(newProductData.unit_amount) * 100)
 
+      // Filter out empty image URLs
+      const validImages = newProductData.images.filter(img => img.trim() !== '')
+
       const payload: any = {
         name: newProductData.name,
         description: newProductData.description || undefined,
@@ -105,6 +109,7 @@ export default function CreateLinkModal({
         currency: newProductData.currency,
         type: newProductData.type,
         active: newProductData.active,
+        images: validImages.length > 0 ? validImages : undefined,
       }
 
       if (newProductData.type === 'recurring') {
@@ -144,6 +149,7 @@ export default function CreateLinkModal({
         recurring_interval: 'month',
         recurring_interval_count: '1',
         active: true,
+        images: ['', '', ''],
       })
     } catch (err: any) {
       setProductError(err.message || 'Error al crear el producto')
@@ -345,6 +351,43 @@ export default function CreateLinkModal({
                     rows={2}
                     className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                   />
+                </div>
+
+                {/* Product Images */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Imágenes (hasta 3)
+                  </label>
+                  <div className="space-y-2">
+                    {newProductData.images.map((image, index) => (
+                      <div key={index} className="flex gap-1">
+                        <input
+                          type="url"
+                          value={image}
+                          onChange={(e) => {
+                            const newImages = [...newProductData.images]
+                            newImages[index] = e.target.value
+                            setNewProductData({ ...newProductData, images: newImages })
+                          }}
+                          placeholder={`URL imagen ${index + 1}`}
+                          className="flex-1 px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                        />
+                        {image && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = [...newProductData.images]
+                              newImages[index] = ''
+                              setNewProductData({ ...newProductData, images: newImages })
+                            }}
+                            className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

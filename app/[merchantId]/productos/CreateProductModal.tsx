@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X, Image as ImageIcon, Trash2 } from 'lucide-react'
 
 interface CreateProductModalProps {
   merchantId: string
@@ -23,6 +23,7 @@ export default function CreateProductModal({
     recurring_interval: 'month',
     recurring_interval_count: '1',
     active: true,
+    images: ['', '', ''] as string[],
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -36,6 +37,9 @@ export default function CreateProductModal({
       // Convert amount to minor units (cents/centavos)
       const amountInCents = Math.round(parseFloat(formData.unit_amount) * 100)
 
+      // Filter out empty image URLs
+      const validImages = formData.images.filter(img => img.trim() !== '')
+
       const payload: any = {
         name: formData.name,
         description: formData.description || undefined,
@@ -43,6 +47,7 @@ export default function CreateProductModal({
         currency: formData.currency,
         type: formData.type,
         active: formData.active,
+        images: validImages.length > 0 ? validImages : undefined,
       }
 
       if (formData.type === 'recurring') {
@@ -124,6 +129,72 @@ export default function CreateProductModal({
               placeholder="Describe tu producto o servicio"
               rows={4}
             />
+          </div>
+
+          {/* Product Images */}
+          <div>
+            <label className="block text-sm font-semibold text-[var(--color-textPrimary)] mb-2">
+              Imágenes del producto (hasta 3)
+            </label>
+            <p className="text-xs text-[var(--color-textSecondary)] mb-3">
+              Agrega URLs de imágenes de tu producto. La primera imagen será la principal.
+            </p>
+            <div className="space-y-3">
+              {formData.images.map((image, index) => (
+                <div key={index} className="flex gap-2">
+                  <div className="relative flex-1">
+                    <ImageIcon
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-textSecondary)] pointer-events-none"
+                    />
+                    <input
+                      type="url"
+                      className="input-field w-full pl-10"
+                      value={image}
+                      onChange={(e) => {
+                        const newImages = [...formData.images]
+                        newImages[index] = e.target.value
+                        setFormData({ ...formData, images: newImages })
+                      }}
+                      placeholder={`URL imagen ${index + 1} (ej: https://ejemplo.com/imagen.jpg)`}
+                    />
+                  </div>
+                  {image && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newImages = [...formData.images]
+                        newImages[index] = ''
+                        setFormData({ ...formData, images: newImages })
+                      }}
+                      className="p-2 text-[var(--color-error)] hover:bg-[var(--color-error)]/10 rounded-lg transition-colors"
+                      title="Eliminar imagen"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            {formData.images.some(img => img.trim() !== '') && (
+              <div className="mt-4 p-3 bg-[var(--color-background)] rounded-lg">
+                <p className="text-xs font-medium text-[var(--color-textPrimary)] mb-2">Vista previa:</p>
+                <div className="flex gap-2 overflow-x-auto">
+                  {formData.images.filter(img => img.trim() !== '').map((image, index) => (
+                    <div key={index} className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-[var(--color-border)]">
+                      <img
+                        src={image}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Price */}
