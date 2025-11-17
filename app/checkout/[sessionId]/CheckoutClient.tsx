@@ -362,31 +362,31 @@ export default function CheckoutClient({ sessionId }: { sessionId: string }) {
   if (!session) return null
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-[var(--color-background)]">
+    <div className="min-h-screen py-6 sm:py-12 px-4 bg-[var(--color-background)]">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           {session.merchant.logo_url ? (
             <img
               src={session.merchant.logo_url}
               alt={session.merchant.name}
-              className="h-12 mx-auto mb-4"
+              className="h-10 sm:h-12 mx-auto mb-3 sm:mb-4"
             />
           ) : (
-            <h1 className="text-3xl font-bold text-[var(--color-textPrimary)] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-textPrimary)] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
               {session.merchant.name}
             </h1>
           )}
-          <p className="text-sm text-[var(--color-textSecondary)]">
+          <p className="text-xs sm:text-sm text-[var(--color-textSecondary)]">
             Checkout seguro
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left: Payment Form */}
           <div>
-            <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl p-8 border border-[var(--color-border)]">
-              <h2 className="text-2xl font-bold text-[var(--color-textPrimary)] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+            <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 border border-[var(--color-border)]">
+              <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-textPrimary)] mb-4 sm:mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
                 Información de pago
               </h2>
 
@@ -516,9 +516,9 @@ export default function CheckoutClient({ sessionId }: { sessionId: string }) {
 
           {/* Right: Order Summary */}
           <div>
-            <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl p-8 sticky top-8 border border-[var(--color-border)]">
-              <h2 className="text-xl font-bold text-[var(--color-textPrimary)] mb-6 flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
-                <ShoppingCart size={24} />
+            <div className="bg-[var(--color-surface)] rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 lg:sticky lg:top-8 border border-[var(--color-border)]">
+              <h2 className="text-lg sm:text-xl font-bold text-[var(--color-textPrimary)] mb-4 sm:mb-6 flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
                 Resumen de compra
               </h2>
 
