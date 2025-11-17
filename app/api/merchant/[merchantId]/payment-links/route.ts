@@ -76,10 +76,28 @@ export async function POST(
       )
     }
 
-    // Return payment link with full URL
+    // Generate full URL for the payment link
+    const fullUrl = `https://link.deonpay.mx/${paymentLink.url_key}`
+
+    // Generate QR code URL using QR Server API
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(fullUrl)}`
+
+    // Update payment link with QR code URL
+    const { error: updateError } = await supabase
+      .from('payment_links')
+      .update({ qr_code_url: qrCodeUrl })
+      .eq('id', paymentLink.id)
+
+    if (updateError) {
+      console.error('Error updating QR code:', updateError)
+      // Don't fail the request, just log the error
+    }
+
+    // Return payment link with full URL and QR code
     return NextResponse.json({
       ...paymentLink,
-      url: `https://link.deonpay.mx/${paymentLink.url_key}`
+      url: fullUrl,
+      qr_code_url: qrCodeUrl
     })
   } catch (error) {
     console.error('Error in payment-links POST:', error)
@@ -187,9 +205,13 @@ export async function GET(
         ? productsMap.get(lineItems[0].product_id)
         : null
 
+      const fullUrl = `https://link.deonpay.mx/${link.url_key}`
+      const qrCodeUrl = link.qr_code_url || `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(fullUrl)}`
+
       return {
         ...link,
-        url: `https://link.deonpay.mx/${link.url_key}`,
+        url: fullUrl,
+        qr_code_url: qrCodeUrl,
         products: firstProduct
       }
     })
