@@ -49,7 +49,16 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired
   const {
     data: { user },
+    error: userError
   } = await supabase.auth.getUser()
+
+  // Debug logging
+  console.log('[Dashboard Middleware]', {
+    path: request.nextUrl.pathname,
+    hasUser: !!user,
+    userError: userError?.message,
+    cookies: request.cookies.getAll().map(c => c.name)
+  })
 
   // If no user, redirect to landing signin
   if (!user) {
