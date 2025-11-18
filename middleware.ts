@@ -67,6 +67,14 @@ export async function middleware(request: NextRequest) {
       .eq('id', merchantId)
       .single()
 
+    // Log for debugging
+    console.log('[Middleware Debug]', {
+      merchantId,
+      userId: user.id,
+      merchantData: merchant,
+      merchantError: merchantError?.message
+    })
+
     // If merchant doesn't exist or user doesn't have access
     if (!merchant) {
       // Check for redirect loop
