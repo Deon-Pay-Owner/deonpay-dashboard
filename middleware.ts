@@ -1,6 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Prevent infinite redirect loops
+const MAX_REDIRECTS = 3
+const REDIRECT_COOKIE_NAME = 'dashboard_redirect_count'
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -57,7 +61,7 @@ export async function middleware(request: NextRequest) {
 
   // Verify user has access to merchant (optional but recommended)
   if (merchantId) {
-    const { data: merchant } = await supabase
+    const { data: merchant, error: merchantError } = await supabase
       .from('merchants')
       .select('owner_user_id')
       .eq('id', merchantId)
@@ -65,6 +69,21 @@ export async function middleware(request: NextRequest) {
 
     // If merchant doesn't exist or user doesn't have access
     if (!merchant) {
+      // Check for redirect loop
+      const redirectCount = parseInt(request.cookies.get(REDIRECT_COOKIE_NAME)?.value || '0')
+
+      if (redirectCount >= MAX_REDIRECTS) {
+        // Too many redirects - clear cookie and show error page
+        const response = new NextResponse('Access denied. Unable to access dashboard. Please contact support or try signing in again.', {
+          status: 403,
+          headers: {
+            'Content-Type': 'text/plain',
+          }
+        })
+        response.cookies.delete(REDIRECT_COOKIE_NAME)
+        return response
+      }
+
       // Redirect to 404 or default merchant
       const { data: userProfile } = await supabase
         .from('users_profile')
@@ -73,14 +92,26 @@ export async function middleware(request: NextRequest) {
         .single()
 
       if (userProfile?.default_merchant_id) {
-        return NextResponse.redirect(
+        const redirectResponse = NextResponse.redirect(
           new URL(`/${userProfile.default_merchant_id}/general`, request.url)
         )
+        // Increment redirect counter
+        redirectResponse.cookies.set(REDIRECT_COOKIE_NAME, (redirectCount + 1).toString(), {
+          maxAge: 10, // Cookie expires in 10 seconds
+          httpOnly: true,
+          sameSite: 'lax'
+        })
+        return redirectResponse
       }
 
-      // No default merchant, redirect to signin
-      return NextResponse.redirect(new URL('https://deonpay.mx/signin', request.url))
+      // No default merchant, redirect to signin (and clear counter)
+      const signinResponse = NextResponse.redirect(new URL('https://deonpay.mx/signin', request.url))
+      signinResponse.cookies.delete(REDIRECT_COOKIE_NAME)
+      return signinResponse
     }
+
+    // Success - clear redirect counter if it exists
+    supabaseResponse.cookies.delete(REDIRECT_COOKIE_NAME)
 
     // Check if user is owner or member
     const isOwner = merchant.owner_user_id === user.id
