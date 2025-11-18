@@ -262,11 +262,11 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
             {filteredLinks.map((link) => (
               <div
                 key={link.id}
-                className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6"
+                className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
                       <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                         {link.products?.name || 'Link de Pago'}
                       </h3>
@@ -282,65 +282,67 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
                     </div>
 
                     {/* URL */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <code className="text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded">
+                    <div className="flex items-start sm:items-center gap-2 mb-4">
+                      <code className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 sm:px-3 py-1 rounded break-all overflow-hidden flex-1 min-w-0">
                         {link.url}
                       </code>
-                      <button
-                        onClick={() => copyToClipboard(link.url, link.id)}
-                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
-                        title="Copiar link"
-                      >
-                        {copiedId === link.id ? (
-                          <span className="text-xs text-green-600 dark:text-green-400">✓ Copiado</span>
-                        ) : (
-                          <Copy className="w-4 h-4 text-slate-500" />
-                        )}
-                      </button>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
-                        title="Abrir link"
-                      >
-                        <ExternalLink className="w-4 h-4 text-slate-500" />
-                      </a>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          onClick={() => copyToClipboard(link.url, link.id)}
+                          className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
+                          title="Copiar link"
+                        >
+                          {copiedId === link.id ? (
+                            <span className="text-xs text-green-600 dark:text-green-400 whitespace-nowrap">✓</span>
+                          ) : (
+                            <Copy className="w-4 h-4 text-slate-500" />
+                          )}
+                        </button>
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
+                          title="Abrir link"
+                        >
+                          <ExternalLink className="w-4 h-4 text-slate-500" />
+                        </a>
+                      </div>
                     </div>
 
                     {/* Stats */}
-                    <div className="flex items-center gap-6 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Eye className="w-4 h-4 text-slate-400" />
-                        <span className="text-slate-600 dark:text-slate-400">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 flex-shrink-0" />
+                        <span className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
                           {link.click_count} clics
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-slate-400" />
-                        <span className="text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 flex-shrink-0" />
+                        <span className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
                           {link.completed_sessions_count} conversiones
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-slate-600 dark:text-slate-400">
-                          {getConversionRate(link)}% tasa de conversión
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                          {getConversionRate(link)}% conversión
                         </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0 sm:flex-col sm:gap-1">
                     <button
                       onClick={() => toggleLinkStatus(link)}
                       className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                       title={link.active ? 'Desactivar' : 'Activar'}
                     >
                       {link.active ? (
-                        <EyeOff className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-400" />
                       ) : (
-                        <Eye className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                        <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-slate-400" />
                       )}
                     </button>
                     <button
@@ -348,7 +350,7 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
                       className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                       title="Eliminar"
                     >
-                      <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
+                      <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400" />
                     </button>
                   </div>
                 </div>
