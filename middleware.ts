@@ -61,7 +61,24 @@ export async function middleware(request: NextRequest) {
 
   // Verify user has access to merchant (optional but recommended)
   if (merchantId) {
-    const { data: merchant, error: merchantError } = await supabase
+    // Create service role client to bypass RLS for merchant lookup
+    // We'll verify ownership separately after fetching
+    const serviceSupabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            // No-op for service client
+          },
+        },
+      }
+    )
+
+    const { data: merchant, error: merchantError } = await serviceSupabase
       .from('merchants')
       .select('owner_user_id')
       .eq('id', merchantId)
