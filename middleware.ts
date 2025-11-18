@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Prevent infinite redirect loops
@@ -62,19 +63,15 @@ export async function middleware(request: NextRequest) {
   // Verify user has access to merchant (optional but recommended)
   if (merchantId) {
     // Create service role client to bypass RLS for merchant lookup
-    // We'll verify ownership separately after fetching
-    const serviceSupabase = createServerClient(
+    // Using createClient (not createServerClient) to ensure RLS is bypassed
+    const serviceSupabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            // No-op for service client
-          },
-        },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
       }
     )
 
