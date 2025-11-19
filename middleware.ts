@@ -60,6 +60,8 @@ export async function middleware(request: NextRequest) {
 
   // Verify user has access to merchant (optional but recommended)
   if (merchantId) {
+    console.log('[DASHBOARD MIDDLEWARE] Checking merchant access for:', merchantId)
+
     // Create service role client to bypass RLS for merchant lookup
     // Using createClient (not createServerClient) to ensure RLS is bypassed
     const serviceSupabase = createClient(
@@ -73,11 +75,13 @@ export async function middleware(request: NextRequest) {
       }
     )
 
-    const { data: merchant } = await serviceSupabase
+    const { data: merchant, error: merchantError } = await serviceSupabase
       .from('merchants')
       .select('owner_user_id')
       .eq('id', merchantId)
       .single()
+
+    console.log('[DASHBOARD MIDDLEWARE] Merchant query result:', { merchant, merchantError })
 
     // If merchant doesn't exist or user doesn't have access
     if (!merchant) {
@@ -127,6 +131,11 @@ export async function middleware(request: NextRequest) {
 
     // Check if user is owner or member
     const isOwner = merchant.owner_user_id === user.id
+    console.log('[DASHBOARD MIDDLEWARE] Ownership check:', {
+      merchantOwnerId: merchant.owner_user_id,
+      userId: user.id,
+      isOwner
+    })
 
     // TODO: Add member check if you implement merchant_members table
     // const { data: member } = await supabase
@@ -137,12 +146,15 @@ export async function middleware(request: NextRequest) {
     //   .single()
 
     if (!isOwner) {
+      console.log('[DASHBOARD MIDDLEWARE] User is not owner, redirecting to signin')
       // User doesn't have access to this merchant
       return NextResponse.redirect(
         new URL('https://deonpay.mx/signin', request.url)
       )
     }
   }
+
+  console.log('[DASHBOARD MIDDLEWARE] Access granted, allowing request')
 
   return supabaseResponse
 }
