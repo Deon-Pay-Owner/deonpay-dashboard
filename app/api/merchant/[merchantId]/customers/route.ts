@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createApiClient } from '@/lib/supabase'
-import { emitCustomerCreated } from '@/lib/webhooks'
+
+const API_WORKER_URL = process.env.NEXT_PUBLIC_DEONPAY_API_URL || 'https://pagos.deonpay.mx'
 
 export async function GET(
   request: NextRequest,
@@ -47,65 +48,52 @@ export async function GET(
       )
     }
 
-    // Get query parameters for filtering and pagination
-    const searchParams = request.nextUrl.searchParams
-    const search = searchParams.get('search') || ''
-    const limit = parseInt(searchParams.get('limit') || '50')
-    const offset = parseInt(searchParams.get('offset') || '0')
-
-    // Build query
-    let query = supabase
-      .from('customers')
-      .select('*', { count: 'exact' })
+    // Get merchant's secret key for API Worker authentication
+    const { data: apiKey, error: keyError } = await supabase
+      .from('api_keys')
+      .select('secret_key')
       .eq('merchant_id', merchantId)
-      .eq('deleted', false)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
+      .eq('key_type', 'test') // Use test key for now
+      .eq('is_active', true)
+      .single()
 
-    // Apply search filter if provided
-    if (search) {
-      query = query.or(`email.ilike.%${search}%,name.ilike.%${search}%,phone.ilike.%${search}%`)
-    }
-
-    const { data: customers, error: customersError, count } = await query
-
-    if (customersError) {
-      console.error('Error fetching customers:', customersError)
+    if (keyError || !apiKey || !apiKey.secret_key) {
+      console.error('Error fetching API key:', keyError)
       return NextResponse.json(
-        { error: 'Failed to fetch customers' },
+        { error: 'Merchant API key not configured' },
         { status: 500 }
       )
     }
 
-    // Get aggregated stats
-    const { data: stats } = await supabase
-      .from('customers')
-      .select('transaction_count, created_at')
-      .eq('merchant_id', merchantId)
-      .eq('deleted', false)
+    // Forward request to API Worker
+    const searchParams = request.nextUrl.searchParams
+    const workerUrl = `${API_WORKER_URL}/api/v1/customers?${searchParams.toString()}`
 
-    const totalCustomers = count || 0
-    const activeCustomers = stats?.filter(c => c.transaction_count > 0).length || 0
+    const workerResponse = await fetch(workerUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey.secret_key}`,
+        'Content-Type': 'application/json',
+      },
+    })
 
-    // Calculate new customers this month
-    const now = new Date()
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const newThisMonth = stats?.filter(c =>
-      new Date(c.created_at) >= firstDayOfMonth
-    ).length || 0
+    if (!workerResponse.ok) {
+      const errorData = await workerResponse.json()
+      console.error('API Worker error:', errorData)
+      return NextResponse.json(
+        { error: errorData.error || 'Failed to fetch customers' },
+        { status: workerResponse.status }
+      )
+    }
 
+    const workerData = await workerResponse.json()
+
+    // Worker returns { object: 'list', data: [...], has_more: bool, pagination: {...}, stats: {...} }
+    // Dashboard expects { data: [...], pagination: {...}, stats: {...} }
     return NextResponse.json({
-      data: customers,
-      pagination: {
-        total: totalCustomers,
-        limit,
-        offset,
-      },
-      stats: {
-        total: totalCustomers,
-        active: activeCustomers,
-        newThisMonth,
-      },
+      data: workerData.data || [],
+      pagination: workerData.pagination,
+      stats: workerData.stats
     })
   } catch (error) {
     console.error('Error in customers GET:', error)
@@ -164,52 +152,45 @@ export async function POST(
       )
     }
 
-    // Validate required fields
-    if (!body.email) {
-      return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      )
-    }
-
-    // Create customer
-    const { data: customer, error: createError } = await supabase
-      .from('customers')
-      .insert({
-        merchant_id: merchantId,
-        email: body.email,
-        name: body.name,
-        phone: body.phone,
-        billing_address: body.billing_address || {},
-        shipping_address: body.shipping_address || {},
-        metadata: body.metadata || {},
-        description: body.description,
-        tax_exempt: body.tax_exempt || false,
-        currency: body.currency,
-      })
-      .select()
+    // Get merchant's secret key for API Worker authentication
+    const { data: apiKey, error: keyError } = await supabase
+      .from('api_keys')
+      .select('secret_key')
+      .eq('merchant_id', merchantId)
+      .eq('key_type', 'test') // Use test key for now
+      .eq('is_active', true)
       .single()
 
-    if (createError) {
-      console.error('Error creating customer:', createError)
-
-      // Handle unique constraint violation
-      if (createError.code === '23505') {
-        return NextResponse.json(
-          { error: 'A customer with this email already exists' },
-          { status: 409 }
-        )
-      }
-
+    if (keyError || !apiKey || !apiKey.secret_key) {
+      console.error('Error fetching API key:', keyError)
       return NextResponse.json(
-        { error: { message: createError.message } },
+        { error: 'Merchant API key not configured' },
         { status: 500 }
       )
     }
 
-    // Emit customer.created webhook event
-    await emitCustomerCreated(merchantId, customer)
+    // Forward request to API Worker
+    const workerUrl = `${API_WORKER_URL}/api/v1/customers`
 
+    const workerResponse = await fetch(workerUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey.secret_key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!workerResponse.ok) {
+      const errorData = await workerResponse.json()
+      console.error('API Worker error:', errorData)
+      return NextResponse.json(
+        { error: errorData.error || { message: 'Failed to create customer' } },
+        { status: workerResponse.status }
+      )
+    }
+
+    const customer = await workerResponse.json()
     return NextResponse.json(customer, { status: 201 })
   } catch (error) {
     console.error('Error in customers POST:', error)
