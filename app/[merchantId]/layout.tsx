@@ -13,34 +13,14 @@ export default async function MerchantLayout({
   const { merchantId } = await params
   const supabase = await createClient()
 
-  // Get user session
+  // Middleware already verified authentication and access
+  // Just get user info for display
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // If somehow no user (shouldn't happen due to middleware), redirect
   if (!user) {
-    redirect('https://deonpay.mx/signin')
-  }
-
-  // Verify user has access to merchant
-  const { data: merchant } = await supabase
-    .from('merchants')
-    .select('owner_user_id, name')
-    .eq('id', merchantId)
-    .single()
-
-  if (!merchant || merchant.owner_user_id !== user.id) {
-    // User doesn't have access, redirect to their default merchant or signin
-    const { data: userProfile } = await supabase
-      .from('users_profile')
-      .select('default_merchant_id')
-      .eq('user_id', user.id)
-      .single()
-
-    if (userProfile?.default_merchant_id && userProfile.default_merchant_id !== merchantId) {
-      redirect(`/${userProfile.default_merchant_id}/general`)
-    }
-
     redirect('https://deonpay.mx/signin')
   }
 
