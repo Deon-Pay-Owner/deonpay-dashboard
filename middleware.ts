@@ -22,22 +22,11 @@ export async function middleware(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value)
-
-            // Set secure httpOnly cookie for server
             supabaseResponse.cookies.set(name, value, {
               ...options,
               domain: process.env.SUPABASE_COOKIE_DOMAIN || '.deonpay.mx',
               secure: true,
               httpOnly: true,
-              sameSite: 'lax',
-            })
-
-            // Also set a client-accessible cookie (without httpOnly) for browser client
-            supabaseResponse.cookies.set(`${name}-client`, value, {
-              ...options,
-              domain: process.env.SUPABASE_COOKIE_DOMAIN || '.deonpay.mx',
-              secure: true,
-              httpOnly: false, // Client can read this
               sameSite: 'lax',
             })
           })
@@ -49,16 +38,7 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired
   const {
     data: { user },
-    error: userError
   } = await supabase.auth.getUser()
-
-  // Debug logging
-  console.log('[Dashboard Middleware]', {
-    path: request.nextUrl.pathname,
-    hasUser: !!user,
-    userError: userError?.message,
-    cookies: request.cookies.getAll().map(c => c.name)
-  })
 
   // If no user, redirect to landing signin
   if (!user) {
@@ -84,19 +64,11 @@ export async function middleware(request: NextRequest) {
       }
     )
 
-    const { data: merchant, error: merchantError } = await serviceSupabase
+    const { data: merchant } = await serviceSupabase
       .from('merchants')
       .select('owner_user_id')
       .eq('id', merchantId)
       .single()
-
-    // Log for debugging
-    console.log('[Middleware Debug]', {
-      merchantId,
-      userId: user.id,
-      merchantData: merchant,
-      merchantError: merchantError?.message
-    })
 
     // If merchant doesn't exist or user doesn't have access
     if (!merchant) {
