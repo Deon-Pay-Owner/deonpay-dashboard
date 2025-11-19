@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createApiClient } from '@/lib/supabase'
 
+const API_WORKER_URL = process.env.NEXT_PUBLIC_DEONPAY_API_URL || 'https://pagos.deonpay.mx'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ merchantId: string }> }
@@ -24,7 +26,7 @@ export async function GET(
       )
     }
 
-    // Verify user has access to this merchant
+    // Verify user has access to this merchant and get API key
     const { data: merchant, error: merchantError } = await supabase
       .from('merchants')
       .select('owner_user_id')
@@ -46,35 +48,49 @@ export async function GET(
       )
     }
 
-    // Get query parameters
-    const searchParams = request.nextUrl.searchParams
-    const activeParam = searchParams.get('active')
-    const limit = parseInt(searchParams.get('limit') || '100')
-
-    // Build query
-    let query = supabase
-      .from('products')
-      .select('*')
+    // Get merchant's secret key for API Worker authentication
+    const { data: apiKey, error: keyError } = await supabase
+      .from('api_keys')
+      .select('secret_key')
       .eq('merchant_id', merchantId)
-      .order('created_at', { ascending: false })
-      .limit(limit)
+      .eq('key_type', 'test') // Use test key for now
+      .eq('is_active', true)
+      .single()
 
-    // Filter by active status if specified
-    if (activeParam !== null) {
-      query = query.eq('active', activeParam === 'true')
-    }
-
-    const { data: products, error: productsError } = await query
-
-    if (productsError) {
-      console.error('Error fetching products:', productsError)
+    if (keyError || !apiKey || !apiKey.secret_key) {
+      console.error('Error fetching API key:', keyError)
       return NextResponse.json(
-        { error: 'Failed to fetch products' },
+        { error: 'Merchant API key not configured' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ data: products })
+    // Forward request to API Worker
+    const searchParams = request.nextUrl.searchParams
+    const workerUrl = `${API_WORKER_URL}/api/v1/products?${searchParams.toString()}`
+
+    const workerResponse = await fetch(workerUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey.secret_key}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!workerResponse.ok) {
+      const errorData = await workerResponse.json()
+      console.error('API Worker error:', errorData)
+      return NextResponse.json(
+        { error: errorData.error || 'Failed to fetch products' },
+        { status: workerResponse.status }
+      )
+    }
+
+    const workerData = await workerResponse.json()
+
+    // Worker returns { object: 'list', data: [...], has_more: bool }
+    // Dashboard expects { data: [...] }
+    return NextResponse.json({ data: workerData.data || [] })
   } catch (error) {
     console.error('Error in products GET:', error)
     return NextResponse.json(
@@ -132,32 +148,45 @@ export async function POST(
       )
     }
 
-    // Create product
-    const { data: product, error: createError } = await supabase
-      .from('products')
-      .insert({
-        merchant_id: merchantId,
-        name: body.name,
-        description: body.description,
-        unit_amount: body.unit_amount,
-        currency: body.currency,
-        type: body.type,
-        recurring_interval: body.recurring_interval,
-        recurring_interval_count: body.recurring_interval_count,
-        active: body.active !== undefined ? body.active : true,
-        metadata: body.metadata || {}
-      })
-      .select()
+    // Get merchant's secret key for API Worker authentication
+    const { data: apiKey, error: keyError } = await supabase
+      .from('api_keys')
+      .select('secret_key')
+      .eq('merchant_id', merchantId)
+      .eq('key_type', 'test') // Use test key for now
+      .eq('is_active', true)
       .single()
 
-    if (createError) {
-      console.error('Error creating product:', createError)
+    if (keyError || !apiKey || !apiKey.secret_key) {
+      console.error('Error fetching API key:', keyError)
       return NextResponse.json(
-        { error: { message: createError.message } },
+        { error: 'Merchant API key not configured' },
         { status: 500 }
       )
     }
 
+    // Forward request to API Worker
+    const workerUrl = `${API_WORKER_URL}/api/v1/products`
+
+    const workerResponse = await fetch(workerUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey.secret_key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!workerResponse.ok) {
+      const errorData = await workerResponse.json()
+      console.error('API Worker error:', errorData)
+      return NextResponse.json(
+        { error: errorData.error || { message: 'Failed to create product' } },
+        { status: workerResponse.status }
+      )
+    }
+
+    const product = await workerResponse.json()
     return NextResponse.json(product)
   } catch (error) {
     console.error('Error in products POST:', error)
