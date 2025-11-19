@@ -12,6 +12,10 @@ const nextConfig = {
   compress: true,
   // Ensure Tailwind CSS is properly compiled
   transpilePackages: [],
+  // Force clean build - Nov 19, 2025
+  generateBuildId: async () => {
+    return `build-${Date.now()}`
+  },
 }
 
 module.exports = nextConfig
