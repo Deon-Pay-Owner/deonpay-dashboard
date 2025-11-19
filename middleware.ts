@@ -7,6 +7,11 @@ const MAX_REDIRECTS = 3
 const REDIRECT_COOKIE_NAME = 'dashboard_redirect_count'
 
 export async function middleware(request: NextRequest) {
+  // Debug: Log all incoming cookies
+  const allCookies = request.cookies.getAll()
+  console.log('[DASHBOARD MIDDLEWARE] URL:', request.url)
+  console.log('[DASHBOARD MIDDLEWARE] Incoming cookies:', allCookies.length, allCookies.map(c => c.name))
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -38,7 +43,11 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser()
+
+  console.log('[DASHBOARD MIDDLEWARE] User:', user ? user.id : 'null')
+  console.log('[DASHBOARD MIDDLEWARE] Auth error:', authError)
 
   // If no user, redirect to landing signin
   if (!user) {
