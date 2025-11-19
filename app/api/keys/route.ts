@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createApiClient } from '@/lib/supabase'
 
 /**
  * GET /api/keys?merchantId=xxx
@@ -17,7 +17,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    // Create a mutable response
+    const response = NextResponse.json({ keys: [] })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get current user to verify they have access to this merchant
     const { data: { user }, error: userError } = await supabase.auth.getUser()

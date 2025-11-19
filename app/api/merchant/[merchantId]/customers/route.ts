@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createApiClient } from '@/lib/supabase'
 import { emitCustomerCreated } from '@/lib/webhooks'
 
 export async function GET(
@@ -7,8 +7,13 @@ export async function GET(
   { params }: { params: Promise<{ merchantId: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { merchantId } = await params
+
+    // Create a mutable response
+    const response = NextResponse.json({ data: [] })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -116,8 +121,16 @@ export async function POST(
   { params }: { params: Promise<{ merchantId: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { merchantId } = await params
+
+    // Get request body first
+    const body = await request.json()
+
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -150,9 +163,6 @@ export async function POST(
         { status: 403 }
       )
     }
-
-    // Get request body
-    const body = await request.json()
 
     // Validate required fields
     if (!body.email) {

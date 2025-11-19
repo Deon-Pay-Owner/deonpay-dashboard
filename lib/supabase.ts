@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
 
 export type Database = {
   public: {
@@ -102,6 +103,36 @@ export async function createClient() {
 }
 
 export type SupabaseClient = ReturnType<typeof createClient>
+
+/**
+ * Create a Supabase client for API routes
+ * This properly handles cookies in API routes context
+ */
+export function createApiClient(request: NextRequest, response: NextResponse) {
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value)
+            response.cookies.set(name, value, {
+              ...options,
+              domain: process.env.SUPABASE_COOKIE_DOMAIN || '.deonpay.mx',
+              secure: true,
+              httpOnly: true,
+              sameSite: 'lax' as const,
+            })
+          })
+        },
+      },
+    }
+  )
+}
 
 /**
  * Verifica si un usuario tiene acceso a un merchant

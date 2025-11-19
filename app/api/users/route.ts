@@ -2,10 +2,10 @@
  * Users API - Get team members for a merchant
  */
 
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { NextRequest, NextResponse } from 'next/server'
+import { createApiClient } from '@/lib/supabase'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const merchantId = searchParams.get('merchantId')
@@ -17,7 +17,11 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    // Create a mutable response
+    const response = NextResponse.json({ users: [] })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()

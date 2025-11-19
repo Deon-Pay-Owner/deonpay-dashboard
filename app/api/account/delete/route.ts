@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createApiClient } from '@/lib/supabase'
 import { z } from 'zod'
 
 const deleteSchema = z.object({
@@ -14,8 +14,11 @@ export async function DELETE(request: NextRequest) {
     // Validate input
     const { confirmEmail } = deleteSchema.parse(body)
 
-    // Create Supabase client
-    const supabase = await createClient()
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()

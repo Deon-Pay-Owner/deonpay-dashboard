@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createApiClient } from '@/lib/supabase'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ merchantId: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { merchantId } = await params
+
+    // Get request body first
+    const body = await request.json()
+
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -40,9 +48,6 @@ export async function POST(
         { status: 403 }
       )
     }
-
-    // Get request body
-    const body = await request.json()
 
     // Build line_items array
     const lineItems = [{
@@ -125,8 +130,13 @@ export async function GET(
   { params }: { params: Promise<{ merchantId: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { merchantId } = await params
+
+    // Create a mutable response
+    const response = NextResponse.json({ data: [] })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

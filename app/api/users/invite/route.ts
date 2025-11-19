@@ -2,10 +2,10 @@
  * Users Invite API - Send invitation to join merchant team
  */
 
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { NextRequest, NextResponse } from 'next/server'
+import { createApiClient } from '@/lib/supabase'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { merchantId, email, role } = body
@@ -35,7 +35,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()

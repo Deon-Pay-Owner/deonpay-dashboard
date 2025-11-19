@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createApiClient } from '@/lib/supabase'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ merchantId: string; productId: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { merchantId, productId } = await params
+
+    // Get request body first
+    const body = await request.json()
+
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -40,9 +48,6 @@ export async function PUT(
         { status: 403 }
       )
     }
-
-    // Get request body
-    const body = await request.json()
 
     // Update product
     const { data: product, error: updateError } = await supabase
@@ -86,8 +91,13 @@ export async function DELETE(
   { params }: { params: Promise<{ merchantId: string; productId: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { merchantId, productId } = await params
+
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

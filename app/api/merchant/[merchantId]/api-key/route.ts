@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createApiClient } from '@/lib/supabase'
 
 /**
  * DEPRECATED: This endpoint cannot return the full secret key anymore
@@ -11,8 +11,13 @@ export async function GET(
   { params }: { params: Promise<{ merchantId: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { merchantId } = await params
+
+    // Create a mutable response
+    const response = NextResponse.json({ data: null })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

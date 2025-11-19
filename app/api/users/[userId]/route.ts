@@ -2,12 +2,12 @@
  * User Management API - Update or remove team members
  */
 
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { NextRequest, NextResponse } from 'next/server'
+import { createApiClient } from '@/lib/supabase'
 
 // Update user role
 export async function PATCH(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
@@ -31,7 +31,11 @@ export async function PATCH(
       )
     }
 
-    const supabase = await createClient()
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -109,7 +113,7 @@ export async function PATCH(
 
 // Remove user from team
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
@@ -124,7 +128,11 @@ export async function DELETE(
       )
     }
 
-    const supabase = await createClient()
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createApiClient } from '@/lib/supabase'
 import { z } from 'zod'
 
 const accountUpdateSchema = z.object({
@@ -28,7 +28,14 @@ const accountUpdateSchema = z.object({
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    // Get request body first
+    const body = await request.json()
+
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -43,7 +50,6 @@ export async function PATCH(request: NextRequest) {
     const userId = user.id
 
     // Parse and validate
-    const body = await request.json()
     const { merchantId, merchant_name, full_name, phone } = accountUpdateSchema.parse(body)
 
     // Verify user has access to this merchant
