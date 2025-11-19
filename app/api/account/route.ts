@@ -146,7 +146,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    // Create a mutable response
+    const response = NextResponse.json({ data: null })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
