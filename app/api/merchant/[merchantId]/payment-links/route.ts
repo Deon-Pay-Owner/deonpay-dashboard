@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createApiClient } from '@/lib/supabase'
 
+const API_WORKER_URL = process.env.NEXT_PUBLIC_DEONPAY_API_URL || 'https://pagos.deonpay.mx'
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ merchantId: string }> }
@@ -49,73 +51,46 @@ export async function POST(
       )
     }
 
-    // Build line_items array
-    const lineItems = [{
-      product_id: body.product_id,
-      quantity: 1
-    }]
-
-    // Create payment link
-    const { data: paymentLink, error: createError } = await supabase
-      .from('payment_links')
-      .insert({
-        merchant_id: merchantId,
-        line_items: lineItems,
-        currency: body.currency || 'MXN',
-        active: body.active !== undefined ? body.active : true,
-        // Ensure custom_url is null if empty or undefined to avoid unique constraint conflicts
-        custom_url: body.custom_url && body.custom_url.trim() !== '' ? body.custom_url.trim() : null,
-        after_completion_url: body.after_completion?.redirect?.url,
-        after_completion_message: body.after_completion?.hosted_confirmation?.custom_message,
-        billing_address_collection: body.billing_address_collection || 'auto',
-        phone_number_collection: body.phone_number_collection || false,
-        type: 'payment'
-      })
-      .select()
+    // Get merchant's secret key for API Worker authentication
+    const { data: apiKey, error: keyError } = await supabase
+      .from('api_keys')
+      .select('secret_key')
+      .eq('merchant_id', merchantId)
+      .eq('key_type', 'test') // Use test key for now
+      .eq('is_active', true)
       .single()
 
-    if (createError) {
-      console.error('Error creating payment link:', createError)
-
-      // Check if it's a duplicate custom_url error
-      if (createError.code === '23505' && createError.message.includes('idx_payment_links_merchant_custom_url')) {
-        return NextResponse.json(
-          { error: { message: 'Esta URL personalizada ya está en uso. Por favor elige otra.' } },
-          { status: 409 }
-        )
-      }
-
+    if (keyError || !apiKey || !apiKey.secret_key) {
+      console.error('Error fetching API key:', keyError)
       return NextResponse.json(
-        { error: { message: createError.message } },
+        { error: 'Merchant API key not configured' },
         { status: 500 }
       )
     }
 
-    // Generate full URL for the payment link
-    // Use custom_url if available, otherwise use the payment link ID
-    const urlSlug = paymentLink.custom_url || paymentLink.id
-    const fullUrl = `https://link.deonpay.mx/${urlSlug}`
+    // Forward request to API Worker
+    const workerUrl = `${API_WORKER_URL}/api/v1/payment_links`
 
-    // Generate QR code URL using QR Server API
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(fullUrl)}`
+    const workerResponse = await fetch(workerUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey.secret_key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
 
-    // Update payment link with QR code URL
-    const { error: updateError } = await supabase
-      .from('payment_links')
-      .update({ qr_code_url: qrCodeUrl })
-      .eq('id', paymentLink.id)
-
-    if (updateError) {
-      console.error('Error updating QR code:', updateError)
-      // Don't fail the request, just log the error
+    if (!workerResponse.ok) {
+      const errorData = await workerResponse.json()
+      console.error('API Worker error:', errorData)
+      return NextResponse.json(
+        { error: errorData.error || { message: 'Failed to create payment link' } },
+        { status: workerResponse.status }
+      )
     }
 
-    // Return payment link with full URL and QR code
-    return NextResponse.json({
-      ...paymentLink,
-      url: fullUrl,
-      qr_code_url: qrCodeUrl
-    })
+    const paymentLink = await workerResponse.json()
+    return NextResponse.json(paymentLink)
   } catch (error) {
     console.error('Error in payment-links POST:', error)
     return NextResponse.json(
@@ -170,78 +145,49 @@ export async function GET(
       )
     }
 
-    // Get query parameters
-    const searchParams = request.nextUrl.searchParams
-    const activeParam = searchParams.get('active')
-    const limit = parseInt(searchParams.get('limit') || '100')
-
-    // Build query
-    let query = supabase
-      .from('payment_links')
-      .select('*')
+    // Get merchant's secret key for API Worker authentication
+    const { data: apiKey, error: keyError } = await supabase
+      .from('api_keys')
+      .select('secret_key')
       .eq('merchant_id', merchantId)
-      .order('created_at', { ascending: false })
-      .limit(limit)
+      .eq('key_type', 'test') // Use test key for now
+      .eq('is_active', true)
+      .single()
 
-    // Filter by active status if specified
-    if (activeParam !== null) {
-      query = query.eq('active', activeParam === 'true')
-    }
-
-    const { data: paymentLinks, error: linksError } = await query
-
-    if (linksError) {
-      console.error('Error fetching payment links:', linksError)
+    if (keyError || !apiKey || !apiKey.secret_key) {
+      console.error('Error fetching API key:', keyError)
       return NextResponse.json(
-        { error: 'Failed to fetch payment links' },
+        { error: 'Merchant API key not configured' },
         { status: 500 }
       )
     }
 
-    // Get all unique product IDs from line_items
-    const productIds = new Set<string>()
-    paymentLinks?.forEach(link => {
-      const lineItems = link.line_items as Array<{ product_id: string }>
-      lineItems?.forEach(item => {
-        if (item.product_id) productIds.add(item.product_id)
-      })
+    // Forward request to API Worker
+    const searchParams = request.nextUrl.searchParams
+    const workerUrl = `${API_WORKER_URL}/api/v1/payment_links?${searchParams.toString()}`
+
+    const workerResponse = await fetch(workerUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey.secret_key}`,
+        'Content-Type': 'application/json',
+      },
     })
 
-    // Fetch all products in one query
-    let productsMap = new Map()
-    if (productIds.size > 0) {
-      const { data: products } = await supabase
-        .from('products')
-        .select('*')
-        .in('id', Array.from(productIds))
-
-      products?.forEach(product => {
-        productsMap.set(product.id, product)
-      })
+    if (!workerResponse.ok) {
+      const errorData = await workerResponse.json()
+      console.error('API Worker error:', errorData)
+      return NextResponse.json(
+        { error: errorData.error || 'Failed to fetch payment links' },
+        { status: workerResponse.status }
+      )
     }
 
-    // Add URLs and products to each link
-    const linksWithUrls = paymentLinks?.map(link => {
-      const lineItems = link.line_items as Array<{ product_id: string }>
-      const firstProduct = lineItems?.[0]?.product_id
-        ? productsMap.get(lineItems[0].product_id)
-        : null
+    const workerData = await workerResponse.json()
 
-      // IMPORTANT: Always use payment link ID, NOT url_key
-      // The [urlKey]/page.tsx handles lookup by ID, custom_url, or url_key
-      const urlSlug = link.custom_url || link.id
-      const fullUrl = `https://link.deonpay.mx/${urlSlug}`
-      const qrCodeUrl = link.qr_code_url || `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(fullUrl)}`
-
-      return {
-        ...link,
-        url: fullUrl,
-        qr_code_url: qrCodeUrl,
-        products: firstProduct
-      }
-    })
-
-    return NextResponse.json({ data: linksWithUrls })
+    // Worker returns { object: 'list', data: [...], has_more: bool }
+    // Dashboard expects { data: [...] }
+    return NextResponse.json({ data: workerData.data || [] })
   } catch (error) {
     console.error('Error in payment-links GET:', error)
     return NextResponse.json(
