@@ -96,8 +96,13 @@ export async function DELETE(
   { params }: { params: Promise<{ merchantId: string; linkId: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { merchantId, linkId } = await params
+
+    // Create a mutable response
+    const response = NextResponse.json({ success: true })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser()

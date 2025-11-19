@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Get all invitations for a merchant
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const merchantId = searchParams.get('merchantId')
@@ -153,7 +153,11 @@ export async function GET(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    // Create a mutable response
+    const response = NextResponse.json({ invitations: [] })
+
+    // Use createApiClient for proper cookie handling
+    const supabase = createApiClient(request, response)
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()
