@@ -39,7 +39,7 @@ export default async function DesarrolladoresPage({
   console.log('[DEBUG] User ID:', user.id)
 
   // Transform the API keys to match the frontend interface
-  const apiKeys = rawApiKeys?.map(key => {
+  const apiKeys = (rawApiKeys as any[] || []).map((key: any) => {
     if (key.key_type === 'public') {
       return {
         id: key.id,
