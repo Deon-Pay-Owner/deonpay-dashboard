@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { X, Image as ImageIcon, Trash2 } from 'lucide-react'
+import { products } from '@/lib/api-client'
 
 interface CreateProductModalProps {
   merchantId: string
@@ -55,23 +56,14 @@ export default function CreateProductModal({
         payload.recurring_interval_count = parseInt(formData.recurring_interval_count)
       }
 
-      // Call the dashboard API to create the product
-      const response = await fetch(`/api/merchant/${merchantId}/products`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
+      // Call the API worker to create the product
+      const { data, error: apiError } = await products.create(payload)
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error?.message || 'Error al crear el producto')
+      if (apiError) {
+        throw new Error(apiError.message || 'Error al crear el producto')
       }
 
-      const result = await response.json()
-      console.log('Product created:', result)
-
+      console.log('Product created:', data)
       onSuccess()
     } catch (err: any) {
       setError(err.message || 'Error al crear el producto')

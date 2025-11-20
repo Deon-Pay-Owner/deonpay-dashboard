@@ -9,9 +9,11 @@ import {
   Edit,
   Trash2,
   Eye,
-  EyeOff
+  EyeOff,
+  AlertCircle
 } from 'lucide-react'
 import CreateProductModal from './CreateProductModal'
+import { products } from '@/lib/api-client'
 
 interface Product {
   id: string
@@ -28,11 +30,12 @@ interface Product {
 }
 
 export default function ProductosClient({ merchantId }: { merchantId: string }) {
-  const [products, setProducts] = useState<Product[]>([])
+  const [productsList, setProductsList] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchProducts()
@@ -40,29 +43,31 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
 
   const fetchProducts = async () => {
     setLoading(true)
+    setError(null)
     try {
       // Build query params
-      const params = new URLSearchParams({
-        limit: '100',
-      })
+      const params: { limit?: number; active?: boolean } = {
+        limit: 100
+      }
 
       if (activeFilter === 'active') {
-        params.append('active', 'true')
+        params.active = true
       } else if (activeFilter === 'inactive') {
-        params.append('active', 'false')
+        params.active = false
       }
 
-      const response = await fetch(`/api/merchant/${merchantId}/products?${params}`)
+      const { data, error: apiError } = await products.list(params)
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch products: ${response.statusText}`)
+      if (apiError) {
+        setError(apiError.message || 'Failed to fetch products')
+        setProductsList([])
+      } else {
+        setProductsList(data?.data || [])
       }
-
-      const data = await response.json()
-      setProducts(data.data || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching products:', error)
-      setProducts([])
+      setError(error.message || 'Network error')
+      setProductsList([])
     } finally {
       setLoading(false)
     }
@@ -91,7 +96,7 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
     return `Cada ${count > 1 ? count + ' ' : ''}${intervalText[interval || 'month']}`
   }
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = productsList.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description?.toLowerCase().includes(searchTerm.toLowerCase())
 
@@ -103,9 +108,9 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
   })
 
   const stats = {
-    total: products.length,
-    active: products.filter(p => p.active).length,
-    recurring: products.filter(p => p.type === 'recurring').length,
+    total: productsList.length,
+    active: productsList.filter(p => p.active).length,
+    recurring: productsList.filter(p => p.type === 'recurring').length,
   }
 
   return (
@@ -197,6 +202,25 @@ export default function ProductosClient({ merchantId }: { merchantId: string }) 
           <p className="text-3xl font-bold text-[var(--color-info)]">{stats.recurring}</p>
         </div>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
+          <AlertCircle size={20} className="text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-red-800 dark:text-red-300 mb-1">Error loading products</p>
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            {error.includes('API key') && (
+              <a
+                href={`/${merchantId}/desarrolladores`}
+                className="text-sm text-red-700 dark:text-red-300 underline mt-2 inline-block"
+              >
+                Configure API keys →
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Products Grid */}
       <div className="card">

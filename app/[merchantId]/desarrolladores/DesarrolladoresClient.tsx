@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Copy,
   Eye,
@@ -18,6 +18,7 @@ import {
   Zap,
 } from 'lucide-react'
 import Link from 'next/link'
+import { setPublicApiKey } from '@/lib/api-client'
 
 interface ApiKey {
   id: string
@@ -47,6 +48,13 @@ export default function DesarrolladoresClient({
 
   const publicKeys = apiKeys.filter(k => k.type === 'public')
   const secretKeys = apiKeys.filter(k => k.type === 'secret')
+
+  // Save the public API key to localStorage for use in API calls
+  useEffect(() => {
+    if (publicKeys.length > 0 && publicKeys[0].key) {
+      setPublicApiKey(publicKeys[0].key)
+    }
+  }, [publicKeys])
 
   const codeExample = `// Instalar el SDK
 npm install @deonpay/sdk
