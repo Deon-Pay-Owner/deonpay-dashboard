@@ -53,7 +53,7 @@ export async function GET(
       .from('api_keys')
       .select('secret_key')
       .eq('merchant_id', merchantId)
-      .eq('key_type', 'test') // Use test key for now
+      .eq('key_type', 'secret')
       .eq('is_active', true)
       .single()
 
@@ -157,7 +157,7 @@ export async function POST(
       .from('api_keys')
       .select('secret_key')
       .eq('merchant_id', merchantId)
-      .eq('key_type', 'test') // Use test key for now
+      .eq('key_type', 'secret')
       .eq('is_active', true)
       .single()
 
