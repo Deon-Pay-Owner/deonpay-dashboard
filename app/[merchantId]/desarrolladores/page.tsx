@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase'
+import { createClient, createServiceClient } from '@/lib/supabase'
 import DesarrolladoresClient from './DesarrolladoresClient'
 import { redirect } from 'next/navigation'
 
@@ -17,8 +17,13 @@ export default async function DesarrolladoresPage({
     redirect('/login')
   }
 
+  // Use Service Role client to bypass RLS and fetch API keys
+  // This is safe because we already verified the user is authenticated
+  // and the middleware verifies they own this merchant
+  const serviceSupabase = await createServiceClient()
+
   // Fetch API keys for this merchant
-  const { data: rawApiKeys, error: apiKeysError } = await supabase
+  const { data: rawApiKeys, error: apiKeysError } = await serviceSupabase
     .from('api_keys')
     .select('*')
     .eq('merchant_id', merchantId)

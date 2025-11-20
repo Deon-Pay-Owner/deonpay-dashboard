@@ -135,6 +135,26 @@ export function createApiClient(request: NextRequest, response: NextResponse) {
 }
 
 /**
+ * Create a Supabase client with Service Role Key (bypasses RLS)
+ * Use ONLY for server-side operations that require admin access
+ * NEVER expose this client to the frontend
+ */
+export async function createServiceClient() {
+  const { createClient: createSupabaseClient } = await import('@supabase/supabase-js')
+
+  return createSupabaseClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  )
+}
+
+/**
  * Verifica si un usuario tiene acceso a un merchant
  * @param userId - ID del usuario
  * @param merchantId - ID del merchant
