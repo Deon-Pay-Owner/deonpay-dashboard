@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, Link2, Package, Plus, CheckCircle2, Image as ImageIcon, Trash2 } from 'lucide-react'
+import { products, paymentLinks } from '@/lib/api-client'
 
 interface Product {
   id: string
@@ -75,11 +76,13 @@ export default function CreateLinkModal({
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`/api/merchant/${merchantId}/products?active=true&limit=100`)
-      if (!response.ok) throw new Error('Failed to fetch products')
+      const { data, error } = await products.list({ active: true, limit: 100 })
 
-      const data = await response.json()
-      setProducts(data.data || [])
+      if (error) {
+        throw new Error(error.message || 'Failed to fetch products')
+      }
+
+      setProducts(data || [])
     } catch (error) {
       console.error('Error fetching products:', error)
     } finally {
@@ -117,20 +120,11 @@ export default function CreateLinkModal({
         payload.recurring_interval_count = parseInt(newProductData.recurring_interval_count)
       }
 
-      const response = await fetch(`/api/merchant/${merchantId}/products`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
+      const { data: result, error: apiError } = await products.create(payload)
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error?.message || 'Error al crear el producto')
+      if (apiError) {
+        throw new Error(apiError.message || 'Error al crear el producto')
       }
-
-      const result = await response.json()
 
       // Add product to list and select it
       setProducts([result, ...products])
@@ -169,21 +163,12 @@ export default function CreateLinkModal({
     setLoading(true)
 
     try {
-      const url = link
-        ? `/api/merchant/${merchantId}/payment-links/${link.id}`
-        : `/api/merchant/${merchantId}/payment-links`
+      const { data, error: apiError } = link
+        ? await paymentLinks.update(link.id, formData)
+        : await paymentLinks.create(formData)
 
-      const response = await fetch(url, {
-        method: link ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error?.message || 'Failed to create payment link')
+      if (apiError) {
+        throw new Error(apiError.message || 'Failed to create payment link')
       }
 
       onSuccess()

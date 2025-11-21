@@ -16,6 +16,7 @@ import {
   TrendingUp
 } from 'lucide-react'
 import CreateLinkModal from './CreateLinkModal'
+import { paymentLinks } from '@/lib/api-client'
 
 interface PaymentLink {
   id: string
@@ -62,24 +63,23 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
   const fetchPaymentLinks = async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({
-        limit: '100',
-      })
+      const params: { limit?: number; active?: boolean } = {
+        limit: 100
+      }
 
       if (activeFilter === 'active') {
-        params.append('active', 'true')
+        params.active = true
       } else if (activeFilter === 'inactive') {
-        params.append('active', 'false')
+        params.active = false
       }
 
-      const response = await fetch(`/api/merchant/${merchantId}/payment-links?${params}`)
+      const { data, error } = await paymentLinks.list(params)
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch payment links: ${response.statusText}`)
+      if (error) {
+        throw new Error(error.message || 'Failed to fetch payment links')
       }
 
-      const data = await response.json()
-      setPaymentLinks(data.data || [])
+      setPaymentLinks(data || [])
     } catch (error) {
       console.error('Error fetching payment links:', error)
       setPaymentLinks([])
@@ -100,18 +100,12 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
 
   const toggleLinkStatus = async (link: PaymentLink) => {
     try {
-      const response = await fetch(`/api/merchant/${merchantId}/payment-links/${link.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          active: !link.active,
-        }),
+      const { error } = await paymentLinks.update(link.id, {
+        active: !link.active,
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to update payment link')
+      if (error) {
+        throw new Error(error.message || 'Failed to update payment link')
       }
 
       await fetchPaymentLinks()
@@ -127,12 +121,10 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
     }
 
     try {
-      const response = await fetch(`/api/merchant/${merchantId}/payment-links/${linkId}`, {
-        method: 'DELETE',
-      })
+      const { error } = await paymentLinks.delete(linkId)
 
-      if (!response.ok) {
-        throw new Error('Failed to delete payment link')
+      if (error) {
+        throw new Error(error.message || 'Failed to delete payment link')
       }
 
       await fetchPaymentLinks()
