@@ -82,7 +82,8 @@ export default function CreateLinkModal({
         throw new Error(error.message || 'Failed to fetch products')
       }
 
-      setProducts(data || [])
+      // Extract the products array from the nested data property
+      setProducts(data?.data || [])
     } catch (error) {
       console.error('Error fetching products:', error)
     } finally {
