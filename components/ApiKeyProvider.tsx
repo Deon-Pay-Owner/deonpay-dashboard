@@ -21,23 +21,18 @@ export default function ApiKeyProvider({ merchantId }: ApiKeyProviderProps) {
           return // Key already loaded
         }
 
-        // Fetch the public API key from Supabase
-        const response = await fetch(`/api/merchant/${merchantId}/api-keys`)
+        // Fetch the public API key from the existing endpoint
+        const response = await fetch(`/api/merchant/${merchantId}/api-key`)
 
         if (!response.ok) {
-          console.error('Failed to load API keys')
+          console.error('Failed to load API key')
           return
         }
 
-        const { keys } = await response.json()
+        const { api_key } = await response.json()
 
-        // Find the first active public key
-        const publicKey = keys?.find(
-          (key: any) => key.type === 'public' && key.is_active
-        )
-
-        if (publicKey) {
-          setPublicApiKey(publicKey.key)
+        if (api_key) {
+          setPublicApiKey(api_key)
         }
       } catch (error) {
         console.error('Error loading API key:', error)
