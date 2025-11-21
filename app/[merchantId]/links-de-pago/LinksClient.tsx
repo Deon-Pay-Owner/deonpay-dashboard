@@ -16,7 +16,7 @@ import {
   TrendingUp
 } from 'lucide-react'
 import CreateLinkModal from './CreateLinkModal'
-import { paymentLinks } from '@/lib/api-client'
+import { paymentLinks as paymentLinksAPI } from '@/lib/api-client'
 
 interface PaymentLink {
   id: string
@@ -73,7 +73,7 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
         params.active = false
       }
 
-      const { data, error } = await paymentLinks.list(params)
+      const { data, error } = await paymentLinksAPI.list(params)
 
       if (error) {
         throw new Error(error.message || 'Failed to fetch payment links')
@@ -100,7 +100,7 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
 
   const toggleLinkStatus = async (link: PaymentLink) => {
     try {
-      const { error } = await paymentLinks.update(link.id, {
+      const { error } = await paymentLinksAPI.update(link.id, {
         active: !link.active,
       })
 
@@ -121,7 +121,7 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
     }
 
     try {
-      const { error } = await paymentLinks.delete(linkId)
+      const { error } = await paymentLinksAPI.delete(linkId)
 
       if (error) {
         throw new Error(error.message || 'Failed to delete payment link')

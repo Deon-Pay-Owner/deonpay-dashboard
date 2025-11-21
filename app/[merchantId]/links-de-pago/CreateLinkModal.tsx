@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, Link2, Package, Plus, CheckCircle2, Image as ImageIcon, Trash2 } from 'lucide-react'
-import { products, paymentLinks } from '@/lib/api-client'
+import { products as productsAPI, paymentLinks as paymentLinksAPI } from '@/lib/api-client'
 
 interface Product {
   id: string
@@ -76,7 +76,7 @@ export default function CreateLinkModal({
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await products.list({ active: true, limit: 100 })
+      const { data, error } = await productsAPI.list({ active: true, limit: 100 })
 
       if (error) {
         throw new Error(error.message || 'Failed to fetch products')
@@ -120,7 +120,7 @@ export default function CreateLinkModal({
         payload.recurring_interval_count = parseInt(newProductData.recurring_interval_count)
       }
 
-      const { data: result, error: apiError } = await products.create(payload)
+      const { data: result, error: apiError } = await productsAPI.create(payload)
 
       if (apiError) {
         throw new Error(apiError.message || 'Error al crear el producto')
@@ -164,8 +164,8 @@ export default function CreateLinkModal({
 
     try {
       const { data, error: apiError } = link
-        ? await paymentLinks.update(link.id, formData)
-        : await paymentLinks.create(formData)
+        ? await paymentLinksAPI.update(link.id, formData)
+        : await paymentLinksAPI.create(formData)
 
       if (apiError) {
         throw new Error(apiError.message || 'Failed to create payment link')
