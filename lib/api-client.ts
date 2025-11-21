@@ -3,7 +3,8 @@
  * Helper functions to call the API worker (api.deonpay.mx)
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_DEONPAY_API_URL || 'https://api.deonpay.mx/api/v1'
+// NEXT_PUBLIC_ environment variables are available on both server and client
+const API_BASE_URL = 'https://api.deonpay.mx/api/v1'
 
 /**
  * Get the merchant's public API key from localStorage
