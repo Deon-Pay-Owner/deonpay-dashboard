@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { X, User, Mail, Phone, MapPin } from 'lucide-react'
+import { customers as customersAPI } from '@/lib/api-client'
 
 interface NewCustomerModalProps {
   merchantId: string
@@ -45,32 +46,21 @@ export default function NewCustomerModal({
     setLoading(true)
 
     try {
-      const billingAddress = {
-        line1: addressLine1 || undefined,
-        line2: addressLine2 || undefined,
-        city: city || undefined,
-        state: state || undefined,
-        postal_code: postalCode || undefined,
-        country: country || undefined,
+      const payload: any = {
+        email,
+        name: name || undefined,
+        phone: phone || undefined,
       }
 
-      const response = await fetch(`/api/merchant/${merchantId}/customers`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          name: name || undefined,
-          phone: phone || undefined,
-          description: description || undefined,
-          billing_address: Object.values(billingAddress).some(v => v) ? billingAddress : undefined,
-        }),
-      })
+      // Add metadata if description exists
+      if (description) {
+        payload.metadata = { description }
+      }
 
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Error al crear cliente')
+      const { data, error: apiError } = await customersAPI.create(payload)
+
+      if (apiError) {
+        throw new Error(apiError.message || 'Error al crear cliente')
       }
 
       // Reset form

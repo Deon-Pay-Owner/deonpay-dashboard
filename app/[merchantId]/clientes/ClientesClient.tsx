@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search, UserPlus, Users as UsersIcon, Mail, Phone, Calendar } from 'lucide-react'
 import NewCustomerModal from './NewCustomerModal'
+import { customers as customersAPI } from '@/lib/api-client'
 
 interface Customer {
   id: string
@@ -47,20 +48,38 @@ export default function ClientesClient({ merchantId }: { merchantId: string }) {
     try {
       setLoading(true)
 
-      const params = new URLSearchParams()
-      if (searchDebounced) params.append('search', searchDebounced)
-
-      const response = await fetch(`/api/merchant/${merchantId}/customers?${params}`)
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch customers')
+      const params: { limit?: number; email?: string } = {
+        limit: 100
       }
 
-      const data = await response.json()
-      setCustomers(data.data || [])
-      setStats(data.stats || { total: 0, active: 0, newThisMonth: 0 })
+      if (searchDebounced) {
+        params.email = searchDebounced
+      }
+
+      const { data, error } = await customersAPI.list(params)
+
+      if (error) {
+        throw new Error(error.message || 'Failed to fetch customers')
+      }
+
+      setCustomers(data || [])
+      // Note: The API doesn't return stats, so we calculate them from the data
+      const now = new Date()
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      const newThisMonth = (data || []).filter(
+        (c: Customer) => new Date(c.created_at) >= startOfMonth
+      ).length
+      const active = (data || []).filter((c: Customer) => c.transaction_count > 0).length
+
+      setStats({
+        total: (data || []).length,
+        active,
+        newThisMonth
+      })
     } catch (error) {
       console.error('Error fetching customers:', error)
+      setCustomers([])
+      setStats({ total: 0, active: 0, newThisMonth: 0 })
     } finally {
       setLoading(false)
     }
