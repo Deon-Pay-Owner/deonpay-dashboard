@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Sidebar from '@/components/Sidebar'
 import ClientHeader from '@/components/ClientHeader'
+import ApiKeyProvider from '@/components/ApiKeyProvider'
 
 export default async function MerchantLayout({
   children,
@@ -26,6 +27,9 @@ export default async function MerchantLayout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--color-surface)]">
+      {/* Load API key into localStorage on dashboard mount */}
+      <ApiKeyProvider merchantId={merchantId} />
+
       {/* Sidebar */}
       <Sidebar merchantId={merchantId} />
 
