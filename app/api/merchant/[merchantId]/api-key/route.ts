@@ -51,26 +51,31 @@ export async function GET(
       )
     }
 
-    // Get the active public API key for this merchant (we can show this one)
-    const { data: apiKey, error: apiKeyError } = await supabase
+    // Get all active public API keys for this merchant
+    const { data: apiKeys, error: apiKeyError } = await supabase
       .from('api_keys')
-      .select('public_key, secret_key_prefix')
+      .select('public_key, key_type, is_active, created_at')
       .eq('merchant_id', merchantId)
       .eq('key_type', 'public')
       .eq('is_active', true)
+      .not('public_key', 'is', null)
       .order('created_at', { ascending: false })
-      .limit(1)
-      .single()
 
-    if (apiKeyError || !apiKey) {
+    if (apiKeyError || !apiKeys || apiKeys.length === 0) {
       return NextResponse.json(
-        { error: 'No active API key found. Please create an API key first.' },
+        { error: 'No active public API key found. Please create one in Developers.' },
         { status: 404 }
       )
     }
 
-    return NextResponse.json({ 
-      api_key: apiKey.public_key,
+    // Prefer live keys over test keys
+    const liveKey = apiKeys.find(k => k.public_key.startsWith('pk_live_'))
+    const testKey = apiKeys.find(k => k.public_key.startsWith('pk_test_'))
+    const selectedKey = liveKey || testKey || apiKeys[0]
+
+    return NextResponse.json({
+      api_key: selectedKey.public_key,
+      mode: selectedKey.public_key.startsWith('pk_live_') ? 'live' : 'test',
       note: 'Secret keys are now hashed and cannot be retrieved. Use /regenerate-keys to get a new secret key.'
     })
   } catch (error) {
