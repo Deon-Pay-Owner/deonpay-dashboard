@@ -168,14 +168,20 @@ export default function CreateLinkModalV2({
       }
 
       // STEP 4: Create payment link
+      console.log('[CreateLink] Sending payload:', JSON.stringify(payload, null, 2))
       const { data: result, error: linkError } = await paymentLinksAPI.create(payload)
 
+      console.log('[CreateLink] API Response:', { result, error: linkError })
+
       if (linkError) {
+        console.error('[CreateLink] Link creation error:', linkError)
         throw new Error(linkError.message || 'Error al crear el link de pago')
       }
 
+      console.log('[CreateLink] Link created successfully:', result)
       onSuccess()
     } catch (err: any) {
+      console.error('[CreateLink] Exception caught:', err)
       setError(err.message || 'Error al crear el link de pago')
     } finally {
       setLoading(false)

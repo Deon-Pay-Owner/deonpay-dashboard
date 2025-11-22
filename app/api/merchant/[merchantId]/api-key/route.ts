@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createApiClient } from '@/lib/supabase'
+import { createApiClient, createServiceClient } from '@/lib/supabase'
 
 /**
  * DEPRECATED: This endpoint cannot return the full secret key anymore
@@ -16,7 +16,7 @@ export async function GET(
     // Create a mutable response
     const response = NextResponse.json({ data: null })
 
-    // Use createApiClient for proper cookie handling
+    // Use createApiClient for authentication
     const supabase = createApiClient(request, response)
 
     // Get the authenticated user
@@ -30,14 +30,11 @@ export async function GET(
     }
 
     // STEP 1: Get all active public API keys for this merchant
+    // Use service client to bypass RLS (api_keys table has RLS policies)
     // This is the source of truth - if api_keys exist, merchant exists
-    console.log('[DEBUG] Fetching API keys for merchant:', {
-      merchantId,
-      userId: user.id,
-      userEmail: user.email,
-    })
+    const serviceClient = await createServiceClient()
 
-    const { data: apiKeys, error: apiKeyError } = await supabase
+    const { data: apiKeys, error: apiKeyError } = await serviceClient
       .from('api_keys')
       .select('public_key, key_type, is_active, created_at')
       .eq('merchant_id', merchantId)
@@ -46,26 +43,8 @@ export async function GET(
       .not('public_key', 'is', null)
       .order('created_at', { ascending: false })
 
-    console.log('[DEBUG] API keys query result:', {
-      merchantId,
-      hasError: !!apiKeyError,
-      error: apiKeyError,
-      keysCount: apiKeys?.length || 0,
-      keys: apiKeys?.map(k => ({
-        prefix: k.public_key?.substring(0, 15) + '...',
-        keyType: k.key_type,
-        isActive: k.is_active,
-      })),
-    })
-
     // STEP 2: If no API keys found, return 404
     if (apiKeyError || !apiKeys || apiKeys.length === 0) {
-      console.error('[ERROR] No API keys found:', {
-        merchantId,
-        apiKeyError,
-        hasData: !!apiKeys,
-        dataLength: apiKeys?.length,
-      })
       return NextResponse.json(
         { error: 'No active public API keys found for this merchant' },
         { status: 404 }
