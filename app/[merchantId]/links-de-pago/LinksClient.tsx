@@ -365,7 +365,6 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
             setShowCreateModal(false)
             setSelectedLink(null)
           }}
-          link={selectedLink}
         />
       )}
     </div>
