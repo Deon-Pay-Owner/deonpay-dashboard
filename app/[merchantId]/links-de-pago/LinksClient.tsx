@@ -73,17 +73,47 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
         params.active = false
       }
 
-      const { data, error } = await paymentLinksAPI.list(params)
+      console.log('[LinksList] Fetching payment links with params:', params)
+      const response = await paymentLinksAPI.list(params)
+      console.log('[LinksList] API Response:', {
+        hasData: !!response.data,
+        isArray: Array.isArray(response.data),
+        dataType: typeof response.data,
+        error: response.error,
+        // Log actual data structure if it exists
+        dataKeys: response.data ? Object.keys(response.data) : null,
+        dataLength: Array.isArray(response.data) ? response.data.length : 'not array'
+      })
 
-      if (error) {
-        throw new Error(error.message || 'Failed to fetch payment links')
+      if (response.error) {
+        console.error('[LinksList] Error from API:', response.error)
+        throw new Error(response.error.message || 'Failed to fetch payment links')
       }
 
-      // Ensure data is always an array - critical defensive check
-      // Even if API returns unexpected format, we convert to empty array
-      setPaymentLinks(Array.isArray(data) ? data : [])
+      // The API returns { object: 'list', data: [...], has_more: boolean }
+      // Extract the data array from the response
+      let linksData = response.data
+
+      // Handle wrapped response format
+      if (linksData && typeof linksData === 'object' && 'data' in linksData) {
+        console.log('[LinksList] Detected wrapped response, extracting data array')
+        linksData = (linksData as any).data
+      }
+
+      // Ensure data is always an array
+      const finalLinks = Array.isArray(linksData) ? linksData : []
+      console.log('[LinksList] Setting payment links:', {
+        count: finalLinks.length,
+        firstLink: finalLinks[0] ? {
+          id: finalLinks[0].id,
+          url: finalLinks[0].url,
+          hasProducts: !!finalLinks[0].products
+        } : null
+      })
+
+      setPaymentLinks(finalLinks)
     } catch (error) {
-      console.error('Error fetching payment links:', error)
+      console.error('[LinksList] Error fetching payment links:', error)
       setPaymentLinks([])
     } finally {
       setLoading(false)
