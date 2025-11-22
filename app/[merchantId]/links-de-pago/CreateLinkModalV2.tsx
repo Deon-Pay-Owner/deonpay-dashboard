@@ -192,77 +192,77 @@ export default function CreateLinkModalV2({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-3xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
-              <Link2 className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+              <Link2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-              Crear Nuevo Link de Pago
+            <h2 className="text-base sm:text-xl font-semibold text-slate-900 dark:text-white">
+              Crear Link de Pago
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
           >
             <X className="w-5 h-5 text-slate-500" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <div className="p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-xs sm:text-sm text-red-600 dark:text-red-400">{error}</p>
             </div>
           )}
 
           {/* Mode Selection */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 sm:mb-3">
               Tipo de Link *
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setActiveMode('select_product')}
-                className={`p-4 rounded-lg border-2 transition-all ${
+                className={`p-3 sm:p-4 rounded-lg border-2 transition-all ${
                   activeMode === 'select_product'
                     ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-slate-300 dark:border-slate-600 hover:border-slate-400'
                 }`}
               >
-                <Package className="w-6 h-6 mx-auto mb-2 text-blue-600" />
-                <div className="text-sm font-medium">Producto Existente</div>
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2 text-blue-600" />
+                <div className="text-xs sm:text-sm font-medium">Producto Existente</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveMode('create_product')}
-                className={`p-4 rounded-lg border-2 transition-all ${
+                className={`p-3 sm:p-4 rounded-lg border-2 transition-all ${
                   activeMode === 'create_product'
                     ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-slate-300 dark:border-slate-600 hover:border-slate-400'
                 }`}
               >
-                <Plus className="w-6 h-6 mx-auto mb-2 text-green-600" />
-                <div className="text-sm font-medium">Crear Producto</div>
+                <Plus className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2 text-green-600" />
+                <div className="text-xs sm:text-sm font-medium">Crear Producto</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveMode('amount_only')}
-                className={`p-4 rounded-lg border-2 transition-all ${
+                className={`p-3 sm:p-4 rounded-lg border-2 transition-all ${
                   activeMode === 'amount_only'
                     ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-slate-300 dark:border-slate-600 hover:border-slate-400'
                 }`}
               >
-                <DollarSign className="w-6 h-6 mx-auto mb-2 text-purple-600" />
-                <div className="text-sm font-medium">Solo Monto</div>
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2 text-purple-600" />
+                <div className="text-xs sm:text-sm font-medium">Solo Monto</div>
               </button>
             </div>
           </div>
@@ -599,22 +599,22 @@ export default function CreateLinkModalV2({
               onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
               className="w-4 h-4 text-blue-600 rounded"
             />
-            <span className="text-sm text-slate-700 dark:text-slate-300">Activar link inmediatamente</span>
+            <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">Activar link inmediatamente</span>
           </label>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              className="px-4 py-2.5 sm:py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-sm sm:text-base"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="px-6 py-2.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm sm:text-base"
             >
               {loading ? 'Creando...' : 'Crear Link de Pago'}
             </button>
