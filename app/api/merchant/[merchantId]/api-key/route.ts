@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createApiClient, createServiceClient } from '@/lib/supabase'
 
+interface ApiKey {
+  public_key: string
+  key_type: string
+  is_active: boolean
+  created_at: string
+}
+
 /**
  * DEPRECATED: This endpoint cannot return the full secret key anymore
  * because secret keys are now hashed in the database.
@@ -34,7 +41,7 @@ export async function GET(
     // This is the source of truth - if api_keys exist, merchant exists
     const serviceClient = await createServiceClient()
 
-    const { data: apiKeys, error: apiKeyError } = await serviceClient
+    const { data: rawApiKeys, error: apiKeyError } = await serviceClient
       .from('api_keys')
       .select('public_key, key_type, is_active, created_at')
       .eq('merchant_id', merchantId)
@@ -42,6 +49,9 @@ export async function GET(
       .eq('is_active', true)
       .not('public_key', 'is', null)
       .order('created_at', { ascending: false })
+
+    // Type cast the result
+    const apiKeys = rawApiKeys as ApiKey[] | null
 
     // STEP 2: If no API keys found, return 404
     if (apiKeyError || !apiKeys || apiKeys.length === 0) {
