@@ -573,7 +573,7 @@ export default function CreateLinkModalV2({
                   value={formData.max_uses}
                   onChange={(e) => setFormData({ ...formData, max_uses: e.target.value })}
                   placeholder="Ilimitado"
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-sm"
+                  className="w-full px-2 sm:px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-xs sm:text-sm"
                 />
               </div>
 
@@ -585,7 +585,8 @@ export default function CreateLinkModalV2({
                   type="datetime-local"
                   value={formData.expires_at}
                   onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-sm"
+                  className="w-full px-2 sm:px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-xs sm:text-sm max-w-full"
+                  style={{ minWidth: 0 }}
                 />
               </div>
             </div>
