@@ -15,7 +15,7 @@ import {
   EyeOff,
   TrendingUp
 } from 'lucide-react'
-import CreateLinkModal from './CreateLinkModal'
+import CreateLinkModal from './CreateLinkModalV2'
 import { paymentLinks as paymentLinksAPI } from '@/lib/api-client'
 
 interface PaymentLink {
