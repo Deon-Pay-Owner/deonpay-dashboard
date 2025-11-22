@@ -192,9 +192,59 @@ export const paymentLinks = {
   },
 
   create: async (data: {
-    product_id: string
+    // Line items (products) - optional if using amount-only mode
+    line_items?: Array<{
+      type: 'product'
+      product_id: string
+      quantity: number
+    }>
+
+    // Completion settings
+    after_completion?: {
+      type: 'redirect' | 'hosted_confirmation'
+      redirect?: { url: string }
+      hosted_confirmation?: { custom_message?: string }
+    }
+
+    // Basic settings
+    currency?: string
     active?: boolean
-    metadata?: Record<string, any>
+    custom_url?: string
+
+    // Collection settings
+    phone_number_collection?: boolean
+
+    // Restrictions
+    restrictions?: {
+      completed_sessions?: {
+        enabled: boolean
+        limit: number
+      }
+    }
+
+    // Extended metadata for custom fields
+    metadata?: {
+      // Business logic fields
+      mode?: 'fixed_amount' | 'customer_chooses'
+      amount?: number // Required if line_items is empty
+
+      // Display fields
+      internal_name?: string
+      public_description?: string
+
+      // Additional collection flags
+      collect_email?: boolean
+      collect_name?: boolean
+
+      // Additional URLs
+      cancel_url?: string
+
+      // Timestamps
+      expires_at?: string
+
+      // Any other custom metadata
+      [key: string]: any
+    }
   }) => {
     return apiRequest('/payment_links', {
       method: 'POST',
@@ -208,6 +258,18 @@ export const paymentLinks = {
 
   update: async (linkId: string, data: Partial<{
     active: boolean
+    after_completion: {
+      type: 'redirect' | 'hosted_confirmation'
+      redirect?: { url: string }
+      hosted_confirmation?: { custom_message?: string }
+    }
+    phone_number_collection: boolean
+    restrictions: {
+      completed_sessions?: {
+        enabled: boolean
+        limit: number
+      }
+    }
     metadata: Record<string, any>
   }>) => {
     return apiRequest(`/payment_links/${linkId}`, {
