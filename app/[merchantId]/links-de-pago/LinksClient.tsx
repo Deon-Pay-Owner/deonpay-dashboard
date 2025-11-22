@@ -79,7 +79,9 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
         throw new Error(error.message || 'Failed to fetch payment links')
       }
 
-      setPaymentLinks(data || [])
+      // Ensure data is always an array - critical defensive check
+      // Even if API returns unexpected format, we convert to empty array
+      setPaymentLinks(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Error fetching payment links:', error)
       setPaymentLinks([])
@@ -139,7 +141,9 @@ export default function LinksClient({ merchantId }: { merchantId: string }) {
     return ((link.completed_sessions_count / link.click_count) * 100).toFixed(1)
   }
 
-  const filteredLinks = paymentLinks.filter(link => {
+  // Ensure paymentLinks is always an array before filtering (defensive programming)
+  const safeLinks = Array.isArray(paymentLinks) ? paymentLinks : []
+  const filteredLinks = safeLinks.filter(link => {
     const productName = link.products?.name || ''
     const matchesSearch = productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          link.url_key.toLowerCase().includes(searchTerm.toLowerCase()) ||
