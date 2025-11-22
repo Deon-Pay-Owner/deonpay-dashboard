@@ -29,17 +29,8 @@ export async function GET(
       )
     }
 
-    // STEP 1: Try to verify user has access to this merchant via merchants table
-    const { data: merchant, error: merchantError } = await supabase
-      .from('merchants')
-      .select('owner_user_id')
-      .eq('id', merchantId)
-      .single()
-
-    // STEP 2: Get all active public API keys for this merchant
-    // We check api_keys BEFORE failing on merchant validation because:
-    // - The merchantId might exist in api_keys but not yet in merchants table
-    // - We want to allow API key access even if merchant record is missing
+    // STEP 1: Get all active public API keys for this merchant
+    // This is the source of truth - if api_keys exist, merchant exists
     const { data: apiKeys, error: apiKeyError } = await supabase
       .from('api_keys')
       .select('public_key, key_type, is_active, created_at')
@@ -49,28 +40,27 @@ export async function GET(
       .not('public_key', 'is', null)
       .order('created_at', { ascending: false })
 
-    // STEP 3: Only return "Merchant not found" if BOTH validations fail
-    if ((merchantError || !merchant) && (apiKeyError || !apiKeys || apiKeys.length === 0)) {
+    // STEP 2: If no API keys found, return 404
+    if (apiKeyError || !apiKeys || apiKeys.length === 0) {
       return NextResponse.json(
-        { error: 'Merchant not found' },
+        { error: 'No active public API keys found for this merchant' },
         { status: 404 }
       )
     }
 
-    // STEP 4: If merchant exists, check ownership
-    // (Skip this check if merchant doesn't exist but api_keys do - allows API key access)
+    // STEP 3: Optional - verify merchant ownership for additional security
+    // But don't fail if merchants table query fails - api_keys is source of truth
+    const { data: merchant } = await supabase
+      .from('merchants')
+      .select('owner_user_id')
+      .eq('id', merchantId)
+      .single()
+
+    // Only check ownership if we successfully retrieved merchant record
     if (merchant && merchant.owner_user_id !== user.id) {
       return NextResponse.json(
         { error: 'Access denied' },
         { status: 403 }
-      )
-    }
-
-    // STEP 5: If we got here via api_keys but merchant query failed, we still have api_keys
-    if (apiKeyError || !apiKeys || apiKeys.length === 0) {
-      return NextResponse.json(
-        { error: 'No active public API key found. Please create one in Developers.' },
-        { status: 404 }
       )
     }
 
